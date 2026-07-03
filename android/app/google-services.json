@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "684694620784",
+    "project_id": "ativamente-97e20",
+    "storage_bucket": "ativamente-97e20.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684694620784:android:ff27852c1a6d6d17e5c2b5",
+        "android_client_info": {
+          "package_name": "com.example.app_academia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQMI_7bKRDREMeSDHgO-apzN60JxEwYI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
