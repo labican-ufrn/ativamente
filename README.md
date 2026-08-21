@@ -18,7 +18,7 @@ Aplicativo Flutter para auxiliar **idosos** na prática de exercícios físicos 
 
 ## Pré-requisitos
 
-1. **Flutter SDK** (canal estável, Dart ^3.12) — ver [instalação](https://docs.flutter.dev/get-started/install);
+1. **Flutter SDK 3.47.1-stable** (Dart ^3.12) — veja o [guia de instalação](docs/instalacao-flutter.md) (Ubuntu direto ou via ASDF; o projeto fixa a versão no `.tool-versions`);
 2. **Android Studio** ou VS Code com plugin Flutter/Dart;
 3. **Emulador Android** ou dispositivo físico com depuração USB;
 4. *(Opcional)* **Node.js + Firebase CLI**, apenas se for usar os emuladores locais ou fazer deploy:
