@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/pessoa.dart'; // We need to create/ensure this exists
+import '../config/app_environment.dart';
+import '../models/pessoa.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
@@ -76,8 +77,15 @@ class AuthController {
     );
 
     try {
-      final userCredential = await FirebaseAuth.instanceFor(app: tempApp)
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final tempAuth = FirebaseAuth.instanceFor(app: tempApp);
+      if (AppEnvironment.useEmulators) {
+        await tempAuth.useAuthEmulator(
+          AppEnvironment.emulatorHost,
+          AppEnvironment.authPort,
+        );
+      }
+      final userCredential = await tempAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
 
       final pessoa = Pessoa(
         id: userCredential.user!.uid,
