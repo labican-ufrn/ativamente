@@ -80,10 +80,11 @@ asdf install flutter 3.47.1-stable
 
 ### 3. Ativar a versão
 
-O repositório já traz o `.tool-versions`, que ativa automaticamente a versão dentro da pasta do projeto. Para definir globalmente (opcional):
+O repositório já traz o `.tool-versions`, que ativa automaticamente a versão dentro da pasta do projeto. Para ativar manualmente (asdf ≥ 0.16 substituiu os comandos `local`/`global` por `set`):
 
 ```bash
-asdf global flutter 3.47.1-stable
+asdf set flutter 3.47.1-stable          # grava no .tool-versions do diretório atual
+asdf set --home flutter 3.47.1-stable   # ativação global (equivalente ao antigo global)
 ```
 
 ### 4. Ajustes finos
