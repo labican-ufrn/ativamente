@@ -63,12 +63,13 @@ Gerencia a versão do Flutter por projeto via arquivo `.tool-versions` — este 
   sudo apt-get install -y jq
   ```
 
-### 2. Instalar o plugin e o SDK
+### 2. Instalar os plugins e SDKs
 
 ```bash
 asdf plugin add flutter
+asdf plugin add java
 cd ativamente            # pasta do projeto (com .tool-versions)
-asdf install             # lê .tool-versions e instala 3.47.1-stable
+asdf install             # lê .tool-versions e instala todas as versões listadas
 ```
 
 Para instalar manualmente uma versão específica:
@@ -76,14 +77,16 @@ Para instalar manualmente uma versão específica:
 ```bash
 asdf list all flutter | grep stable | tail   # versões disponíveis
 asdf install flutter 3.47.1-stable
+asdf install java openjdk-21
 ```
 
 ### 3. Ativar a versão
 
-O repositório já traz o `.tool-versions`, que ativa automaticamente a versão dentro da pasta do projeto. Para ativar manualmente (asdf ≥ 0.16 substituiu os comandos `local`/`global` por `set`):
+O repositório já traz o `.tool-versions`, que ativa automaticamente as versões dentro da pasta do projeto. Para ativar manualmente (asdf ≥ 0.16 substituiu os comandos `local`/`global` por `set`):
 
 ```bash
 asdf set flutter 3.47.1-stable          # grava no .tool-versions do diretório atual
+asdf set java openjdk-21                # adiciona Java ao .tool-versions local
 asdf set --home flutter 3.47.1-stable   # ativação global (equivalente ao antigo global)
 ```
 
@@ -96,8 +99,54 @@ asdf set --home flutter 3.47.1-stable   # ativação global (equivalente ao anti
   export FLUTTER_ROOT="$(asdf where flutter)"
   ```
 
+- **FlutterFire CLI** (`flutterfire`) não encontrado: adicione o diretório de binários globais do Dart ao PATH:
+
+  ```bash
+  export PATH="$HOME/.pub-cache/bin:$PATH"
+  ```
+
 - Equipe usando FVM? O asdf pode ler `.fvmrc` ativando `legacy_version_file = yes` no `~/.asdfrc`.
 - Alternativa equivalente: [mise](https://mise.jdx.dev/) (compatível com plugins e `.tool-versions` do asdf).
+
+---
+
+## Pré-requisitos para Firebase Emuladores
+
+Para rodar o app localmente com os emuladores Firebase, é necessário ter o **Java** e o **Firebase CLI** instalados:
+
+### 1. Java (via ASDF)
+
+```bash
+asdf plugin add java
+asdf install java openjdk-21
+```
+
+O `.tool-versions` do repositório já inclui `java openjdk-21` — basta rodar `asdf install` na pasta do projeto.
+
+### 2. Firebase CLI
+
+```bash
+npm install -g firebase-tools
+firebase login
+```
+
+### 3. Rodar o app com emuladores
+
+Em **dois terminais separados**:
+
+**Terminal 1 — Emuladores:**
+
+```bash
+firebase emulators:start
+```
+
+**Terminal 2 — App:**
+
+```bash
+flutter run -d web-server --web-port=3000 --dart-define=USE_FIREBASE_EMULATORS=true
+```
+
+Acesse `http://localhost:3000` no navegador.
 
 ---
 
