@@ -43,6 +43,8 @@ gantt
 
 **Objetivo:** app navegável sem bugs bloqueantes e rodando sobre o projeto Firebase oficial do Labican.
 
+> **Nota sobre execução local:** A Issue #7 (Migração Firebase) é a tarefa crítica que bloqueia validação em device com o projeto oficial. No entanto, **as Issues #5, #6 e #8 podem ser desenvolvidas e testadas localmente** usando o Firebase Emulator Suite com projeto pessoal de cada desenvolvedor (veja [`docs/execucao-local.md`](execucao-local.md)). A validação final em device com o projeto oficial será feita após a conclusão da Issue #7.
+
 ### T1.1 — Teste exploratório completo do app *(1 semana)*
 - **US relacionadas:** todas (insumo para priorização) · **Issue:** a criar (`docs` de teste)
 - **Descrição:** percorrer todos os fluxos do app e registrar o que funciona e o que não funciona.

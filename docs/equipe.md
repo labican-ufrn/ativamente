@@ -2,17 +2,26 @@
 
 App Flutter para auxiliar idosos na realização de exercícios físicos de forma saudável e segura (Labican/UFRN).
 
-## Membros
+## Docentes
 
-| # | Nome | Matrícula | GitHub |
-|---|------|-----------|--------|
-| 1 | Ícaro Nonato de Freitas | 20250031361 | [@Icaro-Nonato](https://github.com/Icaro-Nonato) |
-| 2 | Marcus Vinícius de Souza Azevedo | 20250032583 | [@MViniciusCoffe](https://github.com/MViniciusCoffe) |
-| 3 | Nathan Lopes Rodrigues | 20240060056 | [@nlopesr](https://github.com/nlopesr) |
-| 4 | Isaac Vilton Ribeiro | 20250031512 | [@Isaac-Ribeiro](https://github.com/Isaac-Ribeiro) |
-| 5 | Tomé Galileu Oliveira Arcanjo | 20240046173 | [@Tome-arcanjo](https://github.com/Tome-arcanjo) |
-| 6 | Wallison Valdemiro Silvino Dias | 20250023771 | [@wallisonvsdias](https://github.com/wallisonvsdias) |
-| 7 | Luiz Henrique Felix Guedes | 20240053740 | [@LuizFelixDev](https://github.com/LuizFelixDev) |
+| # | Nome | Papel | GitHub |
+|---|------|-------|--------|
+| 1 | Taciano Silva | Analista / Docente responsável | [@tacianosilva](https://github.com/tacianosilva) |
+| 2 | Flavius Gorgônio | Docente Coordenador | [@flgorgonio](https://github.com/flgorgonio) |
+| 3 | Karliane Vieira | Docente Coordenador | [@karlianev](https://github.com/karlianev) |
+| 4 | Fabrício Vale | Docente criador da v1 | [@fabriciovale79](https://github.com/fabriciovale79) |
+
+## Equipe de Desenvolvimento
+
+| # | Nome | Matrícula | Papel | GitHub |
+|---|------|-----------|-------|--------|
+| 1 | Ícaro Nonato de Freitas | 20250031361 | Líder Técnico | [@Icaro-Nonato](https://github.com/Icaro-Nonato) |
+| 2 | Marcus Vinícius de Souza Azevedo | 20250032583 | Dev | [@MViniciusCoffe](https://github.com/MViniciusCoffe) |
+| 3 | Nathan Lopes Rodrigues | 20240060056 | Dev | [@nlopesr](https://github.com/nlopesr) |
+| 4 | Isaac Vilton Ribeiro | 20250031512 | Dev | [@Isaac-Ribeiro](https://github.com/Isaac-Ribeiro) |
+| 5 | Tomé Galileu Oliveira Arcanjo | 20240046173 | Dev | [@Tome-arcanjo](https://github.com/Tome-arcanjo) |
+| 6 | Wallison Valdemiro Silvino Dias | 20250023771 | Dev | [@wallisonvsdias](https://github.com/wallisonvsdias) |
+| 7 | Luiz Henrique Felix Guedes | 20240053740 | Dev | [@LuizFelixDev](https://github.com/LuizFelixDev) |
 
 ## Tarefas de estudo (Sprint 1)
 
