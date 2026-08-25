@@ -6,16 +6,16 @@ App Flutter para auxiliar idosos na realização de exercícios físicos de form
 
 | # | Nome | Papel | GitHub |
 |---|------|-------|--------|
-| 1 | Taciano Silva | Analista / Docente responsável | [@tacianosilva](https://github.com/tacianosilva) |
-| 2 | Flavius Gorgônio | Docente Coordenador | [@flgorgonio](https://github.com/flgorgonio) |
-| 3 | Karliane Vieira | Docente Coordenador | [@karlianev](https://github.com/karlianev) |
+| 1 | Taciano Silva | Analista / Revisor de PR | [@tacianosilva](https://github.com/tacianosilva) |
+| 2 | Flavius Gorgônio | Docente Coordenador / Testes de aceitação | [@flgorgonio](https://github.com/flgorgonio) |
+| 3 | Karliane Vieira | Docente Coordenadora / Testes de aceitação | [@karlianev](https://github.com/karlianev) |
 | 4 | Fabrício Vale | Docente criador da v1 | [@fabriciovale79](https://github.com/fabriciovale79) |
 
 ## Equipe de Desenvolvimento
 
 | # | Nome | Matrícula | Papel | GitHub |
 |---|------|-----------|-------|--------|
-| 1 | Ícaro Nonato de Freitas | 20250031361 | Líder Técnico | [@Icaro-Nonato](https://github.com/Icaro-Nonato) |
+| 1 | Ícaro Nonato de Freitas | 20250031361 | Líder Técnico / Revisor de PR | [@Icaro-Nonato](https://github.com/Icaro-Nonato) |
 | 2 | Marcus Vinícius de Souza Azevedo | 20250032583 | Dev | [@MViniciusCoffe](https://github.com/MViniciusCoffe) |
 | 3 | Nathan Lopes Rodrigues | 20240060056 | Dev | [@nlopesr](https://github.com/nlopesr) |
 | 4 | Isaac Vilton Ribeiro | 20250031512 | Dev | [@Isaac-Ribeiro](https://github.com/Isaac-Ribeiro) |
