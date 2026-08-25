@@ -87,8 +87,7 @@ flutter pub get                 # instalar dependências
 flutter analyze                 # análise estática (obrigatório antes do PR)
 dart fix --apply                # corrigir problemas mecânicos de lint
 flutter test                    # testes unitários/widget
-flutter run                     # executar em debug
-flutter run --dart-define=USE_FIREBASE_EMULATORS=true  # executar conectado aos emuladores locais do Firebase
+flutter run -d web-server --web-port=3000 --dart-define-from-file=.env  # executar em debug com emuladores
 flutter build apk               # build Android
 flutter build web               # build Web
 ```
