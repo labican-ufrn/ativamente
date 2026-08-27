@@ -3,18 +3,18 @@
     "platforms": {
       "android": {
         "default": {
-          "projectId": "ativamente-97e20",
-          "appId": "1:684694620784:android:ff27852c1a6d6d17e5c2b5",
+          "projectId": "ativamente-estudo-nathan",
+          "appId": "1:348791242172:android:b48f8a5fbd27b0d5d4bfb9",
           "fileOutput": "android/app/google-services.json"
         }
       },
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "ativamente-97e20",
+          "projectId": "ativamente-estudo-nathan",
           "configurations": {
-            "android": "1:684694620784:android:ff27852c1a6d6d17e5c2b5",
-            "ios": "1:684694620784:ios:6061dc447c9f51fae5c2b5",
-            "web": "1:684694620784:web:989ba6a2bad3e87ae5c2b5"
+            "android": "1:348791242172:android:b48f8a5fbd27b0d5d4bfb9",
+            "ios": "1:348791242172:ios:01ae32eb1b3aa17bd4bfb9",
+            "web": "1:348791242172:web:b94c5646d395db7fd4bfb9"
           }
         }
       }

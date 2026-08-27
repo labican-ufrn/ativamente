@@ -47,29 +47,27 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBo5EpLcM_8ZroypFum2ZyFWB7U5ELt-kA',
-    appId: '1:684694620784:web:989ba6a2bad3e87ae5c2b5',
-    messagingSenderId: '684694620784',
-    projectId: 'ativamente-97e20',
-    authDomain: 'ativamente-97e20.firebaseapp.com',
-    storageBucket: 'ativamente-97e20.firebasestorage.app',
-    measurementId: 'G-F8Q1NZKHYS',
+    apiKey: 'AIzaSyBRbIBk9LweOotDwoWCf4jHR1XIg9czACk',
+    appId: '1:348791242172:web:b94c5646d395db7fd4bfb9',
+    messagingSenderId: '348791242172',
+    projectId: 'ativamente-estudo-nathan',
+    authDomain: 'ativamente-estudo-nathan.firebaseapp.com',
+    storageBucket: 'ativamente-estudo-nathan.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCQMI_7bKRDREMeSDHgO-apzN60JxEwYI8',
-    appId: '1:684694620784:android:ff27852c1a6d6d17e5c2b5',
-    messagingSenderId: '684694620784',
-    projectId: 'ativamente-97e20',
-    storageBucket: 'ativamente-97e20.firebasestorage.app',
+    apiKey: 'AIzaSyC7Yw5HfwnZglxddGJguYYPqDbboytHy_A',
+    appId: '1:348791242172:android:b48f8a5fbd27b0d5d4bfb9',
+    messagingSenderId: '348791242172',
+    projectId: 'ativamente-estudo-nathan',
+    storageBucket: 'ativamente-estudo-nathan.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD-eVuO9lplBe1TSk9kcka2TK88JBwzHf4',
-    appId: '1:684694620784:ios:6061dc447c9f51fae5c2b5',
-    messagingSenderId: '684694620784',
-    projectId: 'ativamente-97e20',
-    storageBucket: 'ativamente-97e20.firebasestorage.app',
+    apiKey: 'AIzaSyDK1dnlxUaUA2YyW6mxx9GgOpYLAsPh9Vc',
+    appId: '1:348791242172:ios:01ae32eb1b3aa17bd4bfb9',
+    messagingSenderId: '348791242172',
+    projectId: 'ativamente-estudo-nathan',
+    storageBucket: 'ativamente-estudo-nathan.firebasestorage.app',
     iosBundleId: 'com.example.appAcademia',
   );
 }
