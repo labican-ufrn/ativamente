@@ -10,6 +10,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/workout/workout_screen.dart';
 import 'screens/admin/add_user_screen.dart';
+import 'screens/admin/tarefas_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -50,6 +51,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/add-user',
         builder: (context, state) => const AddUserScreen(),
+      ),
+      GoRoute(
+        path: '/tarefas',
+        builder: (context, state) => const TarefasScreen(),
       ),
       GoRoute(
         path: '/profile',
