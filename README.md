@@ -124,6 +124,7 @@ flutter pub get          # instalar dependências
 flutter analyze          # análise estática (obrigatória antes do PR)
 dart fix --apply         # corrigir lints mecânicos automaticamente
 flutter test             # testes unitários/widget
+flutter test --coverage  # rodar testes e coletar cobertura (gera coverage/lcov.info)
 flutter run -d web-server --web-port=3000 --dart-define-from-file=.env  # executar em debug
 flutter build apk        # build Android
 flutter build web        # build Web
