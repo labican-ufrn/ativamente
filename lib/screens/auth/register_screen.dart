@@ -16,6 +16,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -36,7 +37,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.go('/'),
         ),
-        title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Criar Conta', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
@@ -59,7 +60,35 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
             const SizedBox(height: 48),
-            Text('Nome', style: Theme.of(context).textTheme.titleLarge),
+            if (_errorMessage != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  border: Border.all(color: Colors.red[800]!, width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red[800], size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Colors.red[800],
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+            Text(
+              'Nome completo', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             TextField(
               controller: _nameController,
@@ -111,6 +140,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 48),
             ElevatedButton(
               onPressed: () async {
+                setState(() {
+                  _errorMessage = null;
+                });
                 try {
                   await ref.read(authControllerProvider).register(
                     _nameController.text.trim(),
@@ -121,6 +153,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 } catch (e) {
                   if (context.mounted) {
                     final message = e is FirebaseAuthException ? (e.message ?? 'Erro ao cadastrar.') : e.toString().replaceAll('Exception: ', '');
+                    setState(() {
+                      _errorMessage = message;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
