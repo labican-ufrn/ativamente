@@ -53,5 +53,15 @@ void main() {
       final error = Exception('Some generic unknown error');
       expect(getFriendlyErrorMessage(error), equals('Não foi possível conectar. Verifique seus dados e tente novamente.'));
     });
+
+    test('deve retornar a mensagem original do Firebase para código desconhecido', () {
+      final error = FirebaseAuthException(code: 'codigo-desconhecido', message: 'Mensagem original de erro.');
+      expect(getFriendlyErrorMessage(error), equals('Mensagem original de erro.'));
+    });
+
+    test('deve retornar mensagem padrão para código desconhecido se mensagem for nula', () {
+      final error = FirebaseAuthException(code: 'codigo-desconhecido');
+      expect(getFriendlyErrorMessage(error), equals('Erro na autenticação. Verifique os dados e tente novamente.'));
+    });
   });
 }
