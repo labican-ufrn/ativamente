@@ -28,7 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = "Tela de Cadastro. Preencha seus dados. Campo nome. Campo email. Campo senha. Botão Cadastrar.";
+    const screenText = "AtivaMente. Tela de Cadastro. Preencha seus dados. Campo nome. Campo email. Campo senha. Botão Cadastrar.";
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -53,13 +53,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           children: [
             const SizedBox(height: 24),
             Text(
-              'Crie sua conta',
+              'AtivaMente',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 40,
               ),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 16),
+            Text(
+              'Cadastre-se para começar!',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 32),
             if (_errorMessage != null) ...[
               Container(
                 padding: const EdgeInsets.all(16),

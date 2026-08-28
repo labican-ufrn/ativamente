@@ -27,7 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = "Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.";
+    const screenText = "AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.";
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -52,13 +52,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             const SizedBox(height: 24),
             Text(
-              'Que bom ter você\naqui!',
+              'AtivaMente',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 40,
               ),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 16),
+            Text(
+              'Que bom ter você aqui!',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 32),
             if (_errorMessage != null) ...[
               Container(
                 padding: const EdgeInsets.all(16),
