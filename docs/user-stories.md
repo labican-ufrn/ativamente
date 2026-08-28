@@ -25,7 +25,7 @@
 - **Critérios de aceite:**
   - [x] Cadastro cria usuário no Firebase Auth e documento na coleção `Pessoas`.
   - [x] Após cadastro, usuário é redirecionado para a Home autenticado.
-  - [x] Erros (e-mail inválido/duplicado, senha fraca) exibidos via SnackBar.
+  - [x] Erros (e-mail inválido/duplicado, senha fraca) exibidos via SnackBar e em card vermelho de alerta no topo do formulário (acessibilidade para idosos).
 
 ### US02 — Autenticar-se
 **Como** usuário cadastrado, **quero** entrar com e-mail e senha, **para** ter acesso às telas privadas do app.
@@ -36,7 +36,7 @@
   - [x] Login com e-mail/senha válido leva à Home.
   - [x] Rotas privadas (`/home`, `/workout`, `/profile`, `/add-user`) redirecionam não autenticados para `/` (guarda em `lib/routes.dart`).
   - [x] Senha oculta com alternância visibilidade.
-- **Observações:** campo aceita "Email ou Nome" na UI, mas só e-mail funciona hoje — ajustar rótulo ou implementar login por nome.
+- **Observações:** campo aceita "Email ou Nome" na UI, mas o login funciona apenas via E-mail. Discussão aberta na Issue #21 para restringir e-mail de forma definitiva e adequar o rótulo para 'E-mail'.
 
 ### US03 — Encerrar sessão
 **Como** usuário autenticado, **quero** sair da conta, **para** impedir uso do app por outra pessoa no mesmo aparelho.
