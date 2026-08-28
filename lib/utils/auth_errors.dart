@@ -28,7 +28,7 @@ String getFriendlyErrorMessage(Object error) {
   if (errorStr.contains('user-not-found') || errorStr.contains('email_not_found')) {
     return 'Usuário não encontrado. Verifique seu e-mail.';
   }
-  if (errorStr.contains('wrong-password') || errorStr.contains('invalid_login_credential')) {
+  if (errorStr.contains('wrong-password') || errorStr.contains('invalid_login_credentials') || errorStr.contains('invalid_login_credential')) {
     return 'Senha incorreta. Tente novamente.';
   }
   if (errorStr.contains('invalid-credential') || errorStr.contains('invalid-email')) {
