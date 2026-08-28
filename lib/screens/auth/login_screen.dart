@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -140,8 +141,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   if (context.mounted) context.go('/home');
                 } catch (e) {
                   if (context.mounted) {
+                    final message = e is FirebaseAuthException ? (e.message ?? 'Erro ao fazer login.') : e.toString().replaceAll('Exception: ', '');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Erro ao fazer login: ${e.toString()}')),
+                      SnackBar(
+                        content: Text(
+                          message,
+                          style: const TextStyle(fontSize: 18), // Texto grande para acessibilidade
+                        ),
+                        backgroundColor: Colors.red[800],
+                        duration: const Duration(seconds: 4),
+                      ),
                     );
                   }
                 }
