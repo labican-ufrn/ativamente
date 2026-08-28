@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../config/app_environment.dart';
 import '../models/pessoa.dart';
+import '../utils/auth_errors.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
@@ -39,33 +40,51 @@ class AuthController {
   AuthController(this.ref);
 
   Future<void> login(String email, String password) async {
-    await ref.read(firebaseAuthProvider).signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+    try {
+      await ref.read(firebaseAuthProvider).signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+    } on FirebaseAuthException catch (e) {
+      throw FirebaseAuthException(
+        code: e.code,
+        message: getFriendlyErrorMessage(e),
+      );
+    } catch (e) {
+      throw Exception(getFriendlyErrorMessage(e));
+    }
   }
 
   Future<void> register(String name, String email, String password) async {
-    final userCredential = await ref.read(firebaseAuthProvider).createUserWithEmailAndPassword(
-          email: email,
-          password: password,
+    try {
+      final userCredential = await ref.read(firebaseAuthProvider).createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+      
+      // Create the Pessoa document in Firestore
+      if (userCredential.user != null) {
+        final pessoa = Pessoa(
+          id: userCredential.user!.uid,
+          nome: name,
+          nomeLogin: email, // Assuming email is used as login
+          dataNascimento: '', // Placeholder, update in profile
+          peso: 0.0,
+          altura: 0.0,
+          notificacoes: [],
         );
-    
-    // Create the Pessoa document in Firestore
-    if (userCredential.user != null) {
-      final pessoa = Pessoa(
-        id: userCredential.user!.uid,
-        nome: name,
-        nomeLogin: email, // Assuming email is used as login
-        dataNascimento: '', // Placeholder, update in profile
-        peso: 0.0,
-        altura: 0.0,
-        notificacoes: [],
+        await FirebaseFirestore.instance
+            .collection('Pessoas')
+            .doc(userCredential.user!.uid)
+            .set(pessoa.toJson());
+      }
+    } on FirebaseAuthException catch (e) {
+      throw FirebaseAuthException(
+        code: e.code,
+        message: getFriendlyErrorMessage(e),
       );
-      await FirebaseFirestore.instance
-          .collection('Pessoas')
-          .doc(userCredential.user!.uid)
-          .set(pessoa.toJson());
+    } catch (e) {
+      throw Exception(getFriendlyErrorMessage(e));
     }
   }
 

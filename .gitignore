@@ -58,3 +58,6 @@ firebase.json
 
 # DevTools - configuração local
 devtools_options.yaml
+
+# Skills de agente (artefatos auto-instalados via `npx skills add`)
+.agents/
