@@ -19,6 +19,11 @@ class ProfileScreen extends ConsumerWidget {
         title: const Text('Perfil', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
+            icon: const Icon(Icons.edit, size: 28),
+            tooltip: 'Editar perfil',
+            onPressed: () => context.push('/edit-profile'),
+          ),
+          IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
             onPressed: readScreen,
             tooltip: 'Ler tela',
