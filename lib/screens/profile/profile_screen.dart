@@ -35,10 +35,29 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           userDataAsync.when(
-            data: (pessoa) => Text(
-              pessoa?.nome ?? 'Nome do Usuário',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            data: (pessoa) => Column(
+              children: [
+                Text(
+                  pessoa?.nome ?? 'Nome do Usuário',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Nascimento: ${pessoa?.dataNascimento ?? "Não informada"}',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Peso: ${pessoa?.peso != null ? "${pessoa!.peso} kg" : "Não informado"}',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Altura: ${pessoa?.altura != null ? "${pessoa!.altura} m" : "Não informada"}',
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ],
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => const Text(
