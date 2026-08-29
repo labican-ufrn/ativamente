@@ -10,6 +10,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/workout/workout_screen.dart';
 import 'screens/admin/add_user_screen.dart';
+import 'screens/estudo/estudo_crud_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -54,6 +55,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/estudo-crud',
+        builder: (context, state) => const EstudoCrudScreen(),
       ),
     ],
   );

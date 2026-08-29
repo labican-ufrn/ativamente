@@ -69,6 +69,8 @@ class HomeScreen extends ConsumerWidget {
                 _buildMenuCard(context, 'Treinos na\nRua', Icons.directions_run, () {}),
                 const SizedBox(height: 16),
                 _buildMenuCard(context, 'Treinos\nSugeridos', Icons.assignment_turned_in, () {}),
+                const SizedBox(height: 16),
+                _buildMenuCard(context, 'Estudo CRUD\nFirestore', Icons.school, () => context.push('/estudo-crud')),
               ],
             ),
           ),
