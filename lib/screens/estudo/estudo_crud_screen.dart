@@ -228,7 +228,7 @@ class _EstudoCrudScreenState extends ConsumerState<EstudoCrudScreen> {
                                       ),
                                     )
                                   : Icon(_editingId == null ? Icons.add : Icons.save),
-                              label: Text(_editingId == null ? 'Adicionar' : 'Salvar Alteraçoes'),
+                              label: Text(_editingId == null ? 'Adicionar' : 'Salvar Alterações'),
                             ),
                           ),
                           if (_editingId != null) ...[
