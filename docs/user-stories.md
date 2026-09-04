@@ -73,12 +73,24 @@
 - **Evidência atual:** `home_screen.dart:45-59` e `profile_screen.dart:37-48` consomem `userDataProvider`; quando o snapshot não existe exibem `'Usuário'`/fallback genérico. Nenhuma outra tela exibe identidade.
 
 ### US06 — Editar meus dados biométricos
-**Como** usuário, **quero** editar altura, peso, data de nascimento, gênero, cidade, comorbidade e frequência de atividade física, **para** manter meu perfil atualizado conforme o design original (`Pessoa`) / backend (`PerfilUsuario`).
+**Como** usuário, **quero** editar altura, peso, data de nascimento e telefone, **para** manter meu perfil atualizado.
 
-- **Status:** 💤 Backlog (modelo já suporta: `pessoa.dart`)
-- **Critérios de aceite (proposta):**
-  - [ ] Formulário de edição com máscaras e validações equivalentes ao design original (Zod): data de nascimento com idade mínima de 14 anos, telefone com DDD etc.
-  - [ ] Alterações persistidas em `Pessoas/{uid}`.
+- **Status:** 🔜 Sprint 4 (Issue #13 / PR #23)
+- **Critérios de aceite / Regras de negócio:**
+  - [ ] **Data de Nascimento:**
+    - Formato com máscara automática (`DD/MM/AAAA`) e limite máximo de 10 caracteres.
+    - Validação contra datas de calendário inexistentes (ex.: 31/02/2020) e bloqueio de datas no futuro.
+    - Validação de idade mínima obrigatória de 14 anos.
+  - [ ] **Telefone com DDD:**
+    - Indicação explícita de formato no rótulo/hint (`(XX) XXXXX-XXXX`).
+    - Máscara automática e limite de caracteres (máximo 15 caracteres para `(XX) XXXXX-XXXX`).
+    - Exibição do número de telefone também na tela de visualização do Perfil (`ProfileScreen`).
+  - [ ] **Peso e Altura:**
+    - Aceita decimais com ponto ou vírgula (normalizar com `replaceAll(',', '.')`).
+    - Altura aceita em metros (0,50 a 2,50) ou em centímetros (50 a 250), normalizando para metros antes de persistir.
+  - [ ] **Acessibilidade & TTS:**
+    - Botão "Ler tela" (TTS) presente na AppBar da tela de edição.
+    - Fontes legíveis (fontSize >= 18) e áreas de toque ampliadas para o público idoso.
 
 ---
 
