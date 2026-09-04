@@ -10,6 +10,7 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     final firestore = FirebaseFirestore.instance;
     final exerciciosCollection = firestore.collection('Exercicios');
 
+    debugPrint('🌱 [Seed] Iniciando povoamento de exercícios e usuários padrão...');
     try {
       final jsonString = await rootBundle.loadString('assets/data/exercises.json');
       final List<dynamic> jsonList = jsonDecode(jsonString);
@@ -24,8 +25,9 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
           }
         }
       }
+      debugPrint('✅ [Seed] ${jsonList.length} exercícios semeados/atualizados no Firestore.');
     } catch (e) {
-      debugPrint('Erro ao carregar ou semear exercises.json: $e');
+      debugPrint('❌ Erro ao carregar ou semear exercises.json: $e');
     }
 
     // Seed Admin
@@ -36,6 +38,7 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
         'dev123456',
         'admin',
       );
+      debugPrint('✅ [Seed] Usuário Admin verificado/criado.');
     } catch (e) {
       debugPrint('Admin user might already exist or error: $e');
     }
@@ -48,9 +51,11 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
         'dev123456',
         'trainer',
       );
+      debugPrint('✅ [Seed] Usuário Personal Trainer verificado/criado.');
     } catch (e) {
       debugPrint('Trainer user might already exist or error: $e');
     }
+    debugPrint('🎉 [Seed] Processo de seed concluído com sucesso!');
   };
 });
 
