@@ -86,8 +86,8 @@
     - Máscara automática e limite de caracteres (máximo 15 caracteres para `(XX) XXXXX-XXXX`).
     - Exibição do número de telefone também na tela de visualização do Perfil (`ProfileScreen`).
   - [ ] **Peso e Altura:**
-    - Aceita decimais com ponto ou vírgula (`replaceAll(',', '.')`).
-    - Validação de limites humanos razoáveis (ex.: peso de 20 kg a 300 kg; altura de 0.50 m a 2.50 m ou em cm).
+    - Aceita decimais com ponto ou vírgula (normalizar com `replaceAll(',', '.')`).
+    - Altura aceita em metros (0,50 a 2,50) ou em centímetros (50 a 250), normalizando para metros antes de persistir.
   - [ ] **Acessibilidade & TTS:**
     - Botão "Ler tela" (TTS) presente na AppBar da tela de edição.
     - Fontes legíveis (fontSize >= 18) e áreas de toque ampliadas para o público idoso.
