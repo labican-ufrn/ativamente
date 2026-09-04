@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/pessoa.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/tts_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -155,11 +156,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const screenText = "Tela de edição de perfil. Altere seus dados pessoais como nome, data de nascimento, telefone, peso e altura.";
+    final readScreen = ref.watch(readScreenProvider(screenText));
     final userDataAsync = ref.watch(userDataProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Perfil'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.volume_up, size: 28),
+            onPressed: readScreen,
+            tooltip: 'Ler tela',
+          ),
+        ],
       ),
       body: userDataAsync.when(
         data: (pessoa) {
