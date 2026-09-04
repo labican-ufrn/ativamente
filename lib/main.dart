@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'config/app_environment.dart';
 import 'firebase_options.dart';
+import 'providers/seed_provider.dart';
 import 'routes.dart';
 import 'theme.dart';
 
@@ -23,6 +24,19 @@ void main() async {
       AppEnvironment.firestorePort,
     );
   }
+
+  // Executa seed automático no startup se a coleção 'Exercicios' estiver vazia
+  try {
+    final snapshot = await FirebaseFirestore.instance.collection('Exercicios').limit(1).get();
+    if (snapshot.docs.isEmpty) {
+      final container = ProviderContainer();
+      await container.read(seedDatabaseProvider)();
+      container.dispose();
+    }
+  } catch (e) {
+    debugPrint('Erro no seed automático de inicialização: $e');
+  }
+
   runApp(
     const ProviderScope(
       child: AppAcademia(),

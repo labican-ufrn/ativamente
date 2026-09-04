@@ -1,0 +1,152 @@
+[
+  {
+    "codigo": "cardio-01",
+    "nome": "Caminhada Orientada",
+    "descricao": "15 min de caminhada em ritmo constante com postura ereta e braços movimentando levemente.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "cardio-02",
+    "nome": "Polichinelo Adaptado",
+    "descricao": "3x de 1 min alternando passos laterais abrindo e fechando os braços sem impacto.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "cardio-03",
+    "nome": "Elevação de Joelhos Sentado",
+    "descricao": "3x de 10 repetições. Sentado firmemente, eleve um joelho de cada vez de forma controlada.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "musculo-01",
+    "nome": "Agachamento na Cadeira",
+    "descricao": "3x de 10 repetições. Sente e levante de uma cadeira firme mantendo a coluna alinhada.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "musculo-02",
+    "nome": "Flexão de Braço na Parede",
+    "descricao": "3x de 8 repetições. Apoie as mãos na parede na largura dos ombros e empurre suavemente.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "musculo-03",
+    "nome": "Elevação de Calcanhares",
+    "descricao": "3x de 12 repetições. Em pé apoiado na cadeira, eleve os calcanhares ficando na ponta dos pés.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "flex-01",
+    "nome": "Alongamento de Ombro e Braço",
+    "descricao": "Segure cada braço cruzado sobre o peito por 20 segundos respirando suavemente.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Flexibilidade",
+      "icone": "accessibility_new"
+    },
+    "tipo": {
+      "nome": "Alongamento",
+      "icone": "self_improvement"
+    }
+  },
+  {
+    "codigo": "flex-02",
+    "nome": "Alongamento Posterior Sentado",
+    "descricao": "Sentado na ponta da cadeira, estenda uma perna e incline o tronco à frente por 20 segundos.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Flexibilidade",
+      "icone": "accessibility_new"
+    },
+    "tipo": {
+      "nome": "Alongamento",
+      "icone": "self_improvement"
+    }
+  },
+  {
+    "codigo": "equil-01",
+    "nome": "Postura do Flamingo",
+    "descricao": "3x de 20 seg sustentando o corpo em uma perna só com apoio de segurança na cadeira.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Equilibrio",
+      "icone": "balance"
+    },
+    "tipo": {
+      "nome": "Estabilidade",
+      "icone": "accessibility"
+    }
+  },
+  {
+    "codigo": "rua-01",
+    "nome": "Caminhada na Praça",
+    "descricao": "20 min de caminhada ao ar livre em terreno plano e seguro.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "NaRua",
+      "icone": "park"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  }
+]

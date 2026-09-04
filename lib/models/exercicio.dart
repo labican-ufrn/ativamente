@@ -42,6 +42,7 @@ class Tipo {
 
 class Exercicio {
   final String id;
+  final String codigo;
   final String nome;
   final String descricao;
   final String midia;
@@ -51,6 +52,7 @@ class Exercicio {
 
   Exercicio({
     required this.id,
+    this.codigo = '',
     required this.nome,
     required this.descricao,
     required this.midia,
@@ -60,8 +62,10 @@ class Exercicio {
   });
 
   factory Exercicio.fromJson(Map<String, dynamic> json, String documentId) {
+    final effectiveId = documentId.isNotEmpty ? documentId : (json['codigo'] ?? '');
     return Exercicio(
-      id: documentId,
+      id: effectiveId,
+      codigo: json['codigo'] ?? effectiveId,
       nome: json['nome'] ?? '',
       descricao: json['descricao'] ?? '',
       midia: json['midia'] ?? '',
@@ -73,6 +77,7 @@ class Exercicio {
 
   Map<String, dynamic> toJson() {
     return {
+      if (codigo.isNotEmpty) 'codigo': codigo,
       'nome': nome,
       'descricao': descricao,
       'midia': midia,

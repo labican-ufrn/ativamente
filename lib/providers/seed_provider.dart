@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/exercicio.dart';
 import 'auth_provider.dart';
 
 final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
@@ -9,43 +10,22 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     final firestore = FirebaseFirestore.instance;
     final exerciciosCollection = firestore.collection('Exercicios');
 
-    final mockExercicios = [
-      Exercicio(
-        id: '', // Firestore will generate this
-        nome: 'Polichinelo',
-        descricao: '10 min',
-        midia: '',
-        categoria: Categoria(nome: 'Coracao', icone: 'favorite'),
-        tipo: Tipo(nome: 'Cardio', icone: 'directions_run'),
-      ),
-      Exercicio(
-        id: '',
-        nome: 'Caminhada',
-        descricao: '15 min',
-        midia: '',
-        categoria: Categoria(nome: 'Coracao', icone: 'favorite'),
-        tipo: Tipo(nome: 'Cardio', icone: 'directions_run'),
-      ),
-      Exercicio(
-        id: '',
-        nome: 'Flexão',
-        descricao: '3x de 10 repetições',
-        midia: '',
-        categoria: Categoria(nome: 'Musculo', icone: 'fitness_center'),
-        tipo: Tipo(nome: 'Força', icone: 'fitness_center'),
-      ),
-      Exercicio(
-        id: '',
-        nome: 'Agachamento',
-        descricao: '4x de 12 repetições',
-        midia: '',
-        categoria: Categoria(nome: 'Musculo', icone: 'fitness_center'),
-        tipo: Tipo(nome: 'Força', icone: 'fitness_center'),
-      ),
-    ];
+    try {
+      final jsonString = await rootBundle.loadString('assets/data/exercises.json');
+      final List<dynamic> jsonList = jsonDecode(jsonString);
 
-    for (var exercicio in mockExercicios) {
-      await exerciciosCollection.add(exercicio.toJson());
+      for (var item in jsonList) {
+        if (item is Map<String, dynamic>) {
+          final codigo = item['codigo'] as String? ?? '';
+          if (codigo.isNotEmpty) {
+            await exerciciosCollection.doc(codigo).set(item, SetOptions(merge: true));
+          } else {
+            await exerciciosCollection.add(item);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Erro ao carregar ou semear exercises.json: $e');
     }
 
     // Seed Admin
@@ -73,3 +53,4 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     }
   };
 });
+
