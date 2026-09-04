@@ -16,6 +16,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -26,7 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = "Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.";
+    const screenText = "AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.";
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -35,7 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.go('/'),
         ),
-        title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Acessar Conta', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
@@ -51,13 +52,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             const SizedBox(height: 24),
             Text(
-              'Que bom ter você\naqui!',
+              'AtivaMente',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 40,
               ),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 16),
+            Text(
+              'Que bom ter você aqui!',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 32),
+            if (_errorMessage != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  border: Border.all(color: Colors.red[800]!, width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red[800], size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Colors.red[800],
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
             Text(
               'Usuário',
               style: Theme.of(context).textTheme.titleLarge,
@@ -133,6 +171,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
+                setState(() {
+                  _errorMessage = null;
+                });
                 try {
                   await ref.read(authControllerProvider).login(
                     _emailController.text.trim(),
@@ -142,6 +183,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 } catch (e) {
                   if (context.mounted) {
                     final message = e is FirebaseAuthException ? (e.message ?? 'Erro ao fazer login.') : e.toString().replaceAll('Exception: ', '');
+                    setState(() {
+                      _errorMessage = message;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

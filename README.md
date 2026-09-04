@@ -44,10 +44,13 @@ cd ativamente
 
 # 2. Instale as dependências do sistema (se ainda não instalou)
 sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev \
-  liblzma-dev libstdc++-12-dev
+  liblzma-dev libstdc++-12-dev jq
 
 # 3. Instale os SDKs via ASDF (recomendado)
-asdf install    # lê .tool-versions e instala Flutter + Java
+. ~/.asdf/asdf.sh          # inicializa o asdf no terminal se necessário
+asdf plugin add flutter    # adiciona o plugin do Flutter
+asdf plugin add java       # adiciona o plugin do Java (para emuladores)
+asdf install               # lê .tool-versions e instala Flutter + Java
 
 # 4. Instale o Firebase CLI e faça login
 npm install -g firebase-tools
@@ -121,6 +124,7 @@ flutter pub get          # instalar dependências
 flutter analyze          # análise estática (obrigatória antes do PR)
 dart fix --apply         # corrigir lints mecânicos automaticamente
 flutter test             # testes unitários/widget
+flutter test --coverage  # rodar testes e coletar cobertura (gera coverage/lcov.info)
 flutter run -d web-server --web-port=3000 --dart-define-from-file=.env  # executar em debug
 flutter build apk        # build Android
 flutter build web        # build Web

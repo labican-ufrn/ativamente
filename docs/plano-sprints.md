@@ -82,6 +82,11 @@ gantt
 - **Descrição:** investigar por que `userDataProvider` não entrega o nome (doc `Pessoas` ausente? regras bloqueando? campos vazios?), aplicar fallback (`displayName`/e-mail) e autocriação do documento quando faltante.
 - **DoD:** critérios de aceite da US05 atendidos; caso de teste adicionado à matriz de QA.
 
+### Issues de Ajuste e Discussão Adicionais (Sprint 1)
+- **[Issue #20](https://github.com/labican-ufrn/ativamente/issues/20) — Inconsistência visual nos campos de login**: Identificada diferença estética entre os campos Usuário (azul/branco) e Senha (cinza/preto) no formulário de login. Planejada correção para padronizar todos os campos com estilo cinza consistente em conformidade com o tema do app.
+- **[Issue #21](https://github.com/labican-ufrn/ativamente/issues/21) — Discussão de identificação de login (E-mail vs Username)**: Discussão aberta para simplificar o acesso de usuários idosos unificando o login exclusivamente por E-mail (substituindo a terminologia vaga de "Usuário").
+- **[Issue #22](https://github.com/labican-ufrn/ativamente/issues/22) — Versionar o arquivo skills-lock.json**: Tarefa administrativa de infraestrutura para adicionar o arquivo de lock de customizações das skills dos agentes de IA ao Git, garantindo consistência de tooling entre os desenvolvedores.
+
 ---
 
 ## Sprint 2 — Detalhe do Exercício & Execução Marcada (04/09 → 18/09)
