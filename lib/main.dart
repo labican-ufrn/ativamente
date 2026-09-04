@@ -15,6 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   if (AppEnvironment.useEmulators) {
+    debugPrint('🔥 [Firebase] Conectando aos emuladores em ${AppEnvironment.emulatorHost} (Auth: ${AppEnvironment.authPort}, Firestore: ${AppEnvironment.firestorePort})...');
     await FirebaseAuth.instance.useAuthEmulator(
       AppEnvironment.emulatorHost,
       AppEnvironment.authPort,
@@ -23,6 +24,8 @@ void main() async {
       AppEnvironment.emulatorHost,
       AppEnvironment.firestorePort,
     );
+  } else {
+    debugPrint('☁️ [Firebase] Usando ambiente de NUVEM (Emuladores desativados).');
   }
 
   runApp(
