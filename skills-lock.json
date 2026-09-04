@@ -121,7 +121,7 @@
       "skillPath": "skills/firebase-crashlytics/SKILL.md",
       "computedHash": "1316a59236b4e2317e1d265df80e2c6c112e855bc15404ade19f2a2fe9cf2502"
     },
-    "firebase-data-connect": {
+    "firebase-data-connect-basics": {
       "source": "firebase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/firebase-data-connect-basics/SKILL.md",
