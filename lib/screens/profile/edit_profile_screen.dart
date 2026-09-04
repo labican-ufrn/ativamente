@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/pessoa.dart';
 import '../../providers/auth_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -20,8 +21,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _pesoController;
   late TextEditingController _alturaController;
   
+  bool _isInitialized = false;
   bool _isLoading = false;
-  String _userId = '';
 
   @override
   void initState() {
@@ -31,24 +32,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _nascimentoController = TextEditingController();
     _pesoController = TextEditingController();
     _alturaController = TextEditingController();
-    
-    // Load existing data if available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = ref.read(authStateProvider).value;
-      if (user != null) {
-        setState(() {
-           _userId = user.uid;
-        });
-        final pessoa = ref.read(userDataProvider).value;
-        if (pessoa != null) {
-          _nomeController.text = pessoa.nome;
-          _telefoneController.text = pessoa.numTelefone;
-          _nascimentoController.text = pessoa.dataNascimento;
-          _pesoController.text = pessoa.peso != 0.0 ? pessoa.peso.toString() : '';
-          _alturaController.text = pessoa.altura != 0.0 ? pessoa.altura.toString() : '';
-        }
-      }
-    });
+  }
+
+  void _initControllers(Pessoa pessoa) {
+    if (_isInitialized) return;
+    _nomeController.text = pessoa.nome;
+    _telefoneController.text = pessoa.numTelefone;
+    _nascimentoController.text = pessoa.dataNascimento;
+    _pesoController.text = pessoa.peso != 0.0 ? pessoa.peso.toString() : '';
+    _alturaController.text = pessoa.altura != 0.0 ? pessoa.altura.toString() : '';
+    _isInitialized = true;
   }
 
   @override
@@ -64,23 +57,33 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
     
+    final user = ref.read(authStateProvider).value;
+    if (user == null || user.uid.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuário não autenticado.')),
+        );
+      }
+      return;
+    }
+
     setState(() => _isLoading = true);
     
     try {
-final peso = double.tryParse(_pesoController.text.replaceAll(',', '.').trim());
-final altura = double.tryParse(_alturaController.text.replaceAll(',', '.').trim());
+      final peso = double.tryParse(_pesoController.text.replaceAll(',', '.').trim());
+      final altura = double.tryParse(_alturaController.text.replaceAll(',', '.').trim());
 
-final data = <String, dynamic>{
-  'nome': _nomeController.text.trim(),
-  'numTelefone': _telefoneController.text.trim(),
-  'dataNascimento': _nascimentoController.text.trim(),
-  if (peso != null) 'peso': peso,
-  if (altura != null) 'altura': altura,
-};
+      final data = <String, dynamic>{
+        'nome': _nomeController.text.trim(),
+        'numTelefone': _telefoneController.text.trim(),
+        'dataNascimento': _nascimentoController.text.trim(),
+        if (peso != null) 'peso': peso,
+        if (altura != null) 'altura': altura,
+      };
 
       await FirebaseFirestore.instance
           .collection('Pessoas')
-          .doc(_userId)
+          .doc(user.uid)
           .update(data);
           
       if (mounted) {
@@ -145,95 +148,115 @@ final data = <String, dynamic>{
 
   @override
   Widget build(BuildContext context) {
+    final userDataAsync = ref.watch(userDataProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Perfil'),
       ),
-      body: _userId.isEmpty && !_isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: _nomeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nome Completo',
-                        border: OutlineInputBorder(),
-                      ),
-                      style: const TextStyle(fontSize: 18),
-                      validator: (value) => 
-                          value == null || value.isEmpty ? 'Informe seu nome' : null,
+      body: userDataAsync.when(
+        data: (pessoa) {
+          if (pessoa != null) {
+            _initControllers(pessoa);
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _nomeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nome Completo',
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _nascimentoController,
-                      decoration: const InputDecoration(
-                        labelText: 'Data de Nascimento (DD/MM/AAAA)',
-                        border: OutlineInputBorder(),
-                        hintText: 'Ex: 25/12/1950',
-                      ),
-                      keyboardType: TextInputType.datetime,
-                      style: const TextStyle(fontSize: 18),
-                      validator: _validateDataNascimento,
+                    style: const TextStyle(fontSize: 18),
+                    validator: (value) => 
+                        value == null || value.isEmpty ? 'Informe seu nome' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _nascimentoController,
+                    decoration: const InputDecoration(
+                      labelText: 'Data de Nascimento (DD/MM/AAAA)',
+                      border: OutlineInputBorder(),
+                      hintText: 'Ex: 25/12/1950',
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _telefoneController,
-                      decoration: const InputDecoration(
-                        labelText: 'Telefone com DDD',
-                        border: OutlineInputBorder(),
-                        hintText: 'Ex: (84) 99999-9999',
-                      ),
-                      keyboardType: TextInputType.phone,
-                      style: const TextStyle(fontSize: 18),
-                      validator: _validateTelefone,
+                    keyboardType: TextInputType.datetime,
+                    style: const TextStyle(fontSize: 18),
+                    validator: _validateDataNascimento,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _telefoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Telefone com DDD',
+                      border: OutlineInputBorder(),
+                      hintText: 'Ex: (84) 99999-9999',
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _pesoController,
-                            decoration: const InputDecoration(
-                              labelText: 'Peso (kg)',
-                              border: OutlineInputBorder(),
-                            ),
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            style: const TextStyle(fontSize: 18),
+                    keyboardType: TextInputType.phone,
+                    style: const TextStyle(fontSize: 18),
+                    validator: _validateTelefone,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _pesoController,
+                          decoration: const InputDecoration(
+                            labelText: 'Peso (kg)',
+                            border: OutlineInputBorder(),
                           ),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: const TextStyle(fontSize: 18),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _alturaController,
-                            decoration: const InputDecoration(
-                              labelText: 'Altura (m)',
-                              border: OutlineInputBorder(),
-                            ),
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _saveProfile,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: _isLoading 
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Salvar Alterações', style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _alturaController,
+                          decoration: const InputDecoration(
+                            labelText: 'Altura (m)',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                  ],
-                ),
+                    child: _isLoading 
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Salvar Alterações', style: TextStyle(fontSize: 20)),
+                  ),
+                ],
               ),
             ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Erro ao carregar perfil: $err',
+              style: const TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
+
