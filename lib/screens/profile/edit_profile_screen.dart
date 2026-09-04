@@ -67,13 +67,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isLoading = true);
     
     try {
-      final data = {
-        'nome': _nomeController.text.trim(),
-        'numTelefone': _telefoneController.text.trim(),
-        'dataNascimento': _nascimentoController.text.trim(),
-        'peso': double.tryParse(_pesoController.text.replaceAll(',', '.').trim()) ?? 0.0,
-        'altura': double.tryParse(_alturaController.text.replaceAll(',', '.').trim()) ?? 0.0,
-      };
+final peso = double.tryParse(_pesoController.text.replaceAll(',', '.').trim());
+final altura = double.tryParse(_alturaController.text.replaceAll(',', '.').trim());
+
+final data = <String, dynamic>{
+  'nome': _nomeController.text.trim(),
+  'numTelefone': _telefoneController.text.trim(),
+  'dataNascimento': _nascimentoController.text.trim(),
+  if (peso != null) 'peso': peso,
+  if (altura != null) 'altura': altura,
+};
 
       await FirebaseFirestore.instance
           .collection('Pessoas')
