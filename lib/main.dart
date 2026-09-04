@@ -25,14 +25,11 @@ void main() async {
     );
   }
 
-  // Executa seed automático no startup se a coleção 'Exercicios' estiver vazia
+  // Executa seed automático e idempotente no startup para garantir o catálogo de exercícios
   try {
-    final snapshot = await FirebaseFirestore.instance.collection('Exercicios').limit(1).get();
-    if (snapshot.docs.isEmpty) {
-      final container = ProviderContainer();
-      await container.read(seedDatabaseProvider)();
-      container.dispose();
-    }
+    final container = ProviderContainer();
+    await container.read(seedDatabaseProvider)();
+    container.dispose();
   } catch (e) {
     debugPrint('Erro no seed automático de inicialização: $e');
   }
