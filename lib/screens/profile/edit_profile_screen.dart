@@ -120,7 +120,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       final year = int.parse(parts[2]);
       
       final date = DateTime(year, month, day);
+      if (date.year != year || date.month != month || date.day != day) {
+        return 'Data inválida';
+      }
+
       final today = DateTime.now();
+      if (date.isAfter(today)) {
+        return 'Data de nascimento não pode ser no futuro';
+      }
       
       int age = today.year - date.year;
       if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
