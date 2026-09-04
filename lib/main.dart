@@ -25,15 +25,6 @@ void main() async {
     );
   }
 
-  // Executa seed automático e idempotente no startup para garantir o catálogo de exercícios
-  try {
-    final container = ProviderContainer();
-    await container.read(seedDatabaseProvider)();
-    container.dispose();
-  } catch (e) {
-    debugPrint('Erro no seed automático de inicialização: $e');
-  }
-
   runApp(
     const ProviderScope(
       child: AppAcademia(),
@@ -41,11 +32,29 @@ void main() async {
   );
 }
 
-class AppAcademia extends ConsumerWidget {
+class AppAcademia extends ConsumerStatefulWidget {
   const AppAcademia({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppAcademia> createState() => _AppAcademiaState();
+}
+
+class _AppAcademiaState extends ConsumerState<AppAcademia> {
+  @override
+  void initState() {
+    super.initState();
+    // Executa seed automático e idempotente assim que a árvore de widgets estiver montada e o rootBundle de assets pronto
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await ref.read(seedDatabaseProvider)();
+      } catch (e) {
+        debugPrint('Erro no seed automático de inicialização: $e');
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
