@@ -77,15 +77,14 @@ Acesse `http://localhost:3000` no navegador.
 
 ### Primeiro acesso e dados de teste
 
-O app inicia na tela de boas-vindas — crie sua conta em **"Criar conta"** ou entre com um usuário existente.
+Ao executar o app com as variáveis de ambiente (`--dart-define-from-file=.env`), o aplicativo executa automaticamente o **seed inicial** no startup:
 
-Para popular o banco com exercícios de exemplo e contas de teste:
+1. **Exercícios de exemplo:** Povoa o Firestore com o catálogo completo de exercícios (`assets/data/exercises.json`);
+2. **Contas de teste:** Cria/verifica automaticamente os usuários de teste no Auth:
+   - **Admin:** `ativamente@ativamente.org` (senha: `dev123456`)
+   - **Personal Trainer:** `personal@ativamente.org` (senha: `dev123456`)
 
-1. Cadastre-se normalmente;
-2. No Console do Firebase (`ativamente-97e20`), promova seu documento em `Pessoas/{seu-uid}` com o campo `role: "admin"`;
-3. Faça login no app → **Perfil → Admin → Seed Database**.
-
-Isso cria os exercícios de exemplo e as contas `ativamente@ativamente.org` / `personal@ativamente.org` (senha padrão `dev123456`) com papéis `admin` e `trainer`.
+Você também pode se cadastrar normalmente na tela de boas-vindas.
 
 ## Banco de dados para testes locais
 
@@ -111,7 +110,7 @@ flutter run -d web-server --web-port=3000 --dart-define-from-file=.env
   ```bash
   FIREBASE_EMULATOR_HOST=10.0.2.2
   ```
-- O banco do emulador começa vazio: use **Perfil → Admin → Seed Database** para popular exercícios e contas de teste localmente.
+- O app executa o seed automático no startup assim que se conecta aos emuladores.
 - Com os emuladores ativos, o seed e o cadastro de usuários admin também são direcionados ao ambiente local.
 
 ## Comandos úteis
