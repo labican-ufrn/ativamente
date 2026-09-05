@@ -19,6 +19,11 @@ class ProfileScreen extends ConsumerWidget {
         title: const Text('Perfil', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
+            icon: const Icon(Icons.edit, size: 28),
+            tooltip: 'Editar perfil',
+            onPressed: () => context.push('/edit-profile'),
+          ),
+          IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
             onPressed: readScreen,
             tooltip: 'Ler tela',
@@ -35,11 +40,53 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           userDataAsync.when(
-            data: (pessoa) => Text(
-              pessoa?.nome ?? 'Nome do Usuário',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
+            data: (pessoa) {
+              final nome = (pessoa?.nome != null && pessoa!.nome.isNotEmpty)
+                  ? pessoa.nome
+                  : 'Nome do Usuário';
+              final dataNasc = (pessoa?.dataNascimento != null && pessoa!.dataNascimento.isNotEmpty)
+                  ? pessoa.dataNascimento
+                  : 'Não informada';
+              final telefone = (pessoa?.numTelefone != null && pessoa!.numTelefone.isNotEmpty)
+                  ? pessoa.numTelefone
+                  : 'Não informado';
+              final peso = (pessoa?.peso != null && pessoa!.peso > 0)
+                  ? '${pessoa.peso} kg'
+                  : 'Não informado';
+              final altura = (pessoa?.altura != null && pessoa!.altura > 0)
+                  ? '${pessoa.altura} m'
+                  : 'Não informada';
+
+              return Column(
+                children: [
+                  Text(
+                    nome,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Nascimento: $dataNasc',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Telefone: $telefone',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Peso: $peso',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Altura: $altura',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              );
+            },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => const Text(
               'Erro ao carregar',

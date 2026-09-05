@@ -44,7 +44,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 userDataAsync.when(
                   data: (pessoa) => Text(
-                    pessoa?.nome ?? 'Usuário',
+                    pessoa?.nome ?? 'Nome do Usuário',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
