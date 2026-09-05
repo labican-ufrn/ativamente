@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/pessoa.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/tts_provider.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -21,6 +22,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nascimentoController;
   late TextEditingController _pesoController;
   late TextEditingController _alturaController;
+
+  final _dateMask = MaskTextInputFormatter(mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
+  final _phoneMask = MaskTextInputFormatter(mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   
   bool _isInitialized = false;
   bool _isLoading = false;
@@ -154,6 +158,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return null;
   }
 
+  String? _validatePeso(String? value) {
+    if (value != null && value.isNotEmpty) {
+      final peso = double.tryParse(value.replaceAll(',', '.').trim());
+      if (peso == null || peso < 20.0 || peso > 300.0) {
+        return 'Insira um peso entre 20kg e 300kg';
+      }
+    }
+    return null;
+  }
+
+  String? _validateAltura(String? value) {
+    if (value != null && value.isNotEmpty) {
+      final altura = double.tryParse(value.replaceAll(',', '.').trim());
+      if (altura == null || altura < 0.50 || altura > 2.50) {
+        return 'Insira uma altura entre 0.50m e 2.50m';
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     const screenText = "Tela de edição de perfil. Altere seus dados pessoais como nome, data de nascimento, telefone, peso e altura.";
@@ -197,6 +221,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _nascimentoController,
+                    inputFormatters: [_dateMask],
                     decoration: const InputDecoration(
                       labelText: 'Data de Nascimento (DD/MM/AAAA)',
                       border: OutlineInputBorder(),
@@ -209,6 +234,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _telefoneController,
+                    inputFormatters: [_phoneMask],
                     decoration: const InputDecoration(
                       labelText: 'Telefone com DDD',
                       border: OutlineInputBorder(),
@@ -230,6 +256,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           ),
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           style: const TextStyle(fontSize: 18),
+                          validator: _validatePeso,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -242,6 +269,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           ),
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           style: const TextStyle(fontSize: 18),
+                          validator: _validateAltura,
                         ),
                       ),
                     ],

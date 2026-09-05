@@ -47,6 +47,9 @@ class ProfileScreen extends ConsumerWidget {
               final dataNasc = (pessoa?.dataNascimento != null && pessoa!.dataNascimento.isNotEmpty)
                   ? pessoa.dataNascimento
                   : 'Não informada';
+              final telefone = (pessoa?.numTelefone != null && pessoa!.numTelefone.isNotEmpty)
+                  ? pessoa.numTelefone
+                  : 'Não informado';
               final peso = (pessoa?.peso != null && pessoa!.peso > 0)
                   ? '${pessoa.peso} kg'
                   : 'Não informado';
@@ -64,6 +67,11 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   Text(
                     'Nascimento: $dataNasc',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Telefone: $telefone',
                     style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(height: 8),
