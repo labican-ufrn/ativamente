@@ -1,0 +1,182 @@
+[
+  {
+    "codigo": "coracao-cardio-01a",
+    "nome": "Caminhada Orientada",
+    "descricao": "15 min de caminhada em ritmo constante com postura ereta e braços movimentando levemente.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "coracao-cardio-01b",
+    "nome": "Caminhada em Esteira Leve",
+    "descricao": "15 min de caminhada em esteira com velocidade reduzida e apoio lateral.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "coracao-cardio-02a",
+    "nome": "Polichinelo Adaptado",
+    "descricao": "3x de 1 min alternando passos laterais abrindo e fechando os braços sem impacto.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "coracao-cardio-03a",
+    "nome": "Elevação de Joelhos Sentado",
+    "descricao": "3x de 10 repetições. Sentado firmemente, eleve um joelho de cada vez de forma controlada.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Coracao",
+      "icone": "favorite"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  },
+  {
+    "codigo": "musculo-forca-01a",
+    "nome": "Agachamento na Cadeira",
+    "descricao": "3x de 10 repetições. Sente e levante de uma cadeira firme mantendo a coluna alinhada.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "musculo-forca-01b",
+    "nome": "Agachamento Livre Suave",
+    "descricao": "3x de 8 repetições. Agachamento controlado sem carga adicional.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "musculo-forca-02a",
+    "nome": "Flexão de Braço na Parede",
+    "descricao": "3x de 8 repetições. Apoie as mãos na parede na largura dos ombros e empurre suavemente.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "musculo-forca-03a",
+    "nome": "Elevação de Calcanhares",
+    "descricao": "3x de 12 repetições. Em pé apoiado na cadeira, eleve os calcanhares ficando na ponta dos pés.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Musculo",
+      "icone": "fitness_center"
+    },
+    "tipo": {
+      "nome": "Forca",
+      "icone": "fitness_center"
+    }
+  },
+  {
+    "codigo": "flexibilidade-alongamento-01a",
+    "nome": "Alongamento de Ombro e Braço",
+    "descricao": "Segure cada braço cruzado sobre o peito por 20 segundos respirando suavemente.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Flexibilidade",
+      "icone": "accessibility_new"
+    },
+    "tipo": {
+      "nome": "Alongamento",
+      "icone": "self_improvement"
+    }
+  },
+  {
+    "codigo": "flexibilidade-alongamento-02a",
+    "nome": "Alongamento Posterior Sentado",
+    "descricao": "Sentado na ponta da cadeira, estenda uma perna e incline o tronco à frente por 20 segundos.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Flexibilidade",
+      "icone": "accessibility_new"
+    },
+    "tipo": {
+      "nome": "Alongamento",
+      "icone": "self_improvement"
+    }
+  },
+  {
+    "codigo": "equilibrio-estabilidade-01a",
+    "nome": "Postura do Flamingo",
+    "descricao": "3x de 20 seg sustentando o corpo em uma perna só com apoio de segurança na cadeira.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "Equilibrio",
+      "icone": "balance"
+    },
+    "tipo": {
+      "nome": "Estabilidade",
+      "icone": "accessibility"
+    }
+  },
+  {
+    "codigo": "narua-cardio-01a",
+    "nome": "Caminhada na Praça",
+    "descricao": "20 min de caminhada ao ar livre em terreno plano e seguro.",
+    "midia": "",
+    "statusRealizado": false,
+    "categoria": {
+      "nome": "NaRua",
+      "icone": "park"
+    },
+    "tipo": {
+      "nome": "Cardio",
+      "icone": "directions_run"
+    }
+  }
+]

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'config/app_environment.dart';
 import 'firebase_options.dart';
+import 'providers/seed_provider.dart';
 import 'routes.dart';
 import 'theme.dart';
 
@@ -14,6 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   if (AppEnvironment.useEmulators) {
+    debugPrint('🔥 [Firebase] Conectando aos emuladores em ${AppEnvironment.emulatorHost} (Auth: ${AppEnvironment.authPort}, Firestore: ${AppEnvironment.firestorePort})...');
     await FirebaseAuth.instance.useAuthEmulator(
       AppEnvironment.emulatorHost,
       AppEnvironment.authPort,
@@ -22,7 +24,10 @@ void main() async {
       AppEnvironment.emulatorHost,
       AppEnvironment.firestorePort,
     );
+  } else {
+    debugPrint('☁️ [Firebase] Usando ambiente de NUVEM (Emuladores desativados).');
   }
+
   runApp(
     const ProviderScope(
       child: AppAcademia(),
@@ -30,11 +35,29 @@ void main() async {
   );
 }
 
-class AppAcademia extends ConsumerWidget {
+class AppAcademia extends ConsumerStatefulWidget {
   const AppAcademia({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppAcademia> createState() => _AppAcademiaState();
+}
+
+class _AppAcademiaState extends ConsumerState<AppAcademia> {
+  @override
+  void initState() {
+    super.initState();
+    // Executa seed automático e idempotente assim que a árvore de widgets estiver montada e o rootBundle de assets pronto
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await ref.read(seedDatabaseProvider)();
+      } catch (e) {
+        debugPrint('Erro no seed automático de inicialização: $e');
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
 
     return MaterialApp.router(

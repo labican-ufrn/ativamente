@@ -165,12 +165,12 @@ Acesse `http://localhost:3000` no navegador.
 ## 5. Testar o app
 
 1. Acesse `http://localhost:3000`
-2. Crie uma conta em **"Criar conta"** (os dados ficam no emulador local)
-3. Faça login com as credenciais criadas
-4. Para popular o banco com exercícios de teste:
-   - Cadastre-se normalmente
-   - No Console do Firebase (http://localhost:4000), promova seu documento em `Pessoas/{seu-uid}` com o campo `role: "admin"`
-   - Faça login no app → **Perfil → Admin → Seed Database**
+2. O app executa o **seed automático** no startup:
+   - **Exercícios de exemplo:** O catálogo de `assets/data/exercises.json` é carregado no Firestore.
+   - **Contas de teste padrão:** Criadas automaticamente no Auth:
+     - **Admin:** `ativamente@ativamente.org` (senha: `dev123456`)
+     - **Personal Trainer:** `personal@ativamente.org` (senha: `dev123456`)
+3. Você também pode criar uma nova conta em **"Criar conta"** (os dados ficam armazenados no emulador local).
 
 ---
 
