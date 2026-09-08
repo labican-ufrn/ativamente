@@ -8,7 +8,7 @@ class WelcomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const screenText = "App Academia. Seja bem-vindo! Botão Entrar. Botão Criar conta.";
+    const screenText = "AtivaMente. Seja bem-vindo! Botão Entrar. Botão Criar conta.";
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -39,7 +39,7 @@ class WelcomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'App Academia',
+                'AtivaMente',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.displayLarge?.copyWith(
                   fontWeight: FontWeight.w900,
