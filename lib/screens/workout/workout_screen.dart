@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
+import '../../models/exercicio.dart';
 
 class WorkoutScreen extends ConsumerStatefulWidget {
   const WorkoutScreen({super.key});
@@ -161,7 +162,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                           itemCount: filteredExercicios.length,
                           itemBuilder: (context, index) {
                             final exercicio = filteredExercicios[index];
-                            return _buildExerciseTile(exercicio.nome, exercicio.descricao);
+                            return _buildExerciseTile(context, exercicio);
                           },
                         );
                       },
@@ -213,18 +214,18 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     );
   }
 
-  Widget _buildExerciseTile(String title, String subtitle) {
+  Widget _buildExerciseTile(BuildContext context, Exercicio exercicio) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        title: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 16)),
+        title: Text(exercicio.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        subtitle: Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.arrow_forward_ios),
         onTap: () {
-          // Navigate to exercise details
+          context.push('/exercise/${exercicio.id}', extra: exercicio);
         },
       ),
     );

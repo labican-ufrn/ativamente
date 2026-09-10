@@ -9,7 +9,9 @@ import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/workout/workout_screen.dart';
+import 'screens/workout/exercise_detail_screen.dart';
 import 'screens/admin/add_user_screen.dart';
+import 'models/exercicio.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -46,6 +48,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/workout',
         builder: (context, state) => const WorkoutScreen(),
+      ),
+      GoRoute(
+        path: '/exercise/:id',
+        builder: (context, state) => ExerciseDetailScreen(
+          exerciseId: state.pathParameters['id']!,
+          exercicio: state.extra as Exercicio?,
+        ),
       ),
       GoRoute(
         path: '/add-user',
