@@ -49,6 +49,7 @@ class Exercicio {
   final bool statusRealizado;
   final Categoria categoria;
   final Tipo tipo;
+  final int intensidade;
 
   Exercicio({
     required this.id,
@@ -59,7 +60,8 @@ class Exercicio {
     this.statusRealizado = false,
     required this.categoria,
     required this.tipo,
-  });
+    required this.intensidade,
+  }) : assert(intensidade >= 1 && intensidade <= 10, 'Intensidade deve estar entre 1 e 10');
 
   factory Exercicio.fromJson(Map<String, dynamic> json, String documentId) {
     final effectiveId = documentId.isNotEmpty ? documentId : (json['codigo'] ?? '');
@@ -72,6 +74,7 @@ class Exercicio {
       statusRealizado: json['statusRealizado'] ?? false,
       categoria: Categoria.fromJson(json['categoria'] ?? {}),
       tipo: Tipo.fromJson(json['tipo'] ?? {}),
+      intensidade: json['intensidade'] as int? ?? 1,
     );
   }
 
@@ -84,6 +87,7 @@ class Exercicio {
       'statusRealizado': statusRealizado,
       'categoria': categoria.toJson(),
       'tipo': tipo.toJson(),
+      'intensidade': intensidade,
     };
   }
 }
