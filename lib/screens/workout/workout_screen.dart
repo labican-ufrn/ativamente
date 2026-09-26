@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
+import '../../providers/active_exercise_provider.dart';
 
 class WorkoutScreen extends ConsumerStatefulWidget {
   const WorkoutScreen({super.key});
@@ -13,33 +13,7 @@ class WorkoutScreen extends ConsumerStatefulWidget {
 }
 
 class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
-  int _seconds = 0;
-  Timer? _timer;
-  bool _isRunning = false;
   String _selectedCategory = 'Coracao'; // Coracao or Musculo
-
-  void _toggleTimer() {
-    setState(() {
-      _isRunning = !_isRunning;
-      if (_isRunning) {
-        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          setState(() {
-            _seconds++;
-          });
-        });
-      } else {
-        _timer?.cancel();
-      }
-    });
-  }
-
-  void _stopTimer() {
-    setState(() {
-      _isRunning = false;
-      _timer?.cancel();
-      _seconds = 0;
-    });
-  }
 
   String _formatTime(int seconds) {
     int minutes = seconds ~/ 60;
@@ -48,13 +22,9 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
   }
 
   @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final activeState = ref.watch(activeExerciseProvider);
+
     const screenText = "Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Lista de exercícios.";
     final readScreen = ref.watch(readScreenProvider(screenText));
 
@@ -82,7 +52,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             child: Column(
               children: [
                 Text(
-                  _formatTime(_seconds),
+_formatTime(activeState.elapsedSeconds),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: 72,
@@ -94,12 +64,18 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: _toggleTimer,
+                      onTap: () {
+                        if (activeState.exerciseId != null) {
+                          ref.read(activeExerciseProvider.notifier).toggleExercise(activeState.exerciseId!);
+                        }
+                      },
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+backgroundColor: activeState.exerciseId != null
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.4),
                         child: Icon(
-                          _isRunning ? Icons.pause : Icons.play_arrow,
+                          activeState.isRunning ? Icons.pause : Icons.play_arrow,
                           size: 40,
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -107,10 +83,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                     ),
                     const SizedBox(width: 24),
                     InkWell(
-                      onTap: _stopTimer,
+                      onTap: () {
+                        ref.read(activeExerciseProvider.notifier).stopExercise();
+                      },
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+backgroundColor: activeState.exerciseId != null
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.4),
                         child: Icon(
                           Icons.stop,
                           size: 40,
@@ -161,7 +141,49 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                           itemCount: filteredExercicios.length,
                           itemBuilder: (context, index) {
                             final exercicio = filteredExercicios[index];
-                            return _buildExerciseTile(exercicio.nome, exercicio.descricao);
+                            final isActive = activeState.exerciseId == exercicio.id;
+                            
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 16.0),
+                              elevation: isActive ? 4 : 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: isActive 
+                                    ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 2) 
+                                    : BorderSide.none,
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                title: Row(
+                                  children: [
+                                    Expanded(child: Text(exercicio.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                                    if (isActive)
+                                      const Icon(Icons.timer, color: Colors.green),
+                                  ],
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
+                                    if (isActive) ...[
+                                      const SizedBox(height: 8),
+                                      const Text('Em execução', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ],
+                                ),
+                                trailing: IconButton(
+                                  icon: Icon(isActive && activeState.isRunning ? Icons.pause_circle_filled : Icons.play_circle_fill),
+                                  color: Theme.of(context).colorScheme.primary,
+                                  iconSize: 36,
+                                  onPressed: () {
+                                    ref.read(activeExerciseProvider.notifier).toggleExercise(exercicio.id);
+                                  },
+                                ),
+                                onTap: () {
+                                  // Quando a Issue #9 estiver pronta, o desenvolvedor adicionará a navegação para os detalhes aqui.
+                                },
+                              ),
+                            );
                           },
                         );
                       },
@@ -212,21 +234,5 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
       ),
     );
   }
-
-  Widget _buildExerciseTile(String title, String subtitle) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        title: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 16)),
-        trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: () {
-          // Navigate to exercise details
-        },
-      ),
-    );
-  }
 }
+
