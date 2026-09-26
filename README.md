@@ -136,6 +136,7 @@ firebase deploy --only hosting  # publicar Web (requer firebase login)
 lib/
 ├── main.dart            # inicialização Firebase + ProviderScope
 ├── routes.dart          # go_router + guarda de rotas públicas/privadas
+│                        #   (ver comentário no arquivo: convenção go vs push)
 ├── theme.dart           # tema visual do app
 ├── models/              # modelos com fromJson/toJson (Pessoa, Exercicio…)
 ├── providers/           # Riverpod (auth, firestore, tts, seed)

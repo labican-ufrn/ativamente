@@ -62,7 +62,11 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => context.pop(),
+          // Esta tela é sempre alcançada via context.go('/workout') (troca de
+          // seção, não empilhamento), então não há rota anterior para dar
+          // pop(). Usamos go('/home') para voltar preservando o estado de
+          // autenticação. Ver convenção de navegação em routes.dart.
+          onPressed: () => context.go('/home'),
         ),
         title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
