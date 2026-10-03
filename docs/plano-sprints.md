@@ -124,9 +124,10 @@ gantt
 
 ## Sprint 4 — Consistência de Perfil & Qualidade (02/10 → 16/10)
 
-### T4.1 — Perfil com dados completos *(~1,5 semanas)*
-- **US:** US06 (escopo mínimo: exibir; edição se houver folga) · **Prioridade:** Média
-- **Escopo:** Perfil exibe altura, peso, data de nascimento e demais campos existentes no documento; consistência do nome entre telas (Home, Perfil, cabeçalhos).
+### T4.1 — Perfil com dados completos *(Concluída antecipadamente)*
+- **US:** US06 · **Prioridade:** Média · **Status:** ✅ Concluída (PR #23 / Issue #13)
+- **Escopo:** Perfil exibe altura, peso, data de nascimento, telefone e demais campos biométricos; formulário de edição com máscaras e validações; consistência visual e TTS.
+
 
 ### T4.2 — QA de regressão + atualização de documentação *(1 semana)*
 - **Descrição:** reexecutar matriz completa (`qa-matriz-testes.md`) incluindo os novos fluxos (detalhe, execução, alertas, registro); atualizar `user-stories.md` e `README.md`; fechar issues resolvidas.
