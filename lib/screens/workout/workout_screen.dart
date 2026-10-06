@@ -225,7 +225,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
         subtitle: Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.arrow_forward_ios),
         onTap: () {
-          context.push('/exercise/${exercicio.id}', extra: exercicio);
+          context.push('/exercise/${exercicio.id}');
         },
       ),
     );
