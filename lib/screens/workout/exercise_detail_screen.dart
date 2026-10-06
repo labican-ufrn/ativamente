@@ -6,46 +6,86 @@ import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
 
 class ExerciseDetailScreen extends ConsumerWidget {
-  const ExerciseDetailScreen({super.key, required this.exerciseId, this.exercicio});
+  const ExerciseDetailScreen({super.key, required this.exerciseId});
 
   final String exerciseId;
-  final Exercicio? exercicio;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (exercicio != null) {
-      return _ExerciseDetailBody(exercicio: exercicio!);
-    }
-
     return ref.watch(exerciciosProvider).when(
       data: (exercicios) {
-        final found = exercicios.where((e) => e.id == exerciseId).toList();
-        if (found.isEmpty) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () => context.pop(),
-              ),
-              title: const Text('Exercício'),
-            ),
-            body: const Center(child: Text('Exercício não encontrado.')),
-          );
+        for (final exercicio in exercicios) {
+          if (exercicio.id == exerciseId) {
+            return _ExerciseDetailBody(exercicio: exercicio);
+          }
         }
-        return _ExerciseDetailBody(exercicio: found.first);
+        return const _StateScreen(
+          title: 'Exercício',
+          message: 'Exercício não encontrado.',
+          screenText: 'Detalhe do exercício. Exercício não encontrado.',
+        );
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      loading: () => const _StateScreen(
+        title: 'Exercício',
+        message: 'Carregando exercício...',
+        screenText: 'Detalhe do exercício. Carregando.',
+        showProgress: true,
       ),
-      error: (err, stack) => Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => context.pop(),
-          ),
-          title: const Text('Exercício'),
+      error: (err, stack) {
+        debugPrint('Erro ao buscar exercício $exerciseId: $err');
+        return _StateScreen(
+          title: 'Exercício',
+          message: 'Não foi possível carregar o exercício. Tente novamente.',
+          screenText: 'Detalhe do exercício. Erro ao carregar. Tente novamente.',
+        );
+      },
+    );
+  }
+}
+
+class _StateScreen extends ConsumerWidget {
+  const _StateScreen({
+    required this.title,
+    required this.message,
+    required this.screenText,
+    this.showProgress = false,
+  });
+
+  final String title;
+  final String message;
+  final String screenText;
+  final bool showProgress;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final readScreen = ref.watch(readScreenProvider(screenText));
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => context.pop(),
         ),
-        body: Center(child: Text('Erro: $err')),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.volume_up, size: 28),
+            onPressed: readScreen,
+            tooltip: 'Ler tela',
+          ),
+        ],
+      ),
+      body: Center(
+        child: showProgress
+            ? const CircularProgressIndicator()
+            : Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
       ),
     );
   }
@@ -125,22 +165,24 @@ class _MediaPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AspectRatio(
       aspectRatio: 16 / 9,
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.play_circle_outline, size: 56, color: Colors.grey[600]),
+            Icon(Icons.play_circle_outline, size: 56, color: colorScheme.onSurfaceVariant),
             const SizedBox(height: 8),
             Text(
               'Vídeo em breve',
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 16, color: colorScheme.onSurfaceVariant),
             ),
           ],
         ),
@@ -157,17 +199,19 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Chip(
-      avatar: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+      avatar: Icon(icon, color: colorScheme.primary, size: 20),
       label: Text(
         label.isNotEmpty ? label : '—',
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
+        side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.3)),
       ),
     );
   }
