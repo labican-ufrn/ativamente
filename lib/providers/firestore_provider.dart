@@ -23,6 +23,8 @@ final exerciciosFiltradosProvider = Provider.family<AsyncValue<List<Exercicio>>,
   final allExercicios = ref.watch(exerciciosProvider);
   return allExercicios.whenData((list) {
     if (filter == null) return list;
-    return list.where((e) => e.intensidade == filter).toList();
+    final min = filter <= 5 ? 1 : filter <= 8 ? 6 : 9;
+    final max = filter <= 5 ? 5 : filter <= 8 ? 8 : 10;
+    return list.where((e) => e.intensidade >= min && e.intensidade <= max).toList();
   });
 });
