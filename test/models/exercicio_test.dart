@@ -22,7 +22,11 @@ void main() {
 
     test('construtor aceita intensidade válida de 1 a 10', () {
       for (var i = 1; i <= 10; i++) {
-        expect(() => criarExercicioValido(intensidade: i), returnsNormally, reason: 'Intensidade $i deve ser aceita');
+        expect(
+          () => criarExercicioValido(intensidade: i),
+          returnsNormally,
+          reason: 'Intensidade $i deve ser aceita',
+        );
       }
     });
 
@@ -41,7 +45,7 @@ void main() {
       final exOriginal = criarExercicioValido(intensidade: intensidadeTeste);
       final json = exOriginal.toJson();
       final exRestaurado = Exercicio.fromJson(json, 'test-id');
-      
+
       expect(exRestaurado.intensidade, intensidadeTeste);
       expect(exRestaurado.nome, exOriginal.nome);
       expect(exRestaurado.codigo, exOriginal.codigo);

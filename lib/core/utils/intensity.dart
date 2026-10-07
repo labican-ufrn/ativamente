@@ -15,10 +15,7 @@ Color corIntensidade(int valor) => switch (valor) {
   _ => throw ArgumentError('Intensidade deve estar entre 1 e 10.'),
 };
 
-Widget intensityChip({
-  required int intensidade,
-  VoidCallback? onPressed,
-}) {
+Widget intensityChip({required int intensidade, VoidCallback? onPressed}) {
   return ActionChip(
     label: Text(rotuloIntensidade(intensidade)),
     backgroundColor: corIntensidade(intensidade),

@@ -74,7 +74,10 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.go('/home'),
         ),
-        title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Voltar',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           if (hasIntensityFilter)
             IconButton(
@@ -189,25 +192,37 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: ref.watch(exerciciosFiltradosProvider(selectedIntensity)).when(
-                      data: (exercicios) {
-                        final filteredExercicios = exercicios.where((e) => e.categoria.nome.toLowerCase() == _selectedCategory.toLowerCase()).toList();
-                        
-                        if (filteredExercicios.isEmpty) {
-                          return const Center(child: Text('Nenhum exercício encontrado.'));
-                        }
-                        
-                        return ListView.builder(
-                          itemCount: filteredExercicios.length,
-                          itemBuilder: (context, index) {
-                            final exercicio = filteredExercicios[index];
-                            return _buildExerciseTile(exercicio);
+                    child: ref
+                        .watch(exerciciosFiltradosProvider(selectedIntensity))
+                        .when(
+                          data: (exercicios) {
+                            final filteredExercicios = exercicios
+                                .where(
+                                  (e) =>
+                                      e.categoria.nome.toLowerCase() ==
+                                      _selectedCategory.toLowerCase(),
+                                )
+                                .toList();
+
+                            if (filteredExercicios.isEmpty) {
+                              return const Center(
+                                child: Text('Nenhum exercício encontrado.'),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: filteredExercicios.length,
+                              itemBuilder: (context, index) {
+                                final exercicio = filteredExercicios[index];
+                                return _buildExerciseTile(exercicio);
+                              },
+                            );
                           },
-                        );
-                      },
-                      loading: () => const Center(child: CircularProgressIndicator()),
-                      error: (err, stack) => Center(child: Text('Erro: $err')),
-                    ),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (err, stack) =>
+                              Center(child: Text('Erro: $err')),
+                        ),
                   ),
                 ],
               ),
@@ -259,9 +274,18 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        title: Text(exercicio.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        subtitle: Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 12,
+        ),
+        title: Text(
+          exercicio.nome,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          exercicio.descricao,
+          style: const TextStyle(fontSize: 16),
+        ),
         trailing: intensityChip(
           intensidade: exercicio.intensidade,
           onPressed: () => _filterByIntensity(exercicio.intensidade),

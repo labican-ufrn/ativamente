@@ -5,17 +5,11 @@ class Categoria {
   Categoria({required this.nome, required this.icone});
 
   factory Categoria.fromJson(Map<String, dynamic> json) {
-    return Categoria(
-      nome: json['nome'] ?? '',
-      icone: json['icone'] ?? '',
-    );
+    return Categoria(nome: json['nome'] ?? '', icone: json['icone'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'nome': nome,
-      'icone': icone,
-    };
+    return {'nome': nome, 'icone': icone};
   }
 }
 
@@ -26,17 +20,11 @@ class Tipo {
   Tipo({required this.nome, required this.icone});
 
   factory Tipo.fromJson(Map<String, dynamic> json) {
-    return Tipo(
-      nome: json['nome'] ?? '',
-      icone: json['icone'] ?? '',
-    );
+    return Tipo(nome: json['nome'] ?? '', icone: json['icone'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'nome': nome,
-      'icone': icone,
-    };
+    return {'nome': nome, 'icone': icone};
   }
 }
 
@@ -72,10 +60,14 @@ class Exercicio {
   }
 
   factory Exercicio.fromJson(Map<String, dynamic> json, String documentId) {
-    final effectiveId = documentId.isNotEmpty ? documentId : (json['codigo'] ?? '');
+    final effectiveId = documentId.isNotEmpty
+        ? documentId
+        : (json['codigo'] ?? '');
     final intensidade = json['intensidade'] as int? ?? 1;
     if (intensidade < 1 || intensidade > 10) {
-      throw FormatException('Intensidade inválida: $intensidade. Deve estar entre 1 e 10.');
+      throw FormatException(
+        'Intensidade inválida: $intensidade. Deve estar entre 1 e 10.',
+      );
     }
     return Exercicio(
       id: effectiveId,
