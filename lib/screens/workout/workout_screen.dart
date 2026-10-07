@@ -162,7 +162,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                           itemCount: filteredExercicios.length,
                           itemBuilder: (context, index) {
                             final exercicio = filteredExercicios[index];
-                            return _buildExerciseTile(context, exercicio);
+                            return _buildExerciseTile(exercicio);
                           },
                         );
                       },
@@ -214,7 +214,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     );
   }
 
-  Widget _buildExerciseTile(BuildContext context, Exercicio exercicio) {
+  Widget _buildExerciseTile(Exercicio exercicio) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
       elevation: 2,

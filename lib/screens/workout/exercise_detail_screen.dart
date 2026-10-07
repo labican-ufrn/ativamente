@@ -43,6 +43,14 @@ class ExerciseDetailScreen extends ConsumerWidget {
   }
 }
 
+void _goBack(BuildContext context) {
+  if (context.canPop()) {
+    context.pop();
+  } else {
+    context.go('/workout');
+  }
+}
+
 class _StateScreen extends ConsumerWidget {
   const _StateScreen({
     required this.title,
@@ -64,7 +72,7 @@ class _StateScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => context.pop(),
+          onPressed: () => _goBack(context),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
@@ -107,7 +115,7 @@ class _ExerciseDetailBody extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => context.pop(),
+          onPressed: () => _goBack(context),
         ),
         title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
