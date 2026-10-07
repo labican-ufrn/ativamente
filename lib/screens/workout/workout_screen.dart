@@ -64,7 +64,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     final selectedIntensity = ref.watch(intensidadeFilterProvider);
     final hasIntensityFilter = selectedIntensity != null;
     final screenText = hasIntensityFilter
-        ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity!)}. Lista de exercícios.'
+        ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
         : 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
@@ -162,7 +162,6 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                     ),
                   ),
                   intensityChip(
-                    context: context,
                     intensidade: selectedIntensity,
                     onPressed: () => _filterByIntensity(null),
                   ),
@@ -264,7 +263,6 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
         title: Text(exercicio.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         subtitle: Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
         trailing: intensityChip(
-          context: context,
           intensidade: exercicio.intensidade,
           onPressed: () => _filterByIntensity(exercicio.intensidade),
         ),
