@@ -4,27 +4,28 @@ import '../../theme.dart';
 String rotuloIntensidade(int valor) => switch (valor) {
   >= 1 && <= 5 => 'Leve',
   >= 6 && <= 8 => 'Moderado',
-  _ => 'Intenso',
+  >= 9 && <= 10 => 'Intenso',
+  _ => throw ArgumentError('Intensidade deve estar entre 1 e 10.'),
 };
 
-Color corIntensidade(BuildContext context, int valor) => switch (valor) {
+Color corIntensidade(int valor) => switch (valor) {
   >= 1 && <= 5 => AppTheme.intensityLight,
   >= 6 && <= 8 => AppTheme.intensityModerate,
-  _ => AppTheme.intensityHeavy,
+  >= 9 && <= 10 => AppTheme.intensityHeavy,
+  _ => throw ArgumentError('Intensidade deve estar entre 1 e 10.'),
 };
 
 Widget intensityChip({
-  required BuildContext context,
   required int intensidade,
   VoidCallback? onPressed,
 }) {
   return ActionChip(
     label: Text(rotuloIntensidade(intensidade)),
-    backgroundColor: corIntensidade(context, intensidade),
-labelStyle: TextStyle(
-  color: intensidade >= 6 && intensidade <= 8 ? Colors.black : Colors.white,
-  fontWeight: FontWeight.w600,
-),
+    backgroundColor: corIntensidade(intensidade),
+    labelStyle: TextStyle(
+      color: intensidade >= 6 && intensidade <= 8 ? Colors.black : Colors.white,
+      fontWeight: FontWeight.w600,
+    ),
     onPressed: onPressed,
     tooltip: 'Filtrar por ${rotuloIntensidade(intensidade).toLowerCase()}',
   );

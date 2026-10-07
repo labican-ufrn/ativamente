@@ -61,10 +61,22 @@ class Exercicio {
     required this.categoria,
     required this.tipo,
     required this.intensidade,
-  }) : assert(intensidade >= 1 && intensidade <= 10, 'Intensidade deve estar entre 1 e 10');
+  }) {
+    if (intensidade < 1 || intensidade > 10) {
+      throw ArgumentError.value(
+        intensidade,
+        'intensidade',
+        'deve estar entre 1 e 10',
+      );
+    }
+  }
 
   factory Exercicio.fromJson(Map<String, dynamic> json, String documentId) {
     final effectiveId = documentId.isNotEmpty ? documentId : (json['codigo'] ?? '');
+    final intensidade = json['intensidade'] as int? ?? 1;
+    if (intensidade < 1 || intensidade > 10) {
+      throw FormatException('Intensidade inválida: $intensidade. Deve estar entre 1 e 10.');
+    }
     return Exercicio(
       id: effectiveId,
       codigo: json['codigo'] ?? effectiveId,
@@ -74,7 +86,7 @@ class Exercicio {
       statusRealizado: json['statusRealizado'] ?? false,
       categoria: Categoria.fromJson(json['categoria'] ?? {}),
       tipo: Tipo.fromJson(json['tipo'] ?? {}),
-      intensidade: json['intensidade'] as int? ?? 1,
+      intensidade: intensidade,
     );
   }
 

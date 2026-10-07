@@ -26,14 +26,14 @@ void main() {
       }
     });
 
-    test('construtor falha com assert quando intensidade < 1', () {
-      expect(() => criarExercicioValido(intensidade: 0), throwsAssertionError);
-      expect(() => criarExercicioValido(intensidade: -1), throwsAssertionError);
+    test('construtor falha com ArgumentError quando intensidade < 1', () {
+      expect(() => criarExercicioValido(intensidade: 0), throwsArgumentError);
+      expect(() => criarExercicioValido(intensidade: -1), throwsArgumentError);
     });
 
-    test('construtor falha com assert quando intensidade > 10', () {
-      expect(() => criarExercicioValido(intensidade: 11), throwsAssertionError);
-      expect(() => criarExercicioValido(intensidade: 100), throwsAssertionError);
+    test('construtor falha com ArgumentError quando intensidade > 10', () {
+      expect(() => criarExercicioValido(intensidade: 11), throwsArgumentError);
+      expect(() => criarExercicioValido(intensidade: 100), throwsArgumentError);
     });
 
     test('fromJson/toJson roundtrip preserva intensidade', () {
@@ -71,6 +71,26 @@ void main() {
       final json = ex.toJson();
       expect(json['intensidade'], 8);
     });
+
+    test('fromJson lança FormatException para intensidade fora de 1..10', () {
+      for (final intensidade in [0, 11, 100, -1]) {
+        final json = {
+          'codigo': 'test',
+          'nome': 'Teste',
+          'descricao': 'Descrição',
+          'midia': '',
+          'statusRealizado': false,
+          'intensidade': intensidade,
+          'categoria': {'nome': 'Coracao', 'icone': 'favorite'},
+          'tipo': {'nome': 'Cardio', 'icone': 'directions_run'},
+        };
+        expect(
+          () => Exercicio.fromJson(json, 'test-id'),
+          throwsA(isA<FormatException>()),
+          reason: 'Intensidade $intensidade deve rejeitar o parse',
+        );
+      }
+    });
   });
 
   group('rotuloIntensidade', () {
@@ -93,14 +113,14 @@ void main() {
       expect(rotuloIntensidade(10), 'Intenso');
     });
 
-    test('retorna Intenso para valores > 10 (comportamento defensivo)', () {
-      expect(rotuloIntensidade(11), 'Intenso');
-      expect(rotuloIntensidade(100), 'Intenso');
+    test('lança ArgumentError para valores > 10 (inválidos rejeitados)', () {
+      expect(() => rotuloIntensidade(11), throwsArgumentError);
+      expect(() => rotuloIntensidade(100), throwsArgumentError);
     });
 
-    test('retorna Intenso para valores < 1 (comportamento defensivo)', () {
-      expect(rotuloIntensidade(0), 'Intenso');
-      expect(rotuloIntensidade(-5), 'Intenso');
+    test('lança ArgumentError para valores < 1 (inválidos rejeitados)', () {
+      expect(() => rotuloIntensidade(0), throwsArgumentError);
+      expect(() => rotuloIntensidade(-5), throwsArgumentError);
     });
   });
 }
