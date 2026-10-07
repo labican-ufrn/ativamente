@@ -31,10 +31,14 @@ project:
   # runtime de produção" parte.
   runtime_file: .tool-versions
 
-  # 0 = baseline inexistente: `dev` tem 1 único arquivo de teste. NÃO é passe livre —
-  # a skill registra no parecer que o limiar real está pendente. Subir a cada PR que
-  # trouxer teste novo, até um valor defensável.
-  min_coverage: 0
+  # Cobertura inicial de 60% — piso inicial, a subir a cada PR que trouxer teste.
+  # Medido com `flutter test --coverage` (lcov.info).
+  #
+  # CUIDADO com a leitura: o lcov do Flutter só inclui os arquivos tocados pelos
+  # testes, então uma suite com 1 arquivo testado reporta 100% mesmo sem tocar os
+  # outros 21. O número só vale quando a suite exercitar boa parte de lib/ — a
+  # skill registra no parecer qual a fração de arquivos medida.
+  min_coverage: 60
 
   # App final, não biblioteca: não há consumidor externo do contrato, então SemVer não
   # é cobrado por PR. `version_file` segue declarado só para a regra "versão: fonte
