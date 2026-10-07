@@ -21,7 +21,10 @@ Widget intensityChip({
   return ActionChip(
     label: Text(rotuloIntensidade(intensidade)),
     backgroundColor: corIntensidade(context, intensidade),
-    labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+labelStyle: TextStyle(
+  color: intensidade >= 6 && intensidade <= 8 ? Colors.black : Colors.white,
+  fontWeight: FontWeight.w600,
+),
     onPressed: onPressed,
     tooltip: 'Filtrar por ${rotuloIntensidade(intensidade).toLowerCase()}',
   );
