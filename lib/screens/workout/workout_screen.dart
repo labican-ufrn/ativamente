@@ -64,7 +64,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     final selectedIntensity = ref.watch(intensidadeFilterProvider);
     final hasIntensityFilter = selectedIntensity != null;
     final screenText = hasIntensityFilter
-        ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
+        ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity!)}. Lista de exercícios.'
         : 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
