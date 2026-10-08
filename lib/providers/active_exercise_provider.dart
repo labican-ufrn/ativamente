@@ -16,10 +16,9 @@ class ActiveExerciseState {
     String? exerciseId,
     int? elapsedSeconds,
     bool? isRunning,
-    bool clearExercise = false,
   }) {
     return ActiveExerciseState(
-      exerciseId: clearExercise ? null : (exerciseId ?? this.exerciseId),
+      exerciseId: exerciseId ?? this.exerciseId,
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
       isRunning: isRunning ?? this.isRunning,
     );
