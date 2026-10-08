@@ -158,7 +158,7 @@ backgroundColor: activeState.exerciseId != null
                                   children: [
                                     Expanded(child: Text(exercicio.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
                                     if (isActive)
-                                      const Icon(Icons.timer, color: Colors.green),
+                                      Icon(Icons.timer, color: Theme.of(context).colorScheme.primary),
                                   ],
                                 ),
                                 subtitle: Column(
@@ -167,7 +167,7 @@ backgroundColor: activeState.exerciseId != null
                                     Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
                                     if (isActive) ...[
                                       const SizedBox(height: 8),
-                                      const Text('Em execução', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                                      Text('Em execução', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
                                     ],
                                   ],
                                 ),
