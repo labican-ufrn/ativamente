@@ -35,6 +35,24 @@ final authControllerProvider = Provider<AuthController>((ref) {
   return AuthController(ref);
 });
 
+FirebaseApp? _seedTempApp;
+FirebaseAuth? _seedTempAuth;
+
+Future<FirebaseAuth> _getSeedTempAuth() async {
+  final app = _seedTempApp ??= await Firebase.initializeApp(
+    name: 'tempApp',
+    options: Firebase.app().options,
+  );
+  final auth = _seedTempAuth ??= FirebaseAuth.instanceFor(app: app);
+  if (AppEnvironment.useEmulators) {
+    await auth.useAuthEmulator(
+      AppEnvironment.emulatorHost,
+      AppEnvironment.authPort,
+    );
+  }
+  return auth;
+}
+
 class AuthController {
   final Ref ref;
   AuthController(this.ref);
@@ -89,41 +107,28 @@ class AuthController {
   }
 
   Future<void> createSecondaryUser(String name, String email, String password, String role) async {
-    // We use a secondary Firebase App to create a user without signing out the current user
-    FirebaseApp tempApp = await Firebase.initializeApp(
-      name: 'tempApp',
-      options: Firebase.app().options,
+    // Reusa um único app/auth secundário para criar usuários sem derrubar a
+    // sessão atual. Antes, Firebase.initializeApp(name: 'tempApp') rodava por
+    // chamada e o 2º usuário falhava com duplicate-app (issue #38).
+    final tempAuth = await _getSeedTempAuth();
+    final userCredential = await tempAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+
+    final pessoa = Pessoa(
+      id: userCredential.user!.uid,
+      nome: name,
+      role: role,
+      nomeLogin: email,
+      dataNascimento: '',
+      peso: 0.0,
+      altura: 0.0,
+      notificacoes: [],
     );
 
-    try {
-      final tempAuth = FirebaseAuth.instanceFor(app: tempApp);
-      if (AppEnvironment.useEmulators) {
-        await tempAuth.useAuthEmulator(
-          AppEnvironment.emulatorHost,
-          AppEnvironment.authPort,
-        );
-      }
-      final userCredential = await tempAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-
-      final pessoa = Pessoa(
-        id: userCredential.user!.uid,
-        nome: name,
-        role: role,
-        nomeLogin: email,
-        dataNascimento: '',
-        peso: 0.0,
-        altura: 0.0,
-        notificacoes: [],
-      );
-
-      await FirebaseFirestore.instance
-          .collection('Pessoas')
-          .doc(userCredential.user!.uid)
-          .set(pessoa.toJson());
-    } finally {
-      await tempApp.delete();
-    }
+    await FirebaseFirestore.instance
+        .collection('Pessoas')
+        .doc(userCredential.user!.uid)
+        .set(pessoa.toJson());
   }
 
   Future<void> logout() async {
