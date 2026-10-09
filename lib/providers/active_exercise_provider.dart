@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Fonte de tempo do cronômetro. Sobrescreva em teste para controlar o relógio.
+final nowProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 class ActiveExerciseState {
   final String? exerciseId;
   final int elapsedSeconds;
@@ -28,6 +31,25 @@ class ActiveExerciseState {
 class ActiveExerciseNotifier extends Notifier<ActiveExerciseState> {
   Timer? _timer;
 
+  /// Início do segmento em execução (null quando pausado/parado).
+  DateTime? _inicio;
+
+  /// Tempo já executado nos segmentos anteriores (pausas).
+  Duration _acumulado = Duration.zero;
+
+  DateTime get _agora => ref.read(nowProvider)();
+
+  /// Tempo decorrido calculado por relógio (não por contagem de ticks): assim
+  /// um tick atrasado — app em segundo plano, event loop ocupado — não subconta.
+  int get _elapsed {
+    final agora = _agora;
+    final corrente = _inicio == null
+        ? Duration.zero
+        : agora.difference(_inicio!);
+    final total = _acumulado + corrente;
+    return total.isNegative ? 0 : total.inSeconds;
+  }
+
   @override
   ActiveExerciseState build() {
     ref.onDispose(() {
@@ -39,6 +61,8 @@ class ActiveExerciseNotifier extends Notifier<ActiveExerciseState> {
   void startExercise(String id) {
     if (state.exerciseId != id) {
       _timer?.cancel();
+      _acumulado = Duration.zero;
+      _inicio = _agora;
       state = ActiveExerciseState(
         exerciseId: id,
         isRunning: true,
@@ -46,18 +70,25 @@ class ActiveExerciseNotifier extends Notifier<ActiveExerciseState> {
       );
       _startTimer();
     } else if (!state.isRunning) {
-      state = state.copyWith(isRunning: true);
+      _inicio = _agora;
+      state = state.copyWith(isRunning: true, elapsedSeconds: _elapsed);
       _startTimer();
     }
   }
 
   void pauseExercise() {
     _timer?.cancel();
-    state = state.copyWith(isRunning: false);
+    if (_inicio != null) {
+      _acumulado += _agora.difference(_inicio!);
+      _inicio = null;
+    }
+    state = state.copyWith(isRunning: false, elapsedSeconds: _elapsed);
   }
 
   void stopExercise() {
     _timer?.cancel();
+    _inicio = null;
+    _acumulado = Duration.zero;
     state = ActiveExerciseState();
   }
 
@@ -75,13 +106,14 @@ class ActiveExerciseNotifier extends Notifier<ActiveExerciseState> {
 
   void _startTimer() {
     _timer?.cancel();
+    // O tick só atualiza a UI; o valor vem do relógio (_elapsed).
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      state = state.copyWith(elapsedSeconds: state.elapsedSeconds + 1);
+      state = state.copyWith(elapsedSeconds: _elapsed);
     });
   }
 }
 
 final activeExerciseProvider =
-    NotifierProvider<ActiveExerciseNotifier, ActiveExerciseState>(() {
-      return ActiveExerciseNotifier();
-    });
+    NotifierProvider<ActiveExerciseNotifier, ActiveExerciseState>(
+      ActiveExerciseNotifier.new,
+    );
