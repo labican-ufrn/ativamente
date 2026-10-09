@@ -58,7 +58,7 @@ project:
   #   estudo/             -> usada no repo (issues #1 e #2), mas NÃO consta no
   #                          GitFlow do AGENTS.md — incluída para não acusar falso
   #                          positivo. Ratificar no AGENTS.md ou remover daqui.
-  branch_pattern: ^(feature|feat|bugfix|fix|hotfix|release|docs|estudo)/
+  branch_pattern: ^(?:(?:feature|feat|bugfix|fix|hotfix|docs|estudo)/[a-z0-9]+(?:-[a-z0-9]+)*|release/[^/]+)$
 
   # Só os arquivos do PR, comparados contra a versão deles na base — assim o parecer
   # separa dívida legada de regressão nova.
