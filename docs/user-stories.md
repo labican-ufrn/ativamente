@@ -1,5 +1,7 @@
 # User Stories — AtivaMente (App Flutter)
 
+> **Última revisão:** 09/10/2026, com base no branch da release e na matriz [`docs/qa-matriz-testes.md`](qa-matriz-testes.md).
+>
 > **Fontes:** [`docs/modelo-conceitual.md`](https://github.com/labican-ufrn/ativamente-api/blob/dev/docs/modelo-conceitual.md) (API Django) + análise de código do repositório (`lib/`) + feedback de teste manual em dispositivo (21/08/2026).
 >
 > **Contexto técnico atual:** app Flutter com Firebase (Auth + Firestore), Riverpod, go_router e flutter_tts. Os modelos seguem o *design frontend original* (`Pessoa`, `Categoria`/`Tipo` com ícone, FKs diretas), ainda não alinhados 1:1 ao modelo conceitual do backend (N:N, `Equipamento`, flags de métricas).
@@ -75,7 +77,7 @@
 ### US06 — Editar meus dados biométricos
 **Como** usuário, **quero** editar altura, peso, data de nascimento e telefone, **para** manter meu perfil atualizado.
 
-- **Status:** 🔜 Sprint 4 (Issue #13 / PR #23)
+- **Status:** ✅ Implementada no branch da release (validação manual Android/Web pendente)
 - **Critérios de aceite / Regras de negócio:**
   - [ ] **Data de Nascimento:**
     - Formato com máscara automática (`DD/MM/AAAA`) e limite máximo de 10 caracteres.
@@ -220,7 +222,7 @@
 | US03 | Encerrar sessão | ✅ | — |
 | US04 | Admin cadastra usuários com papel | ✅ | — |
 | US05 | Ver meus dados em todas as telas | 🐞 Bug | S1 |
-| US06 | Editar dados biométricos | 💤 | Backlog |
+| US06 | Editar dados biométricos | ✅ | S4 |
 | US07 | Listar exercícios por categoria | ✅ | — |
 | US08 | Detalhe do exercício | 🔜 | S2 |
 | US09 | Seed oficial do catálogo | 🔜 | S1 |
