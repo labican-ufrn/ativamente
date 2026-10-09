@@ -96,7 +96,12 @@ gantt
 - **Escopo:** rota `/exercise/:id`; layout com placeholder de mídia (vídeo/GIF futuro), nome, descrição, categoria/tipo; navegação via `push` (voltar preserva aba selecionada).
 - **DoD:** tap no card abre detalhe; voltar funcional; TTS cobre a nova tela.
 
-### T2.2 — Marcação de exercício em execução + timer automático *(1–2 semanas)*
+### T2.2 — Intensidade do exercício: modelo, seed, UI, TTS e testes *(1 semana)*
+- **US:** US21 · **Prioridade:** Alta
+- **Escopo:** adicionar campo `intensidade` (1-10) ao modelo `Exercicio` com validação; atualizar `exercises.json` com valores por exercício; criar helpers `rotuloIntensidade`/`corIntensidade`/`intensityChip` em `lib/core/utils/intensity.dart`; adicionar tokens de cor no tema; exibir `ActionChip` clicável na lista de treino com filtro persistente por intensidade; TTS dinâmico narrando o filtro ativo; testes unitários em `test/models/exercicio_test.dart`.
+- **DoD:** `flutter analyze` limpo; testes passam; filtro funciona e persiste ao trocar abas; TTS narra corretamente.
+
+### T2.3 — Marcação de exercício em execução + timer automático *(1–2 semanas)*
 - **US:** US11 · **Prioridade:** Alta
 - **Escopo:** estado global (Riverpod) de "exercício em execução"; indicador visual na lista/detalhe; cronômetro inicia ao marcar; um exercício por vez; opção de cancelar.
 - **Dependência:** T2.1.

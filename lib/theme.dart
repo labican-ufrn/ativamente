@@ -8,6 +8,11 @@ class AppTheme {
   static const Color textDark = Color(0xFF1E315A); // Text is usually the same dark blue
   static const Color white = Colors.white;
 
+  // Cores de intensidade
+  static const Color intensityLight = Color(0xFF2E7D32); // Verde para Leve (1-5)
+  static const Color intensityModerate = Color(0xFFF57F17); // Âmbar para Moderado (6-8)
+  static const Color intensityHeavy = Color(0xFFC62828); // Vermelho para Intenso (9-10)
+
   static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
