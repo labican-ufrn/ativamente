@@ -84,6 +84,39 @@ final authControllerProvider = Provider<AuthController>((ref) {
   return AuthController(ref);
 });
 
+Future<FirebaseAuth>? _seedTempAuthFuture;
+
+Future<FirebaseAuth> _getSeedTempAuth() async {
+  final existing = _seedTempAuthFuture;
+  if (existing != null) return existing;
+
+  final initializing = _initializeSeedTempAuth();
+  _seedTempAuthFuture = initializing;
+  try {
+    return await initializing;
+  } catch (_) {
+    if (identical(_seedTempAuthFuture, initializing)) {
+      _seedTempAuthFuture = null;
+    }
+    rethrow;
+  }
+}
+
+Future<FirebaseAuth> _initializeSeedTempAuth() async {
+  final app = await Firebase.initializeApp(
+    name: 'tempApp',
+    options: Firebase.app().options,
+  );
+  final auth = FirebaseAuth.instanceFor(app: app);
+  if (AppEnvironment.useEmulators) {
+    await auth.useAuthEmulator(
+      AppEnvironment.emulatorHost,
+      AppEnvironment.authPort,
+    );
+  }
+  return auth;
+}
+
 class AuthController {
   final Ref ref;
   AuthController(this.ref);
@@ -137,61 +170,29 @@ class AuthController {
     }
   }
 
-  static FirebaseApp? _tempApp;
-
-  static Future<FirebaseAuth> _getTempAuth() async {
-    if (_tempApp == null) {
-      try {
-        _tempApp = Firebase.app('tempApp');
-      } catch (_) {
-        _tempApp = await Firebase.initializeApp(
-          name: 'tempApp',
-          options: Firebase.app().options,
-        );
-      }
-      final tempAuth = FirebaseAuth.instanceFor(app: _tempApp!);
-      if (AppEnvironment.useEmulators) {
-        await tempAuth.useAuthEmulator(
-          AppEnvironment.emulatorHost,
-          AppEnvironment.authPort,
-        );
-      }
-      return tempAuth;
-    }
-    return FirebaseAuth.instanceFor(app: _tempApp!);
-  }
-
   Future<void> createSecondaryUser(String name, String email, String password, String role) async {
-    try {
-      final tempAuth = await _getTempAuth();
-      final userCredential = await tempAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    // Reusa um único app/auth secundário para criar usuários sem derrubar a
+    // sessão atual. Antes, Firebase.initializeApp(name: 'tempApp') rodava por
+    // chamada e o 2º usuário falhava com duplicate-app (issue #38).
+    final tempAuth = await _getSeedTempAuth();
+    final userCredential = await tempAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
 
-      if (userCredential.user != null) {
-        final pessoa = Pessoa(
-          id: userCredential.user!.uid,
-          nome: name,
-          role: role,
-          nomeLogin: email,
-          dataNascimento: '',
-          peso: 0.0,
-          altura: 0.0,
-          notificacoes: [],
-        );
+    final pessoa = Pessoa(
+      id: userCredential.user!.uid,
+      nome: name,
+      role: role,
+      nomeLogin: email,
+      dataNascimento: '',
+      peso: 0.0,
+      altura: 0.0,
+      notificacoes: [],
+    );
 
-        await FirebaseFirestore.instance
-            .collection('Pessoas')
-            .doc(userCredential.user!.uid)
-            .set(pessoa.toJson(), SetOptions(merge: true));
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use' || e.code == 'EMAIL_EXISTS') {
-        return;
-      }
-      rethrow;
-    }
+    await FirebaseFirestore.instance
+        .collection('Pessoas')
+        .doc(userCredential.user!.uid)
+        .set(pessoa.toJson());
   }
 
   Future<void> logout() async {

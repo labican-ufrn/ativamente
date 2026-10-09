@@ -56,6 +56,9 @@ lib/firebase_options.dart
 # Firebase - configuração do projeto (seção flutter é específica por dev)
 firebase.json
 
+# Firebase Emulator - dados persistentes (--import/--export-on-exit)
+.firebase/emulator-data/
+
 # DevTools - configuração local
 devtools_options.yaml
 

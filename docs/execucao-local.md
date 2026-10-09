@@ -141,6 +141,19 @@ Deve listar seu projeto com o status ativo.
 ### Terminal 1 — Emuladores Firebase
 
 ```bash
+firebase emulators:start \
+  --import=.firebase/emulator-data \
+  --export-on-exit \
+  --project <seu-project-id>
+```
+
+O `--import`/`--export-on-exit` **persistem os dados** entre execuções (Auth e
+Firestore sobrevivem ao restart). Na primeira vez o emulador sobe vazio e o
+**seed do app** popula os dados (veja a seção 5).
+
+Sem persistência (dados efêmeros a cada execução):
+
+```bash
 firebase emulators:start --project <seu-project-id>
 ```
 
@@ -171,6 +184,12 @@ Acesse `http://localhost:3000` no navegador.
      - **Admin:** `ativamente@ativamente.org` (senha: `dev123456`)
      - **Personal Trainer:** `personal@ativamente.org` (senha: `dev123456`)
 3. Você também pode criar uma nova conta em **"Criar conta"** (os dados ficam armazenados no emulador local).
+
+> **Dados de teste sempre prontos:** antes de qualquer teste que dependa de login
+> ou Firestore, garanta o emulador no ar (Terminal 1) e abra o app **uma vez** para
+> disparar o seed automático (cria as 2 contas, os `Pessoas` e os exercícios). Com
+> `--import/--export-on-exit`, isso só precisa ser feito no primeiro uso; limpe o
+> banco quando quiser recomeçar (seção 6).
 
 ---
 
@@ -220,7 +239,11 @@ O `.tool-versions` do repositório já inclui `java openjdk-21` — basta rodar 
 ## 7. Notas importantes
 
 - **Dados locais:** Todos os dados criados nos emuladores são locais e não afetam o projeto Firebase remoto.
-- **Limpar dados:** Para reiniciar o banco do emulador, pare e reinicie `firebase emulators:start`.
+- **Limpar dados:** Pare o emulador, remova a pasta de persistência e suba de novo — o seed repopula no primeiro load do app:
+  ```bash
+  rm -rf .firebase/emulator-data
+  firebase emulators:start --import=.firebase/emulator-data --export-on-exit --project <seu-project-id>
+  ```
 - **Migração:** Quando a conta oficial do Labican estiver configurada (T1.3), todos os desenvolvedores deverão migrar para o projeto `ativamente-labican`. O `flutterfire configure` será executado uma única vez com a conta Labican.
 - **VS Code:** Se o VS Code não encontrar o SDK, exporte no `~/.zshrc`:
   ```bash

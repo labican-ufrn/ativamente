@@ -118,6 +118,20 @@ flutter build apk               # build Android
 flutter build web               # build Web
 ```
 
+### Execução local com dados (login/Firestore)
+
+Antes de qualquer execução ou teste que dependa de dados (login, Firestore),
+garanta: (1) **emulador no ar** — de preferência com persistência:
+
+```bash
+firebase emulators:start --import=.firebase/emulator-data --export-on-exit --project <seu-project-id>
+```
+
+(2) **seed disparado**: abrir o app **uma vez** semeará os dados automaticamente
+(2 contas de teste, `Pessoas` e exercícios — ver `docs/execucao-local.md`). Emulador
+novo/limpo = abrir o app uma vez para repovoar. `rm -rf .firebase/emulator-data`
+recomeça o banco.
+
 ## Regras de qualidade
 
 1. `flutter analyze` sem erros/warnings novos e testes passando (`flutter test`) antes de abrir PR.
