@@ -35,15 +35,30 @@ final authControllerProvider = Provider<AuthController>((ref) {
   return AuthController(ref);
 });
 
-FirebaseApp? _seedTempApp;
-FirebaseAuth? _seedTempAuth;
+Future<FirebaseAuth>? _seedTempAuthFuture;
 
 Future<FirebaseAuth> _getSeedTempAuth() async {
-  final app = _seedTempApp ??= await Firebase.initializeApp(
+  final existing = _seedTempAuthFuture;
+  if (existing != null) return existing;
+
+  final initializing = _initializeSeedTempAuth();
+  _seedTempAuthFuture = initializing;
+  try {
+    return await initializing;
+  } catch (_) {
+    if (identical(_seedTempAuthFuture, initializing)) {
+      _seedTempAuthFuture = null;
+    }
+    rethrow;
+  }
+}
+
+Future<FirebaseAuth> _initializeSeedTempAuth() async {
+  final app = await Firebase.initializeApp(
     name: 'tempApp',
     options: Firebase.app().options,
   );
-  final auth = _seedTempAuth ??= FirebaseAuth.instanceFor(app: app);
+  final auth = FirebaseAuth.instanceFor(app: app);
   if (AppEnvironment.useEmulators) {
     await auth.useAuthEmulator(
       AppEnvironment.emulatorHost,
