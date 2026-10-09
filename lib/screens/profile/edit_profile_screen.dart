@@ -82,8 +82,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         'nome': _nomeController.text.trim(),
         'numTelefone': _telefoneController.text.trim(),
         'dataNascimento': _nascimentoController.text.trim(),
-        if (peso != null) 'peso': peso,
-        if (altura != null) 'altura': altura,
+        if (peso case final double p) 'peso': p,
+        if (altura case final double a) 'altura': a,
       };
 
       await FirebaseFirestore.instance

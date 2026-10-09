@@ -14,6 +14,35 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
 });
 
+/// Retorna o nome de exibição do usuário aplicando precedência com fallback robusto:
+/// 1. Pessoa.nome (se preenchido)
+/// 2. User.displayName do Firebase Auth (se preenchido)
+/// 3. Prefixo do e-mail do Firebase Auth
+/// 4. Fallback genérico 'Usuário'
+String getEffectiveDisplayName(Pessoa? pessoa, User? user) {
+  if (pessoa != null && pessoa.nome.trim().isNotEmpty) {
+    return pessoa.nome.trim();
+  }
+  if (user != null) {
+    if (user.displayName != null && user.displayName!.trim().isNotEmpty) {
+      return user.displayName!.trim();
+    }
+    if (user.email != null && user.email!.trim().isNotEmpty) {
+      final emailPrefix = user.email!.split('@').first.trim();
+      if (emailPrefix.isNotEmpty) {
+        return emailPrefix;
+      }
+    }
+  }
+  return 'Usuário';
+}
+
+final userDisplayNameProvider = Provider<String>((ref) {
+  final user = ref.watch(authStateProvider).value;
+  final pessoa = ref.watch(userDataProvider).value;
+  return getEffectiveDisplayName(pessoa, user);
+});
+
 final userDataProvider = StreamProvider<Pessoa?>((ref) {
   final user = ref.watch(authStateProvider).value;
   if (user == null) {
@@ -23,11 +52,31 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
       .collection('Pessoas')
       .doc(user.uid)
       .snapshots()
-      .map((snapshot) {
+      .asyncMap((snapshot) async {
     if (snapshot.exists && snapshot.data() != null) {
       return Pessoa.fromJson(snapshot.data()!, snapshot.id);
     }
-    return null;
+    // Auto-criação on-demand para contas sem documento Pessoas no Firestore
+    final fallbackName = getEffectiveDisplayName(null, user);
+    final newPessoa = Pessoa(
+      id: user.uid,
+      nome: fallbackName,
+      nomeLogin: user.email ?? '',
+      role: 'user',
+      dataNascimento: '',
+      peso: 0.0,
+      altura: 0.0,
+      notificacoes: [],
+    );
+    try {
+      await FirebaseFirestore.instance
+          .collection('Pessoas')
+          .doc(user.uid)
+          .set(newPessoa.toJson(), SetOptions(merge: true));
+    } catch (_) {
+      // Ignora falhas de escrita (ex.: offline/regras em execução local)
+    }
+    return newPessoa;
   });
 });
 
@@ -88,41 +137,60 @@ class AuthController {
     }
   }
 
-  Future<void> createSecondaryUser(String name, String email, String password, String role) async {
-    // We use a secondary Firebase App to create a user without signing out the current user
-    FirebaseApp tempApp = await Firebase.initializeApp(
-      name: 'tempApp',
-      options: Firebase.app().options,
-    );
+  static FirebaseApp? _tempApp;
 
-    try {
-      final tempAuth = FirebaseAuth.instanceFor(app: tempApp);
+  static Future<FirebaseAuth> _getTempAuth() async {
+    if (_tempApp == null) {
+      try {
+        _tempApp = Firebase.app('tempApp');
+      } catch (_) {
+        _tempApp = await Firebase.initializeApp(
+          name: 'tempApp',
+          options: Firebase.app().options,
+        );
+      }
+      final tempAuth = FirebaseAuth.instanceFor(app: _tempApp!);
       if (AppEnvironment.useEmulators) {
         await tempAuth.useAuthEmulator(
           AppEnvironment.emulatorHost,
           AppEnvironment.authPort,
         );
       }
-      final userCredential = await tempAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      return tempAuth;
+    }
+    return FirebaseAuth.instanceFor(app: _tempApp!);
+  }
 
-      final pessoa = Pessoa(
-        id: userCredential.user!.uid,
-        nome: name,
-        role: role,
-        nomeLogin: email,
-        dataNascimento: '',
-        peso: 0.0,
-        altura: 0.0,
-        notificacoes: [],
+  Future<void> createSecondaryUser(String name, String email, String password, String role) async {
+    try {
+      final tempAuth = await _getTempAuth();
+      final userCredential = await tempAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      await FirebaseFirestore.instance
-          .collection('Pessoas')
-          .doc(userCredential.user!.uid)
-          .set(pessoa.toJson());
-    } finally {
-      await tempApp.delete();
+      if (userCredential.user != null) {
+        final pessoa = Pessoa(
+          id: userCredential.user!.uid,
+          nome: name,
+          role: role,
+          nomeLogin: email,
+          dataNascimento: '',
+          peso: 0.0,
+          altura: 0.0,
+          notificacoes: [],
+        );
+
+        await FirebaseFirestore.instance
+            .collection('Pessoas')
+            .doc(userCredential.user!.uid)
+            .set(pessoa.toJson(), SetOptions(merge: true));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use' || e.code == 'EMAIL_EXISTS') {
+        return;
+      }
+      rethrow;
     }
   }
 
