@@ -43,9 +43,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           userDataAsync.when(
             data: (pessoa) {
-              final nome = (pessoa?.nome != null && pessoa!.nome.isNotEmpty)
-                  ? pessoa.nome
-                  : 'Nome do Usuário';
+              final nome = ref.watch(userDisplayNameProvider);
               final dataNasc = (pessoa?.dataNascimento != null && pessoa!.dataNascimento.isNotEmpty)
                   ? pessoa.dataNascimento
                   : 'Não informada';
@@ -89,10 +87,21 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => const Text(
-              'Erro ao carregar',
+            loading: () => Column(
+              children: [
+                Text(
+                  ref.watch(userDisplayNameProvider),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                const Center(child: CircularProgressIndicator()),
+              ],
+            ),
+            error: (err, stack) => Text(
+              ref.watch(userDisplayNameProvider),
               textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 48),

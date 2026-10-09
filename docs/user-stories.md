@@ -63,14 +63,14 @@
 ### US05 — Ver meus dados em todas as telas *(atualizada pelo teste)*
 **Como** usuário autenticado, **quero** ver meu nome carregado corretamente na Home e no Perfil (e onde mais for exibido), **para** confirmar que estou na minha conta.
 
-- **Status:** 🐞 Bug reportado — *nome não carrega; também não aparece nas demais telas*
+- **Status:** ✅ Implementada
 - **Prioridade:** Alta (Sprint 1)
 - **Critérios de aceite:**
-  - [ ] Nome real do usuário logado aparece na Home (cabeçalho) e no Perfil.
-  - [ ] Causa raiz diagnosticada e documentada (hipóteses: documento ausente em `Pessoas` para contas criadas fora do fluxo de registro; regras de segurança do Firestore bloqueando leitura; doc com campos vazios).
-  - [ ] Fallback robusto: se o documento não existir, exibir `displayName` ou e-mail do Firebase Auth (nunca travar em loading nem mostrar erro bruto).
-  - [ ] Contas criadas antes da lógica de registro recebem documento `Pessoas` automaticamente (migração/on-demand).
-- **Evidência atual:** `home_screen.dart:45-59` e `profile_screen.dart:37-48` consomem `userDataProvider`; quando o snapshot não existe exibem `'Usuário'`/fallback genérico. Nenhuma outra tela exibe identidade.
+  - [x] Nome real do usuário logado aparece na Home (cabeçalho) e no Perfil.
+  - [x] Causa raiz diagnosticada e documentada em `docs/qa-matriz-testes.md` (documento Pessoas ausente em contas legadas; operador fallback `??` ineficaz com string vazia `''`; ausência de integração com Auth e auto-criação on-demand).
+  - [x] Fallback robusto: se o documento não existir ou nome for vazio, exibe `displayName` ou e-mail do Firebase Auth (sem travar em loading nem mostrar erro bruto).
+  - [x] Contas criadas antes da lógica de registro recebem documento `Pessoas` automaticamente (migração on-demand via `userDataProvider`).
+- **Casos de Teste (QA):** CT-US05-01 a CT-US05-05 em `docs/qa-matriz-testes.md`.
 
 ### US06 — Editar meus dados biométricos
 **Como** usuário, **quero** editar altura, peso, data de nascimento e telefone, **para** manter meu perfil atualizado.
@@ -219,7 +219,7 @@
 | US02 | Autenticar-se | ✅ | — |
 | US03 | Encerrar sessão | ✅ | — |
 | US04 | Admin cadastra usuários com papel | ✅ | — |
-| US05 | Ver meus dados em todas as telas | 🐞 Bug | S1 |
+| US05 | Ver meus dados em todas as telas | ✅ | S1 |
 | US06 | Editar dados biométricos | 💤 | Backlog |
 | US07 | Listar exercícios por categoria | ✅ | — |
 | US08 | Detalhe do exercício | 🔜 | S2 |
