@@ -3,7 +3,7 @@
 ## 📌 Contexto & Estado Atual
 - **Projeto:** App Flutter para auxiliar idosos na prática de exercícios físicos (Labican/UFRN).
 - **Backend:** Firebase (Authentication + Cloud Firestore).
-- **Stack:** Flutter 3.47+, Riverpod 3.x, `go_router` 17.x, `flutter_tts`.
+- **Stack:** Flutter 3.47.1-stable, Riverpod 3.x, `go_router` 17.x, `flutter_tts`.
 - **Branches:** `main` (produção) e `dev` (desenvolvimento).
 - **Iterações:** Ciclos quinzenais de 15 dias (2 semanas), encerrados às sextas-feiras com reunião de alinhamento às 17:00.
 - **Status:** Sprint 3 encerrada em 02/10/2026. Sprint 4 iniciada em 03/10/2026.
