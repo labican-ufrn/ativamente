@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
+import '../../models/exercicio.dart';
 import '../../providers/active_exercise_provider.dart';
 
 class WorkoutScreen extends ConsumerStatefulWidget {
@@ -21,11 +22,82 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
+  Widget _buildExerciseTile(
+    Exercicio exercicio,
+    ActiveExerciseState activeState,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isActive = activeState.exerciseId == exercicio.id;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      elevation: isActive ? 4 : 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isActive
+            ? BorderSide(color: colorScheme.primary, width: 2)
+            : BorderSide.none,
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 12,
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                exercicio.nome,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            if (isActive) Icon(Icons.timer, color: colorScheme.primary),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
+            if (isActive) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Em execução',
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ],
+        ),
+        trailing: IconButton(
+          icon: Icon(
+            isActive && activeState.isRunning
+                ? Icons.pause_circle_filled
+                : Icons.play_circle_fill,
+          ),
+          color: colorScheme.primary,
+          iconSize: 36,
+          onPressed: () => ref
+              .read(activeExerciseProvider.notifier)
+              .toggleExercise(exercicio.id),
+        ),
+        onTap: () {
+          // Navegação para a tela de detalhe entra quando o PR #30 (Issue #9) mergear.
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeState = ref.watch(activeExerciseProvider);
 
-    const screenText = "Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Lista de exercícios.";
+    const screenText =
+        "Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Lista de exercícios.";
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -34,7 +106,10 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Voltar',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
@@ -52,7 +127,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             child: Column(
               children: [
                 Text(
-_formatTime(activeState.elapsedSeconds),
+                  _formatTime(activeState.elapsedSeconds),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: 72,
@@ -65,17 +140,24 @@ _formatTime(activeState.elapsedSeconds),
                   children: [
                     InkWell(
                       onTap: () {
-                        if (activeState.exerciseId != null) {
-                          ref.read(activeExerciseProvider.notifier).toggleExercise(activeState.exerciseId!);
+                        final activeId = activeState.exerciseId;
+                        if (activeId != null) {
+                          ref
+                              .read(activeExerciseProvider.notifier)
+                              .toggleExercise(activeId);
                         }
                       },
                       child: CircleAvatar(
                         radius: 30,
-backgroundColor: activeState.exerciseId != null
+                        backgroundColor: activeState.exerciseId != null
                             ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.4),
+                            : Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withValues(alpha: 0.4),
                         child: Icon(
-                          activeState.isRunning ? Icons.pause : Icons.play_arrow,
+                          activeState.isRunning
+                              ? Icons.pause
+                              : Icons.play_arrow,
                           size: 40,
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -84,13 +166,17 @@ backgroundColor: activeState.exerciseId != null
                     const SizedBox(width: 24),
                     InkWell(
                       onTap: () {
-                        ref.read(activeExerciseProvider.notifier).stopExercise();
+                        ref
+                            .read(activeExerciseProvider.notifier)
+                            .stopExercise();
                       },
                       child: CircleAvatar(
                         radius: 30,
-backgroundColor: activeState.exerciseId != null
+                        backgroundColor: activeState.exerciseId != null
                             ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.4),
+                            : Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withValues(alpha: 0.4),
                         child: Icon(
                           Icons.stop,
                           size: 40,
@@ -129,67 +215,39 @@ backgroundColor: activeState.exerciseId != null
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: ref.watch(exerciciosProvider).when(
-                      data: (exercicios) {
-                        final filteredExercicios = exercicios.where((e) => e.categoria.nome.toLowerCase() == _selectedCategory.toLowerCase()).toList();
-                        
-                        if (filteredExercicios.isEmpty) {
-                          return const Center(child: Text('Nenhum exercício encontrado.'));
-                        }
-                        
-                        return ListView.builder(
-                          itemCount: filteredExercicios.length,
-                          itemBuilder: (context, index) {
-                            final exercicio = filteredExercicios[index];
-                            final isActive = activeState.exerciseId == exercicio.id;
-                            
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 16.0),
-                              elevation: isActive ? 4 : 2,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: isActive 
-                                    ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 2) 
-                                    : BorderSide.none,
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                title: Row(
-                                  children: [
-                                    Expanded(child: Text(exercicio.nome, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-                                    if (isActive)
-                                      Icon(Icons.timer, color: Theme.of(context).colorScheme.primary),
-                                  ],
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
-                                    if (isActive) ...[
-                                      const SizedBox(height: 8),
-                                      Text('Em execução', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
-                                    ],
-                                  ],
-                                ),
-                                trailing: IconButton(
-                                  icon: Icon(isActive && activeState.isRunning ? Icons.pause_circle_filled : Icons.play_circle_fill),
-                                  color: Theme.of(context).colorScheme.primary,
-                                  iconSize: 36,
-                                  onPressed: () {
-                                    ref.read(activeExerciseProvider.notifier).toggleExercise(exercicio.id);
-                                  },
-                                ),
-                                onTap: () {
-                                  // Quando a Issue #9 estiver pronta, o desenvolvedor adicionará a navegação para os detalhes aqui.
-                                },
-                              ),
+                    child: ref
+                        .watch(exerciciosProvider)
+                        .when(
+                          data: (exercicios) {
+                            final filteredExercicios = exercicios
+                                .where(
+                                  (e) =>
+                                      e.categoria.nome.toLowerCase() ==
+                                      _selectedCategory.toLowerCase(),
+                                )
+                                .toList();
+
+                            if (filteredExercicios.isEmpty) {
+                              return const Center(
+                                child: Text('Nenhum exercício encontrado.'),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: filteredExercicios.length,
+                              itemBuilder: (context, index) {
+                                return _buildExerciseTile(
+                                  filteredExercicios[index],
+                                  activeState,
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      loading: () => const Center(child: CircularProgressIndicator()),
-                      error: (err, stack) => Center(child: Text('Erro: $err')),
-                    ),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (err, stack) =>
+                              Center(child: Text('Erro: $err')),
+                        ),
                   ),
                 ],
               ),
@@ -229,10 +287,13 @@ backgroundColor: activeState.exerciseId != null
         child: CircleAvatar(
           radius: 30,
           backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Icon(icon, color: Theme.of(context).colorScheme.onPrimary, size: 30),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.onPrimary,
+            size: 30,
+          ),
         ),
       ),
     );
   }
 }
-

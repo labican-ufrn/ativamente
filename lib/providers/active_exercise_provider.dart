@@ -39,7 +39,11 @@ class ActiveExerciseNotifier extends Notifier<ActiveExerciseState> {
   void startExercise(String id) {
     if (state.exerciseId != id) {
       _timer?.cancel();
-      state = ActiveExerciseState(exerciseId: id, isRunning: true, elapsedSeconds: 0);
+      state = ActiveExerciseState(
+        exerciseId: id,
+        isRunning: true,
+        elapsedSeconds: 0,
+      );
       _startTimer();
     } else if (!state.isRunning) {
       state = state.copyWith(isRunning: true);
@@ -77,6 +81,7 @@ class ActiveExerciseNotifier extends Notifier<ActiveExerciseState> {
   }
 }
 
-final activeExerciseProvider = NotifierProvider<ActiveExerciseNotifier, ActiveExerciseState>(() {
-  return ActiveExerciseNotifier();
-});
+final activeExerciseProvider =
+    NotifierProvider<ActiveExerciseNotifier, ActiveExerciseState>(() {
+      return ActiveExerciseNotifier();
+    });
