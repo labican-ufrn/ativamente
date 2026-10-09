@@ -75,22 +75,23 @@
 ### US06 — Editar meus dados biométricos
 **Como** usuário, **quero** editar altura, peso, data de nascimento e telefone, **para** manter meu perfil atualizado.
 
-- **Status:** 🔜 Sprint 4 (Issue #13 / PR #23)
+- **Status:** ✅ Implementada (PR #23 / Issue #13)
 - **Critérios de aceite / Regras de negócio:**
-  - [ ] **Data de Nascimento:**
+  - [x] **Data de Nascimento:**
     - Formato com máscara automática (`DD/MM/AAAA`) e limite máximo de 10 caracteres.
     - Validação contra datas de calendário inexistentes (ex.: 31/02/2020) e bloqueio de datas no futuro.
     - Validação de idade mínima obrigatória de 14 anos.
-  - [ ] **Telefone com DDD:**
+  - [x] **Telefone com DDD:**
     - Indicação explícita de formato no rótulo/hint (`(XX) XXXXX-XXXX`).
     - Máscara automática e limite de caracteres (máximo 15 caracteres para `(XX) XXXXX-XXXX`).
     - Exibição do número de telefone também na tela de visualização do Perfil (`ProfileScreen`).
-  - [ ] **Peso e Altura:**
+  - [x] **Peso e Altura:**
     - Aceita decimais com ponto ou vírgula (normalizar com `replaceAll(',', '.')`).
-    - Altura aceita em metros (0,50 a 2,50) ou em centímetros (50 a 250), normalizando para metros antes de persistir.
-  - [ ] **Acessibilidade & TTS:**
+    - Altura e peso com limites biológicos razoáveis (peso: 20kg–300kg; altura: 0.50m–2.50m).
+  - [x] **Acessibilidade & TTS:**
     - Botão "Ler tela" (TTS) presente na AppBar da tela de edição.
     - Fontes legíveis (fontSize >= 18) e áreas de toque ampliadas para o público idoso.
+
 
 ---
 
@@ -219,8 +220,8 @@
 | US02 | Autenticar-se | ✅ | — |
 | US03 | Encerrar sessão | ✅ | — |
 | US04 | Admin cadastra usuários com papel | ✅ | — |
-| US05 | Ver meus dados em todas as telas | ✅ | S1 |
-| US06 | Editar dados biométricos | 💤 | Backlog |
+| US05 | Ver meus dados em todas as telas | 🐞 Bug | S1 |
+| US06 | Editar dados biométricos | ✅ | — |
 | US07 | Listar exercícios por categoria | ✅ | — |
 | US08 | Detalhe do exercício | 🔜 | S2 |
 | US09 | Seed oficial do catálogo | 🔜 | S1 |
