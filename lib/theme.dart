@@ -77,8 +77,38 @@ class AppTheme {
         onSecondary: Colors.black,
         surface: highContrastBackground,
         onSurface: highContrastWhite,
+        surfaceContainerLow: Color(0xFF1C1C1C),
+        surfaceContainer: Color(0xFF262626),
+        surfaceContainerHighest: Color(0xFF333333),
         error: Colors.redAccent,
         onError: Colors.black,
+      ),
+      cardTheme: CardThemeData(
+        color: const Color(0xFF1C1C1C),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: highContrastYellow, width: 2),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF1C1C1C),
+        hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
+        labelStyle: const TextStyle(color: highContrastYellow, fontSize: 16, fontWeight: FontWeight.bold),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: highContrastYellow, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: highContrastYellow, width: 2),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: highContrastWhite, width: 2.5),
+        ),
+        errorStyle: const TextStyle(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.bold),
       ),
       textTheme: GoogleFonts.interTextTheme().copyWith(
         displayLarge: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: highContrastYellow),

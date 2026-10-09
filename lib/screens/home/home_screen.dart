@@ -11,7 +11,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const screenText = "AtivaMente. Tela inicial. Botão Treinos em Casa. Botão Treinos na Rua. Botão Treinos Sugeridos.";
     final readScreen = ref.watch(readScreenProvider(screenText));
-    final userDataAsync = ref.watch(userDataProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,19 +41,12 @@ class HomeScreen extends ConsumerWidget {
                   child: Icon(Icons.person, size: 80, color: Theme.of(context).colorScheme.primary),
                 ),
                 const SizedBox(height: 8),
-                userDataAsync.when(
-                  data: (pessoa) => Text(
-pessoa?.nome ?? 'Usuário',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  loading: () => CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary),
-                  error: (err, stack) => Text(
-                    'Erro',
-                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                Text(
+                  ref.watch(userDisplayNameProvider),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

@@ -14,6 +14,35 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
 });
 
+/// Retorna o nome de exibição do usuário aplicando precedência com fallback robusto:
+/// 1. Pessoa.nome (se preenchido)
+/// 2. User.displayName do Firebase Auth (se preenchido)
+/// 3. Prefixo do e-mail do Firebase Auth
+/// 4. Fallback genérico 'Usuário'
+String getEffectiveDisplayName(Pessoa? pessoa, User? user) {
+  if (pessoa != null && pessoa.nome.trim().isNotEmpty) {
+    return pessoa.nome.trim();
+  }
+  if (user != null) {
+    if (user.displayName != null && user.displayName!.trim().isNotEmpty) {
+      return user.displayName!.trim();
+    }
+    if (user.email != null && user.email!.trim().isNotEmpty) {
+      final emailPrefix = user.email!.split('@').first.trim();
+      if (emailPrefix.isNotEmpty) {
+        return emailPrefix;
+      }
+    }
+  }
+  return 'Usuário';
+}
+
+final userDisplayNameProvider = Provider<String>((ref) {
+  final user = ref.watch(authStateProvider).value;
+  final pessoa = ref.watch(userDataProvider).value;
+  return getEffectiveDisplayName(pessoa, user);
+});
+
 final userDataProvider = StreamProvider<Pessoa?>((ref) {
   final user = ref.watch(authStateProvider).value;
   if (user == null) {
@@ -23,11 +52,31 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
       .collection('Pessoas')
       .doc(user.uid)
       .snapshots()
-      .map((snapshot) {
+      .asyncMap((snapshot) async {
     if (snapshot.exists && snapshot.data() != null) {
       return Pessoa.fromJson(snapshot.data()!, snapshot.id);
     }
-    return null;
+    // Auto-criação on-demand para contas sem documento Pessoas no Firestore
+    final fallbackName = getEffectiveDisplayName(null, user);
+    final newPessoa = Pessoa(
+      id: user.uid,
+      nome: fallbackName,
+      nomeLogin: user.email ?? '',
+      role: 'user',
+      dataNascimento: '',
+      peso: 0.0,
+      altura: 0.0,
+      notificacoes: [],
+    );
+    try {
+      await FirebaseFirestore.instance
+          .collection('Pessoas')
+          .doc(user.uid)
+          .set(newPessoa.toJson(), SetOptions(merge: true));
+    } catch (_) {
+      // Ignora falhas de escrita (ex.: offline/regras em execução local)
+    }
+    return newPessoa;
   });
 });
 
