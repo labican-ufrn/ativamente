@@ -3,14 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'config/app_environment.dart';
 import 'firebase_options.dart';
+import 'providers/accessibility_provider.dart';
 import 'providers/seed_provider.dart';
 import 'routes.dart';
 import 'theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final sharedPreferences = await SharedPreferences.getInstance();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -29,8 +32,11 @@ void main() async {
   }
 
   runApp(
-    const ProviderScope(
-      child: AppAcademia(),
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const AppAcademia(),
     ),
   );
 }
@@ -59,12 +65,14 @@ class _AppAcademiaState extends ConsumerState<AppAcademia> {
   @override
   Widget build(BuildContext context) {
     final goRouter = ref.watch(goRouterProvider);
+    final isHighContrast = ref.watch(highContrastProvider);
 
     return MaterialApp.router(
       title: 'App Academia',
-      theme: AppTheme.theme,
+      theme: isHighContrast ? AppTheme.highContrastTheme : AppTheme.theme,
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
     );
   }
 }
+

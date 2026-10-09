@@ -63,14 +63,14 @@
 ### US05 — Ver meus dados em todas as telas *(atualizada pelo teste)*
 **Como** usuário autenticado, **quero** ver meu nome carregado corretamente na Home e no Perfil (e onde mais for exibido), **para** confirmar que estou na minha conta.
 
-- **Status:** 🐞 Bug reportado — *nome não carrega; também não aparece nas demais telas*
+- **Status:** ✅ Implementada
 - **Prioridade:** Alta (Sprint 1)
 - **Critérios de aceite:**
-  - [ ] Nome real do usuário logado aparece na Home (cabeçalho) e no Perfil.
-  - [ ] Causa raiz diagnosticada e documentada (hipóteses: documento ausente em `Pessoas` para contas criadas fora do fluxo de registro; regras de segurança do Firestore bloqueando leitura; doc com campos vazios).
-  - [ ] Fallback robusto: se o documento não existir, exibir `displayName` ou e-mail do Firebase Auth (nunca travar em loading nem mostrar erro bruto).
-  - [ ] Contas criadas antes da lógica de registro recebem documento `Pessoas` automaticamente (migração/on-demand).
-- **Evidência atual:** `home_screen.dart:45-59` e `profile_screen.dart:37-48` consomem `userDataProvider`; quando o snapshot não existe exibem `'Usuário'`/fallback genérico. Nenhuma outra tela exibe identidade.
+  - [x] Nome real do usuário logado aparece na Home (cabeçalho) e no Perfil.
+  - [x] Causa raiz diagnosticada e documentada em `docs/qa-matriz-testes.md` (documento Pessoas ausente em contas legadas; operador fallback `??` ineficaz com string vazia `''`; ausência de integração com Auth e auto-criação on-demand).
+  - [x] Fallback robusto: se o documento não existir ou nome for vazio, exibe `displayName` ou e-mail do Firebase Auth (sem travar em loading nem mostrar erro bruto).
+  - [x] Contas criadas antes da lógica de registro recebem documento `Pessoas` automaticamente (migração on-demand via `userDataProvider`).
+- **Casos de Teste (QA):** CT-US05-01 a CT-US05-05 em `docs/qa-matriz-testes.md`.
 
 ### US06 — Editar meus dados biométricos
 **Como** usuário, **quero** editar altura, peso, data de nascimento e telefone, **para** manter meu perfil atualizado.
@@ -189,8 +189,14 @@
 ### US15 — Preferências de acessibilidade funcionais
 **Como** usuário, **quero** configurar alto contraste, tamanho de fonte e velocidade da voz, **para** adaptar o app às minhas necessidades.
 
-- **Status:** 💤 Backlog (UI existe como placeholder sem ação em `profile_screen.dart`)
-- **Critérios de aceite (proposta):** preferências persistidas e aplicadas globalmente; velocidade da voz altera `setSpeechRate`.
+- **Status:** ✅ Modo Alto Contraste implementado / 💤 Outras opções em backlog
+- **Critérios de aceite:**
+  - [x] Switch "Modo Alto Contraste" ativa tema de alto contraste em toda a aplicação instantaneamente.
+  - [x] Desativar o switch retorna ao tema padrão.
+  - [x] Preferência de alto contraste persistida em `shared_preferences` entre sessões.
+  - [x] Cores do próprio tema atendem WCAG AAA (fundo preto + destaque amarelo: 16,6:1 e 21:1).
+  - [x] Contraste AA com o modo ligado em **todas** as telas — separação visual de Cards e substituição de cores fixas por tokens do tema concluídas (Issue #37).
+  - [ ] Ajuste de tamanho de fonte e velocidade da voz (backlog).
 
 ---
 
@@ -224,5 +230,5 @@
 | US12 | Tempo previsto com alertas | 🔜 | S3 |
 | US13 | Registrar conclusão do exercício | 🔜 | S3 |
 | US14 | Ler tela em voz alta | ✅ | — |
-| US15 | Preferências de acessibilidade | 💤 | Backlog |
+| US15 | Preferências de acessibilidade (Alto Contraste) | ✅ | — |
 | US16–US20 | Backlog futuro | 💤 | — |

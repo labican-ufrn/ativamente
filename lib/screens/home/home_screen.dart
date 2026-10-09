@@ -11,7 +11,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const screenText = "AtivaMente. Tela inicial. Botão Treinos em Casa. Botão Treinos na Rua. Botão Treinos Sugeridos.";
     final readScreen = ref.watch(readScreenProvider(screenText));
-    final userDataAsync = ref.watch(userDataProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,25 +35,18 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: 24.0),
             child: Column(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 50,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 80, color: Color(0xFF1E315A)),
+                  backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                  child: Icon(Icons.person, size: 80, color: Theme.of(context).colorScheme.primary),
                 ),
                 const SizedBox(height: 8),
-                userDataAsync.when(
-                  data: (pessoa) => Text(
-                    pessoa?.nome ?? 'Nome do Usuário',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  loading: () => const CircularProgressIndicator(color: Colors.white),
-                  error: (err, stack) => Text(
-                    'Erro',
-                    style: const TextStyle(color: Colors.white),
+                Text(
+                  ref.watch(userDisplayNameProvider),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -89,14 +81,16 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildMenuCard(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(24.0),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
+          color: colorScheme.primary,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colorScheme.onPrimary, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -110,16 +104,16 @@ class HomeScreen extends ConsumerWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: colorScheme.onPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             CircleAvatar(
               radius: 40,
-              backgroundColor: Colors.white,
-              child: Icon(icon, size: 50, color: Theme.of(context).colorScheme.primary),
+              backgroundColor: colorScheme.onPrimary,
+              child: Icon(icon, size: 50, color: colorScheme.primary),
             ),
           ],
         ),
