@@ -8,6 +8,11 @@ class AppTheme {
   static const Color textDark = Color(0xFF1E315A); // Text is usually the same dark blue
   static const Color white = Colors.white;
 
+  // Cores de intensidade
+  static const Color intensityLight = Color(0xFF2E7D32); // Verde para Leve (1-5)
+  static const Color intensityModerate = Color(0xFFF57F17); // Âmbar para Moderado (6-8)
+  static const Color intensityHeavy = Color(0xFFC62828); // Vermelho para Intenso (9-10)
+
   static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
@@ -77,8 +82,38 @@ class AppTheme {
         onSecondary: Colors.black,
         surface: highContrastBackground,
         onSurface: highContrastWhite,
+        surfaceContainerLow: Color(0xFF1C1C1C),
+        surfaceContainer: Color(0xFF262626),
+        surfaceContainerHighest: Color(0xFF333333),
         error: Colors.redAccent,
         onError: Colors.black,
+      ),
+      cardTheme: CardThemeData(
+        color: const Color(0xFF1C1C1C),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: highContrastYellow, width: 2),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF1C1C1C),
+        hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 16),
+        labelStyle: const TextStyle(color: highContrastYellow, fontSize: 16, fontWeight: FontWeight.bold),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: highContrastYellow, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: highContrastYellow, width: 2),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: highContrastWhite, width: 2.5),
+        ),
+        errorStyle: const TextStyle(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.bold),
       ),
       textTheme: GoogleFonts.interTextTheme().copyWith(
         displayLarge: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: highContrastYellow),

@@ -1,0 +1,34 @@
+# .editorconfig — padroniza formatação entre editores/IDEs.
+# Para Dart, `dart format` continua sendo a fonte da verdade.
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Dart, YAML, JSON e workflows: 2 espaços
+[*.{dart,yaml,yml,json}]
+indent_style = space
+indent_size = 2
+
+# Markdown: preserva espaços no fim de linha (quebras de linha)
+[*.md]
+trim_trailing_whitespace = false
+
+# Scripts Python (ex.: ferramentas locais): 4 espaços
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Android/Gradle e Web: 4 espaços
+[*.{kt,kts,gradle,java,html,css,js,ts}]
+indent_style = space
+indent_size = 4
+
+# Makefile exige tabulação
+[Makefile]
+indent_style = tab

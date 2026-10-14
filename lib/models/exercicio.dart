@@ -5,17 +5,11 @@ class Categoria {
   Categoria({required this.nome, required this.icone});
 
   factory Categoria.fromJson(Map<String, dynamic> json) {
-    return Categoria(
-      nome: json['nome'] ?? '',
-      icone: json['icone'] ?? '',
-    );
+    return Categoria(nome: json['nome'] ?? '', icone: json['icone'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'nome': nome,
-      'icone': icone,
-    };
+    return {'nome': nome, 'icone': icone};
   }
 }
 
@@ -26,17 +20,11 @@ class Tipo {
   Tipo({required this.nome, required this.icone});
 
   factory Tipo.fromJson(Map<String, dynamic> json) {
-    return Tipo(
-      nome: json['nome'] ?? '',
-      icone: json['icone'] ?? '',
-    );
+    return Tipo(nome: json['nome'] ?? '', icone: json['icone'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'nome': nome,
-      'icone': icone,
-    };
+    return {'nome': nome, 'icone': icone};
   }
 }
 
@@ -49,6 +37,7 @@ class Exercicio {
   final bool statusRealizado;
   final Categoria categoria;
   final Tipo tipo;
+  final int intensidade;
 
   Exercicio({
     required this.id,
@@ -59,10 +48,27 @@ class Exercicio {
     this.statusRealizado = false,
     required this.categoria,
     required this.tipo,
-  });
+    required this.intensidade,
+  }) {
+    if (intensidade < 1 || intensidade > 10) {
+      throw ArgumentError.value(
+        intensidade,
+        'intensidade',
+        'deve estar entre 1 e 10',
+      );
+    }
+  }
 
   factory Exercicio.fromJson(Map<String, dynamic> json, String documentId) {
-    final effectiveId = documentId.isNotEmpty ? documentId : (json['codigo'] ?? '');
+    final effectiveId = documentId.isNotEmpty
+        ? documentId
+        : (json['codigo'] ?? '');
+    final intensidade = json['intensidade'] as int? ?? 1;
+    if (intensidade < 1 || intensidade > 10) {
+      throw FormatException(
+        'Intensidade inválida: $intensidade. Deve estar entre 1 e 10.',
+      );
+    }
     return Exercicio(
       id: effectiveId,
       codigo: json['codigo'] ?? effectiveId,
@@ -72,6 +78,7 @@ class Exercicio {
       statusRealizado: json['statusRealizado'] ?? false,
       categoria: Categoria.fromJson(json['categoria'] ?? {}),
       tipo: Tipo.fromJson(json['tipo'] ?? {}),
+      intensidade: intensidade,
     );
   }
 
@@ -84,6 +91,7 @@ class Exercicio {
       'statusRealizado': statusRealizado,
       'categoria': categoria.toJson(),
       'tipo': tipo.toJson(),
+      'intensidade': intensidade,
     };
   }
 }

@@ -5,6 +5,7 @@
     "descricao": "15 min de caminhada em ritmo constante com postura ereta e braços movimentando levemente.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 3,
     "categoria": {
       "nome": "Coracao",
       "icone": "favorite"
@@ -20,6 +21,7 @@
     "descricao": "15 min de caminhada em esteira com velocidade reduzida e apoio lateral.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 3,
     "categoria": {
       "nome": "Coracao",
       "icone": "favorite"
@@ -35,6 +37,7 @@
     "descricao": "3x de 1 min alternando passos laterais abrindo e fechando os braços sem impacto.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 6,
     "categoria": {
       "nome": "Coracao",
       "icone": "favorite"
@@ -50,6 +53,7 @@
     "descricao": "3x de 10 repetições. Sentado firmemente, eleve um joelho de cada vez de forma controlada.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 4,
     "categoria": {
       "nome": "Coracao",
       "icone": "favorite"
@@ -65,6 +69,7 @@
     "descricao": "3x de 10 repetições. Sente e levante de uma cadeira firme mantendo a coluna alinhada.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 6,
     "categoria": {
       "nome": "Musculo",
       "icone": "fitness_center"
@@ -80,6 +85,7 @@
     "descricao": "3x de 8 repetições. Agachamento controlado sem carga adicional.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 6,
     "categoria": {
       "nome": "Musculo",
       "icone": "fitness_center"
@@ -95,6 +101,7 @@
     "descricao": "3x de 8 repetições. Apoie as mãos na parede na largura dos ombros e empurre suavemente.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 9,
     "categoria": {
       "nome": "Musculo",
       "icone": "fitness_center"
@@ -110,6 +117,7 @@
     "descricao": "3x de 12 repetições. Em pé apoiado na cadeira, eleve os calcanhares ficando na ponta dos pés.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 3,
     "categoria": {
       "nome": "Musculo",
       "icone": "fitness_center"
@@ -125,6 +133,7 @@
     "descricao": "Segure cada braço cruzado sobre o peito por 20 segundos respirando suavemente.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 2,
     "categoria": {
       "nome": "Flexibilidade",
       "icone": "accessibility_new"
@@ -140,6 +149,7 @@
     "descricao": "Sentado na ponta da cadeira, estenda uma perna e incline o tronco à frente por 20 segundos.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 2,
     "categoria": {
       "nome": "Flexibilidade",
       "icone": "accessibility_new"
@@ -155,6 +165,7 @@
     "descricao": "3x de 20 seg sustentando o corpo em uma perna só com apoio de segurança na cadeira.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 5,
     "categoria": {
       "nome": "Equilibrio",
       "icone": "balance"
@@ -170,6 +181,7 @@
     "descricao": "20 min de caminhada ao ar livre em terreno plano e seguro.",
     "midia": "",
     "statusRealizado": false,
+    "intensidade": 3,
     "categoria": {
       "nome": "NaRua",
       "icone": "park"

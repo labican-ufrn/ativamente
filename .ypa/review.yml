@@ -1,0 +1,93 @@
+# .ypa/review.yml — configuração do fluxo de revisão de código do AtivaMente.
+#
+# Leitura: skills do labens-skills (`code-review-criteria`, `sonar-quality-gate`,
+# `backend-issue-template`) leem este arquivo com PyYAML. Não há template
+# `.ypa/review.yml.example` neste repo de propósito: o `checks` deste projeto não
+# tem caminho específico de máquina (`flutter analyze`/`flutter test` são universais),
+# então versionar o arquivo direto garante que todos os integrantes revisem com os
+# mesmos critérios. Nada aqui é segredo — token vai pelo NOME da variável, nunca pelo
+# valor.
+#
+# Fontes de verdade, sem sobreposição:
+#   .ypa/review.yml  -> fluxo de revisão (este arquivo)
+#   sonar-project.properties -> SonarQube (não existe neste projeto: sem CI/Sonar)
+#   AGENTS.md / MEMORY.md -> regras e fatos do projeto
+#
+# Obs.: este repo não tem CI nem SonarQube. A seção `sonarqube` fica declarada só
+# para a skill saber que não há o que consultar — não preencha `host_url` sem que a
+# CI exista.
+
+project:
+  name: ativamente
+
+  # Este repo é GitFlow: dev é a branch de integração e a default do GitHub.
+  # O default da skill é `main`, que aqui estaria errado.
+  base_branch: dev
+
+  # Carrega stacks/flutter.md (camadas, tema, navegação, Riverpod, acessibilidade).
+  stack: flutter
+
+  # Declara o runtime de produção — é dele que a regra "runtime validado difere do
+  # runtime de produção" parte.
+  runtime_file: .tool-versions
+
+  # Cobertura inicial de 60% — piso inicial, a subir a cada PR que trouxer teste.
+  # Medido com `flutter test --coverage` (lcov.info).
+  #
+  # CUIDADO com a leitura: o lcov do Flutter só inclui os arquivos tocados pelos
+  # testes, então uma suite com 1 arquivo testado reporta 100% mesmo sem tocar os
+  # outros 21. O número só vale quando a suite exercitar boa parte de lib/ — a
+  # skill registra no parecer qual a fração de arquivos medida.
+  min_coverage: 60
+
+  # App final, não biblioteca: não há consumidor externo do contrato, então SemVer não
+  # é cobrado por PR. `version_file` segue declarado só para a regra "versão: fonte
+  # única" (PR que mexe em versão sem atualizar o pubspec).
+  enforce_semver: false
+  version_file: pubspec.yaml
+
+  # Tipos de AGENTS.md. `ci` está na tabela da regra de commits mesmo sem uso ainda.
+  require_conventional_commits: true
+  conventional_commit_types: feat, fix, docs, test, refactor, style, chore, ci
+
+  # Formatos aceitos:
+  #   feature/ feat/      -> AGENTS.md exige `feature/<nome>`; `feat/` é a abreviatura
+  #                          usada na prática e aceita como variante da mesma forma.
+  #   bugfix/ fix/        -> idem: `fix/` é a abreviatura de `bugfix/`.
+  #   docs/ hotfix/ release/ -> previstos no GitFlow do AGENTS.md.
+  #   estudo/             -> usada no repo (issues #1 e #2), mas NÃO consta no
+  #                          GitFlow do AGENTS.md — incluída para não acusar falso
+  #                          positivo. Ratificar no AGENTS.md ou remover daqui.
+  branch_pattern: ^(?:(?:feature|feat|bugfix|fix|hotfix|docs|estudo)/[a-z0-9]+(?:-[a-z0-9]+)*|release/[^/]+)$
+
+  # Só os arquivos do PR, comparados contra a versão deles na base — assim o parecer
+  # separa dívida legada de regressão nova.
+  lint_scope: diff
+  lint_baseline:
+
+sonarqube:
+  # Projeto sem CI e sem SonarQube. Não preencha host_url enquanto não existir a CI:
+  # a skill trata ausência como "não houve análise", nunca como "zero issues".
+  host_url:
+  token_env_var: SONAR_TOKEN
+  analysis_mode: branch
+  max_issues: 30
+
+checks:
+  # Flutter: `flutter analyze` é ao mesmo tempo o validador e o linter.
+  app_check_cmd: flutter analyze
+  linter_cmd: flutter analyze
+  test_coverage_cmd: flutter test --coverage
+  # stacks/flutter.md não exige `migrations_check_cmd` — não há migrations.
+
+exclusions:
+  # Filtro do RELATÓRIO (e do SonarQube, quando existir): não conta teste, código
+  # gerado nem artefato de build como produção.
+  paths: "**/test/**, lib/firebase_options.dart, **/*.g.dart, **/*.freezed.dart, build/**, .dart_tool/**"
+
+workflow:
+  # Toda ação que escreve exige plano + confirmação, nesta ordem.
+  require_sync_confirmation: true
+  require_write_confirmation: true
+  require_commit_confirmation: true
+  require_push_confirmation: true

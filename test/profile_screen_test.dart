@@ -17,6 +17,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
+        authStateProvider.overrideWith((ref) => Stream.value(null)),
         userDataProvider.overrideWith((ref) => Stream.value(null)),
       ],
     );

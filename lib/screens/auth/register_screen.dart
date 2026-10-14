@@ -66,7 +66,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               'Cadastre-se para começar!',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 32),
@@ -74,19 +74,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  border: Border.all(color: Colors.red[800]!, width: 2),
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  border: Border.all(color: Theme.of(context).colorScheme.error, width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red[800], size: 28),
+                    Icon(Icons.error_outline, color: Theme.of(context).colorScheme.onErrorContainer, size: 28),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         _errorMessage!,
                         style: TextStyle(
-                          color: Colors.red[800],
+                          color: Theme.of(context).colorScheme.onErrorContainer,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -105,13 +105,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               decoration: InputDecoration(
                 hintText: 'Seu nome completo',
                 filled: true,
-                fillColor: Colors.grey[300],
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
             ),
             const SizedBox(height: 24),
             Text('Email', style: Theme.of(context).textTheme.titleLarge),
@@ -122,13 +124,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               decoration: InputDecoration(
                 hintText: 'Seu email',
                 filled: true,
-                fillColor: Colors.grey[300],
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
             ),
             const SizedBox(height: 24),
             Text('Senha', style: Theme.of(context).textTheme.titleLarge),
@@ -139,13 +143,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               decoration: InputDecoration(
                 hintText: 'Sua senha',
                 filled: true,
-                fillColor: Colors.grey[300],
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               ),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
             ),
             const SizedBox(height: 48),
             ElevatedButton(
@@ -170,9 +176,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       SnackBar(
                         content: Text(
                           message,
-                          style: const TextStyle(fontSize: 18), // Texto grande para acessibilidade
+                          style: const TextStyle(fontSize: 18),
                         ),
-                        backgroundColor: Colors.red[800],
+                        backgroundColor: Theme.of(context).colorScheme.error,
                         duration: const Duration(seconds: 4),
                       ),
                     );

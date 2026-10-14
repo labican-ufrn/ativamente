@@ -65,7 +65,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               'Que bom ter você aqui!',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 32),
@@ -73,19 +73,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  border: Border.all(color: Colors.red[800]!, width: 2),
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  border: Border.all(color: Theme.of(context).colorScheme.error, width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red[800], size: 28),
+                    Icon(Icons.error_outline, color: Theme.of(context).colorScheme.onErrorContainer, size: 28),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         _errorMessage!,
                         style: TextStyle(
-                          color: Colors.red[800],
+                          color: Theme.of(context).colorScheme.onErrorContainer,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -105,17 +105,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               controller: _emailController,
               decoration: InputDecoration(
                 hintText: 'Email ou Nome',
-                prefixIcon: const Icon(Icons.person, color: Colors.white),
+                prefixIcon: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.primary,
-                hintStyle: const TextStyle(color: Colors.white70),
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 20),
               ),
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
             ),
             const SizedBox(height: 24),
             Row(
@@ -134,10 +134,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: InputDecoration(
                 hintText: 'Digite sua senha...',
                 filled: true,
-                fillColor: Colors.grey[300],
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -152,7 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               ),
-              style: const TextStyle(fontSize: 18),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -161,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Text(
                   'Esqueci minha senha',
                   style: TextStyle(
-                    color: Colors.blue[700],
+                    color: Theme.of(context).colorScheme.primary,
                     decoration: TextDecoration.underline,
                     fontSize: 16,
                   ),
@@ -190,9 +191,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       SnackBar(
                         content: Text(
                           message,
-                          style: const TextStyle(fontSize: 18), // Texto grande para acessibilidade
+                          style: const TextStyle(fontSize: 18),
                         ),
-                        backgroundColor: Colors.red[800],
+                        backgroundColor: Theme.of(context).colorScheme.error,
                         duration: const Duration(seconds: 4),
                       ),
                     );
@@ -208,7 +209,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             const SizedBox(height: 48),
-            const Divider(color: Colors.black54, thickness: 1),
+            Divider(color: Theme.of(context).colorScheme.outlineVariant, thickness: 1),
             const SizedBox(height: 16),
             Text(
               'Não possui uma conta?',
@@ -220,7 +221,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Text(
                 'Cadastre-se',
                 style: TextStyle(
-                  color: Colors.blue[700],
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),

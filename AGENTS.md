@@ -126,6 +126,7 @@ flutter build web               # build Web
 4. Sem segredos/chaves no repositório (configurações Firebase ficam nos arquivos gerados pelo `flutterfire configure`, que não devem conter chaves privadas).
 5. Modelos em `lib/models/` seguem o padrão `fromJson`/`toJson`; providers em `lib/providers/` com Riverpod.
 6. Toda documentação nova em PT-BR dentro de `docs/`.
+7. `lib/routes.dart` não importa modelos nem providers para resolver entidades de detalhe; imports de infraestrutura de navegação e autenticação são permitidos. Navegação de detalhe resolve **um único caminho**: a tela busca o registro por `id` no provider — não duplicar a resolução com `state.extra` de objeto de domínio.
 
 ## Templates
 

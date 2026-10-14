@@ -90,7 +90,7 @@ class _AddUserScreenState extends ConsumerState<AddUserScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _selectedRole,
+                initialValue: _selectedRole,
                 decoration: const InputDecoration(labelText: 'Tipo de Usuário'),
                 items: const [
                   DropdownMenuItem(value: 'user', child: Text('Usuário Comum')),

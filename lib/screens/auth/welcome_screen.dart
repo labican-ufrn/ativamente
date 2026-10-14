@@ -17,7 +17,7 @@ class WelcomeScreen extends ConsumerWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.volume_up, color: Color(0xFF1E315A), size: 32),
+            icon: Icon(Icons.volume_up, color: Theme.of(context).colorScheme.primary, size: 32),
             onPressed: readScreen,
             tooltip: 'Ler tela',
           ),
@@ -32,10 +32,10 @@ class WelcomeScreen extends ConsumerWidget {
             children: [
               const Spacer(),
               // Placeholder for Logo
-              const Icon(
+              Icon(
                 Icons.favorite_border, // Using generic icon until asset is provided
                 size: 100,
-                color: Color(0xFF1E315A),
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 16),
               Text(
@@ -67,9 +67,6 @@ class WelcomeScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               OutlinedButton(
                 onPressed: () => context.go('/register'),
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
