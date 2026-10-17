@@ -43,6 +43,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
           horizontal: 20,
           vertical: 12,
         ),
+        titleAlignment: ListTileTitleAlignment.center,
         title: Row(
           children: [
             Expanded(
@@ -81,6 +82,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
           ),
           color: colorScheme.primary,
           iconSize: 36,
+          padding: const EdgeInsets.all(8),
+          constraints: const BoxConstraints(
+            minWidth: 48,
+            minHeight: 48,
+          ),
+          tooltip: isActive && activeState.isRunning
+              ? 'Pausar exercício'
+              : 'Iniciar exercício',
           onPressed: () => ref
               .read(activeExerciseProvider.notifier)
               .toggleExercise(exercicio.id),
