@@ -1,47 +1,68 @@
-# Matriz de Testes & QA — AtivaMente (App Flutter)
+# Matriz de QA — Iteração 4
 
-Documento de rastreabilidade de testes e matriz de garantia de qualidade do aplicativo AtivaMente.
+**Data da execução:** 09/10/2026  
+**Branch avaliado:** `14-docs-qa-de-regressão-atualização-de-documentação-e-release`  
+**Plataformas previstas:** Android e Web
 
----
+## Legenda
 
-## 1. Diagnóstico de Causas Raízes (Bugs Registrados)
+| Status | Significado |
+|---|---|
+| ✅ | Executado e aprovado |
+| ⚠️ | Parcial, com limitação registrada |
+| ❌ | Falhou ou não está implementado |
+| ⏸️ | Bloqueado por ambiente ou integração ausente |
 
-### Bug Issue #8 — Nome do Usuário Logado (US05)
-- **Sintoma:** O nome do usuário exibia "Usuário", "Nome do Usuário" ou string em branco no cabeçalho da Home e na tela de Perfil.
-- **Causas Raízes Diagnosticadas:**
-  1. **Documento Ausente em `Pessoas`:** Contas de usuário criadas por fluxos secundários ou legados não possuíam o documento `Pessoas/{uid}` criado no Cloud Firestore.
-  2. **Fallback Ineficiente para String Vazia:** O código anterior fazia `pessoa?.nome ?? 'Usuário'`, porém se `nome` no Firestore fosse uma string vazia (`''`), o operador `??` não era acionado, mantendo a string vazia na tela.
-  3. **Ausência de Integração com Firebase Auth:** O provider não consultava `user.displayName` ou `user.email` como fonte secundária de identidade ao aguardar ou quando o Firestore estivesse sem dados.
-  4. **Sem Auto-criação On-demand:** Contas sem documento `Pessoas` no Firestore não tinham um mecanismo de auto-recuperação/migração on-demand ao realizar login.
+## Pré-condições e evidências
 
-- **Solução Aplicada:**
-  - Criação da função pura `getEffectiveDisplayName(pessoa, user)` com a hierarquia de precedência:
-    1. `Pessoa.nome` (se preenchido e não-vazio);
-    2. `User.displayName` do Firebase Auth (se preenchido e não-vazio);
-    3. Prefixo do e-mail do Firebase Auth (parte anterior ao `@`);
-    4. Fallback genérico `'Usuário'`.
-  - Introdução do `userDisplayNameProvider` para servir o nome de forma síncrona e resiliente ao estado do Auth/Firestore.
-  - Atualização do `userDataProvider` para realizar a auto-criação on-demand do documento `Pessoas/{uid}` com `SetOptions(merge: true)`.
+- `flutter analyze`: ⏸️ bloqueado pela ausência de `lib/firebase_options.dart`, arquivo gerado pelo FlutterFire e ignorado pelo repositório. Foram identificados 2 erros de compilação relacionados a essa configuração.
+- `flutter test`: ⏸️ bloqueado pelo requisito de symlink do Flutter no Windows (Developer Mode desativado). A suíte existente contém 14 testes em 3 arquivos.
+- Não foi possível executar um dispositivo Android nem iniciar o Web com Firebase nesta estação: não há configuração local do FlutterFire nem emuladores ativos.
+- O branch avaliado não contém as rotas/telas de detalhe, alertas ou registro. Os branches remotos `origin/feat/detalhes-exercicio` e `origin/feat/marcacao-exercicio-timer` contêm trabalho não integrado; não foram considerados aprovados nesta release.
 
-### Feature Issue #37 — Conclusão do Modo Alto Contraste & Separação de Cards (US15)
-- **Sintomas:**
-  1. **Cards Pretos em Fundo Preto:** Em Material 3, o papel `surfaceContainerLow` não era definido no `highContrastTheme`, fazendo a cor do Card cair em `surface` (preto), igual ao fundo da tela (`scaffoldBackgroundColor`), perdendo a separação visual.
-  2. **Cores Hardcoded:** Telas com cores fixas (`Colors.white`, `Colors.grey`, etc.) ignoravam o tema ativo, gerando pares com baixo contraste no modo alto contraste.
-- **Solução Aplicada:**
-  - Definição explícita de `surfaceContainerLow` (`0xFF1C1C1C`), `surfaceContainer` (`0xFF262626`) e `surfaceContainerHighest` (`0xFF333333`) no `highContrastTheme`.
-  - Configuração de `cardTheme` com borda visível de alto contraste (`0xFFFFE600`, 2px) e `inputDecorationTheme` para campos de formulário.
-  - Substituição de cores fixas por tokens do `colorScheme` em `welcome_screen.dart`, `login_screen.dart`, `register_screen.dart`, `add_user_screen.dart`, `edit_profile_screen.dart` e `profile_screen.dart`.
+## Matriz funcional
 
----
+| Fluxo | Android | Web | Evidência/observação |
+|---|---:|---:|---|
+| Abertura e tela de boas-vindas | ⏸️ | ⏸️ | Bloqueado pela configuração Firebase |
+| Cadastro com dados válidos | ⏸️ | ⏸️ | Fluxo implementado; exige Auth configurado |
+| Cadastro com e-mail inválido/duplicado e senha fraca | ⚠️ | ⚠️ | Cobertura automatizada de mensagens em `test/utils/auth_errors_test.dart`; execução Flutter bloqueada |
+| Login válido | ⏸️ | ⏸️ | Exige Auth configurado |
+| Login inválido e mensagem acessível | ⚠️ | ⚠️ | Traduções cobertas por teste unitário; execução Flutter bloqueada |
+| Guarda de rotas privadas | ⚠️ | ⚠️ | Implementado em `lib/routes.dart`; sem teste de integração executável |
+| Logout e bloqueio após logout | ⏸️ | ⏸️ | Exige Auth configurado |
+| Home, navegação inferior e perfil | ⏸️ | ⏸️ | Exige Auth/Firestore configurados |
+| Nome do usuário na Home e no Perfil (US05) | ❌ | ❌ | Ainda há fallback genérico `Usuário` e erro bruto `Erro` |
+| Edição de dados biométricos (US06) | ⚠️ | ⚠️ | Código presente no branch; sem execução visual por falta de ambiente |
+| Seed idempotente do catálogo (US09) | ⚠️ | ⚠️ | Implementado com emulador/Firestore, mas sem execução nesta QA |
+| Listagem por categoria Coração/Músculo (US07) | ⏸️ | ⏸️ | UI presente; catálogo depende do Firestore |
+| Detalhe do exercício (US08) | ❌ | ❌ | Rota e tela não estão integradas neste branch |
+| Voltar do treino para Home (US10) | ⚠️ | ⚠️ | Código usa `context.pop()`; precisa validação manual de navegação |
+| Marcar exercício em execução (US11) | ❌ | ❌ | Provider e integração existem apenas em branch remoto não integrado |
+| Cronômetro básico | ⚠️ | ⚠️ | Implementado com `Timer.periodic`; sem validação em device |
+| Tempo previsto e diálogo de conclusão (US12) | ❌ | ❌ | Não implementado no branch avaliado |
+| Alertas visuais e sonoros após o tempo (US12) | ❌ | ❌ | Não implementado no branch avaliado |
+| Registro da conclusão no Firestore (US13) | ❌ | ❌ | Não há chamada de persistência para `RegistroAtivDia` |
+| TTS “Ler tela” (US14) | ⚠️ | ⚠️ | Botões/providers presentes; exige validação de áudio em Android e Web |
+| Alto contraste e persistência (US15) | ⚠️ | ⚠️ | Testes de provider/widget presentes; execução Flutter bloqueada |
+| Acesso de administrador e criação de usuários | ⏸️ | ⏸️ | Exige Auth/Firestore configurados |
 
-## 2. Matriz de Casos de Teste (QA)
+## Regressão por plataforma
 
-| ID Caso de Teste | US | Funcionalidade / Cenário | Pré-condição | Passos de Execução | Resultado Esperado | Status |
-|---|---|---|---|---|---|---|
-| **CT-US05-01** | US05 | Exibição de nome real completo | Usuário cadastrado com nome "Maria Silva" em `Pessoas` | 1. Fazer login com a conta.<br>2. Navegar para a Home.<br>3. Navegar para a tela de Perfil. | "Maria Silva" é exibido no cabeçalho da Home e na tela de Perfil. | ✅ Aprovado |
-| **CT-US05-02** | US05 | Fallback para `user.displayName` | Conta no Firebase Auth com `displayName = "João Auth"`, sem doc `Pessoas` | 1. Logar com a conta.<br>2. Abrir Home e Perfil. | "João Auth" é exibido enquanto o doc é auto-criado no Firestore. | ✅ Aprovado |
-| **CT-US05-03** | US05 | Fallback para e-mail | Conta criada via Auth com e-mail `carlos.dev@ativamente.org`, sem nome | 1. Logar com a conta.<br>2. Abrir Home e Perfil. | "carlos.dev" é exibido no cabeçalho e perfil. | ✅ Aprovado |
-| **CT-US05-04** | US05 | Auto-criação de doc `Pessoas` | Conta sem documento na coleção `Pessoas` do Firestore | 1. Efetuar login.<br>2. Verificar coleção `Pessoas` no Firestore. | O documento `Pessoas/{uid}` é auto-criado com os dados básicos do Auth. | ✅ Aprovado |
-| **CT-US05-05** | US05 | Ausência de travamentos em loading | Troca rápida de telas no carregamento inicial | 1. Efetuar login.<br>2. Alternar entre Home e Perfil imediatamente. | Nome do Auth/Fallback aparece de imediato sem travar UI ou mostrar erro bruto. | ✅ Aprovado |
-| **CT-US15-01** | US15 | Separação visual de Cards | Modo Alto Contraste ativado | 1. Ativar Modo Alto Contraste no Perfil.<br>2. Navegar por Home e listas de treinos. | Cards exibem fundo escuro destacado (`0xFF1C1C1C`) e borda amarela contrastante (`0xFFFFE600`). | ✅ Aprovado |
-| **CT-US15-02** | US15 | Formulários em Alto Contraste | Modo Alto Contraste ativado | 1. Abrir telas de Login, Registro, Editar Perfil e Adicionar Usuário. | Textos, rótulos e bordas com taxa de contraste WCAG AA >= 4.5:1, sem textos ilegíveis. | ✅ Aprovado |
+| Plataforma | Resultado | Bloqueio |
+|---|---|---|
+| Android | ⏸️ Não executado | Sem dispositivo/emulador disponível e sem `firebase_options.dart` |
+| Web | ⏸️ Não executado | Sem configuração FlutterFire local e sem servidor/emulador Firebase |
+
+## Bugs e pendências convertidos em acompanhamento
+
+1. **Crítico — configuração de release não reproduzível:** `firebase_options.dart` não está disponível para análise/build. Deve ser gerado por `flutterfire configure` em cada ambiente e validado no pipeline sem versionar credenciais privadas.
+2. **Crítico — escopo da iteração não integrado:** detalhe, execução marcada, alertas e registro não estão no branch avaliado. A release não pode ser considerada funcional até os branches correspondentes serem integrados e testados.
+3. **Alto — US05:** nome do usuário ainda pode aparecer como `Usuário` e falhas de leitura como `Erro`, contrariando o fallback previsto.
+4. **Alto — QA multiplataforma pendente:** Android e Web precisam ser executados com emuladores/Firestore configurados antes do fechamento da iteração.
+
+Não foi criada uma issue remota automaticamente porque o ambiente não disponibiliza permissão de escrita na API do GitHub. Os itens acima devem ser abertos no repositório antes do merge.
+
+## Gate da release
+
+**Resultado: NÃO APROVADO para produção.** A matriz não possui evidência suficiente para declarar ausência de itens críticos: há configuração de build ausente e funcionalidades críticas da Sprint 3 não integradas. O tag gerado para esta entrega deve ser tratado somente como candidato de QA até que os bloqueios sejam resolvidos.
