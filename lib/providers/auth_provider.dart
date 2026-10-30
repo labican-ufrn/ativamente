@@ -56,27 +56,36 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
     if (snapshot.exists && snapshot.data() != null) {
       return Pessoa.fromJson(snapshot.data()!, snapshot.id);
     }
-    // Auto-criação on-demand para contas sem documento Pessoas no Firestore
+    // Auto-criação on-demand para contas sem documento Pessoas no Firestore.
+    // Grava apenas campos de identidade e perfil básico com merge: true,
+    // sem definir ou sobrescrever 'role' implicitamente no banco, preservando
+    // autorizações de administrador/trainer geridas externamente ou por claims.
     final fallbackName = getEffectiveDisplayName(null, user);
-    final newPessoa = Pessoa(
+    final dadosIdentidade = {
+      'nome': fallbackName,
+      'nomeLogin': user.email ?? '',
+      'dataNascimento': '',
+      'peso': 0.0,
+      'altura': 0.0,
+      'notificacoes': [],
+    };
+    try {
+      await FirebaseFirestore.instance
+          .collection('Pessoas')
+          .doc(user.uid)
+          .set(dadosIdentidade, SetOptions(merge: true));
+    } catch (_) {
+      // Ignora falhas de escrita (ex.: offline/regras em execução local)
+    }
+    return Pessoa(
       id: user.uid,
       nome: fallbackName,
       nomeLogin: user.email ?? '',
-      role: 'user',
       dataNascimento: '',
       peso: 0.0,
       altura: 0.0,
       notificacoes: [],
     );
-    try {
-      await FirebaseFirestore.instance
-          .collection('Pessoas')
-          .doc(user.uid)
-          .set(newPessoa.toJson(), SetOptions(merge: true));
-    } catch (_) {
-      // Ignora falhas de escrita (ex.: offline/regras em execução local)
-    }
-    return newPessoa;
   });
 });
 
