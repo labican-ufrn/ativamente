@@ -274,8 +274,11 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                                 .toList();
 
                             if (filteredExercicios.isEmpty) {
-                              return const Center(
-                                child: Text('Nenhum exercício encontrado.'),
+                              return Center(
+                                child: Text(
+                                  'Nenhum exercício encontrado.',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
                               );
                             }
 
@@ -291,8 +294,21 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                           },
                           loading: () =>
                               const Center(child: CircularProgressIndicator()),
-                          error: (err, stack) =>
-                              Center(child: Text('Erro: $err')),
+                          error: (err, stack) {
+                            debugPrint(
+                              'Erro ao carregar exercícios filtrados: $err',
+                            );
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Text(
+                                  'Não foi possível carregar os exercícios no momento. Por favor, tente novamente mais tarde.',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                   ),
                 ],
@@ -317,7 +333,8 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
   }
 
   Widget _buildCategoryTab(IconData icon, String category) {
-    bool isSelected = _selectedCategory == category;
+    final bool isSelected = _selectedCategory == category;
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -327,15 +344,20 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.grey[400] : Colors.grey[200],
+          color: isSelected
+              ? colorScheme.surfaceContainerHighest
+              : colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
+          border: isSelected
+              ? Border.all(color: colorScheme.primary, width: 2)
+              : null,
         ),
         child: CircleAvatar(
           radius: 30,
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: colorScheme.primary,
           child: Icon(
             icon,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: colorScheme.onPrimary,
             size: 30,
           ),
         ),
