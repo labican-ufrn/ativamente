@@ -160,13 +160,12 @@ void main(List<String> args) {
     }
   }
 
-  stdout.writeln('\nPróximos passos recomendados (GitFlow):');
-  stdout.writeln('  1. git checkout -b release/${next.tagName}');
-  stdout.writeln('  2. git add pubspec.yaml CHANGELOG.md');
-  stdout.writeln('  3. git commit -m "chore(release): prepara versao ${next.tagName}"');
-  stdout.writeln('  4. Abra o PR para a branch `main`');
-  stdout.writeln('  5. Após o merge na `main`, crie a tag: git tag -a ${next.tagName} -m "Release ${next.tagName}"');
-  stdout.writeln('  6. Envie a tag: git push origin ${next.tagName}');
+  stdout.writeln('\nPróximos passos recomendados (GitFlow Simplificado 0.x.y):');
+  stdout.writeln('  1. git add pubspec.yaml CHANGELOG.md');
+  stdout.writeln('  2. git commit -m "chore(release): prepara versao ${next.tagName}"');
+  stdout.writeln('  3. Abra o PR de `dev` para a branch `main`');
+  stdout.writeln('  4. Após o merge na `main`, crie a tag: git tag -a ${next.tagName} -m "Release ${next.tagName}"');
+  stdout.writeln('  5. Envie a tag: git push origin ${next.tagName}');
 }
 
 String _formatDate(DateTime date) {

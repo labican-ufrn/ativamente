@@ -43,88 +43,50 @@ No ecossistema Dart/Flutter, existem ferramentas consolidadas para SemVer:
 
 ---
 
-## 3. Passo a Passo do Fluxo de Release (GitFlow)
+## 3. Fluxo de Release (GitFlow Simplificado para Fase 0.x.y)
 
-O processo de release integra o padrão GitFlow do projeto (`dev` → `release/vX.Y.Z` → `main`):
+Durante o desenvolvimento inicial (versões `0.x.y`), adota-se um **GitFlow simplificado**: as releases são criadas diretamente via Pull Request de `dev` para `main`. Branches dedicadas (`release/vX.Y.Z`) são reservadas apenas para versões *Release Candidate* (RC) e a partir da `v1.0.0`.
 
 ```mermaid
 gitGraph
     commit id: "dev"
     commit id: "feat: intensidade"
-    branch release/v0.2.0
-    checkout release/v0.2.0
-    commit id: "chore(release): prepara versao v0.2.0"
+    commit id: "chore(release): prepara versao v0.1.0"
     checkout main
-    merge release/v0.2.0 tag: "v0.2.0"
-    checkout dev
-    merge release/v0.2.0
+    merge dev tag: "v0.1.0"
 ```
 
-### Passo 1: Criar a branch de release a partir de `dev`
+### Passo a Passo da Release (Fase 0.x.y):
 
-Garanta que a branch `dev` local está atualizada:
-```bash
-git checkout dev
-git pull origin dev
-```
+1. **Atualizar versão e changelog na branch `dev` (ou em feature de release):**
+   ```bash
+   git checkout dev
+   git pull origin dev
 
-Crie a branch de release:
-```bash
-git checkout -b release/v0.2.0
-```
+   # Incrementa versão no pubspec.yaml e atualiza CHANGELOG.md
+   dart run tool/bump_version.dart [patch|minor|major]
 
-### Passo 2: Executar o script de versionamento
+   # Commita as alterações
+   git add pubspec.yaml CHANGELOG.md
+   git commit -m "chore(release): prepara versao v0.1.0"
+   git push origin dev
+   ```
 
-Execute o script especificando o tipo de incremento (`patch`, `minor` ou `major`):
+2. **Abrir Pull Request de `dev` para `main`:**
+   * Título do PR: `Release v0.1.0` (ou a versão correspondente).
+   * Validação obrigatória do CI (`flutter analyze`, testes e SonarQube Quality Gate).
+   * Fazer o merge do PR na branch `main`.
 
-```bash
-# Para correções de bugs (ex.: 0.1.0+1 -> 0.1.1+2)
-dart run tool/bump_version.dart patch
+3. **Criar e enviar a tag de release na `main`:**
+   ```bash
+   git checkout main
+   git pull origin main
+   git tag -a v0.1.0 -m "Release v0.1.0"
+   git push origin v0.1.0
+   ```
 
-# Para novas funcionalidades (ex.: 0.1.0+1 -> 0.2.0+2)
-dart run tool/bump_version.dart minor
-
-# Para grandes entregas / quebra (ex.: 0.9.0+9 -> 1.0.0+10)
-dart run tool/bump_version.dart major
-```
-
-O script atualizará automaticamente o `pubspec.yaml` e adicionará a entrada no `CHANGELOG.md`.
-
-### Passo 3: Revisar o `CHANGELOG.md` e commitar
-
-Edite o `CHANGELOG.md` para descrever os itens entregues sob a seção recém-criada (`Adicionado`, `Modificado`, `Corrigido`).
-
-Faça o commit seguindo os Conventional Commits:
-```bash
-git add pubspec.yaml CHANGELOG.md
-git commit -m "chore(release): prepara versao v0.2.0"
-git push origin release/v0.2.0
-```
-
-### Passo 4: Abrir Pull Request para `main`
-
-* Abra o PR com destino à branch `main`.
-* Título do PR: `Release v0.2.0`.
-* Após aprovação e aprovação do SonarQube Quality Gate, faça o merge do PR na `main`.
-
-### Passo 5: Criar e enviar a tag de release
-
-Na branch `main` atualizada após o merge:
-```bash
-git checkout main
-git pull origin main
-git tag -a v0.2.0 -m "Release v0.2.0"
-git push origin v0.2.0
-```
-
-### Passo 6: Back-merge em `dev`
-
-Sincronize a branch `dev` com as atualizações de versão e changelog:
-```bash
-git checkout dev
-git merge main
-git push origin dev
-```
+4. **Branches dedicadas `release/vX.Y.Z`:**
+   * Ficam reservadas para versões estáveis maiores (ex.: `v1.0.0-rc.1`, `v1.0.0`), quando o app atingir maturidade para publicação nas lojas oficiais.
 
 ---
 
