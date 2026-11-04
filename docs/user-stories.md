@@ -122,11 +122,12 @@
 ### US09 — Seed oficial do catálogo *(atualizada)*
 **Como** administrador, **quero** popular o Firestore com os exercícios oficiais (Manual do Idoso) e as contas de teste (admin/trainer), **para** validar o app com dados reais.
 
-- **Status:** 🔜 Sprint 1 (re-executar no novo projeto Labican)
+- **Status:** ✅ Concluída (povoamento oficial realizado no projeto `ativamente-labican-ufrn`; mapeamento completo em [`docs/catalogo-exercicios-manual.md`](catalogo-exercicios-manual.md))
 - **Critérios de aceite:**
-  - [ ] Seed idempotente (não duplicar exercícios/contas ao rodar 2×).
-  - [ ] Executável pelo admin pela tela de Perfil (fluxo atual mantido).
-  - [ ] Descrições padronizadas permitindo extrair tempo previsto (ex.: `"10 min"`, `"3x de 10 repetições"`).
+  - [x] Seed idempotente (não duplica exercícios ao rodar múltiplas vezes via `SetOptions(merge: true)`).
+  - [x] Executável pelo admin pela tela de Perfil e automático em ambiente controlado.
+  - [x] 12 exercícios iniciais do Manual semeados no Cloud Firestore na nuvem.
+  - [x] Descrições padronizadas permitindo extrair tempo previsto e intensidades calibradas (1 a 10).
 
 ---
 
@@ -226,7 +227,7 @@
 | US06 | Editar dados biométricos | ✅ | S4 |
 | US07 | Listar exercícios por categoria | ✅ | — |
 | US08 | Detalhe do exercício | ✅ | S2 |
-| US09 | Seed oficial do catálogo | 🔜 | S1 |
+| US09 | Seed oficial do catálogo | ✅ | S1 |
 | US10 | Navegação correta na tela de treino | ✅ | S1 |
 | US11 | Marcar exercício em execução | ✅ | S2 |
 | US12 | Tempo previsto com alertas | 🔜 | S3 |

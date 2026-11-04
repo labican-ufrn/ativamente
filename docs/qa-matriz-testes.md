@@ -56,6 +56,7 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
 | **CT-US11-02** | US11 | Troca e interrupção de exercício | Exercício A em andamento | 1. Iniciar exercício B. | Exercício A é desmarcado, exercício B torna-se o ativo e cronômetro é reiniciado. | ✅ Aprovado |
 | **CT-US15-01** | US15 | Separação visual de Cards | Modo Alto Contraste ativado | 1. Ativar Modo Alto Contraste no Perfil.<br>2. Navegar por Home e listas de treinos. | Cards exibem fundo escuro destacado (`0xFF1C1C1C`) e borda contrastante (`0xFFFFE600`, 2px). | ✅ Aprovado |
 | **CT-US15-02** | US15 | Formulários em Alto Contraste | Modo Alto Contraste ativado | 1. Abrir telas de Login, Registro, Editar Perfil e Adicionar Usuário. | Textos, rótulos e bordas com taxa de contraste WCAG AA >= 4.5:1, sem textos ilegíveis. | ✅ Aprovado |
+| **CT-US09-01** | US09 | Povoamento oficial do catálogo (Manual do Idoso) | Acesso administrativo no projeto `ativamente-labican-ufrn` | 1. Executar seed idempotente do catálogo inicial.<br>2. Consultar coleção `Exercicios` no Cloud Firestore. | 12 exercícios oficiais do Manual semeados com intensidade e idempotência garantida (`docs/catalogo-exercicios-manual.md`). | ✅ Aprovado |
 | **CT-US21-01** | US21 | Chips e filtro por intensidade | Lista de treino carregada | 1. Tocar no chip de intensidade (ex.: Leve). | Lista filtra exercícios pela intensidade selecionada e TTS narra o filtro ativo. | ✅ Aprovado |
 
 ---
@@ -68,6 +69,7 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
 | Guarda de Rotas Privadas | ✅ Aprovado | `lib/routes.dart` com redirecionamento de não autenticados |
 | Identificação do Usuário (US05) | ✅ Aprovado | `userDisplayNameProvider` + `getEffectiveDisplayName` (PR #40) |
 | Perfil e Dados Biométricos (US06) | ✅ Aprovado | `EditProfileScreen` com máscaras e validações (PR #23) |
+| Seed Oficial do Catálogo (US09) | ✅ Aprovado | 12 exercícios oficiais semeados com idempotência no Firestore (PR #63) |
 | Catálogo de Exercícios e Categorias (US07) | ✅ Aprovado | Filtragem em abas Coração/Músculo via `exerciciosFiltradosProvider` |
 | Detalhe do Exercício (US08) | ✅ Aprovado | Rota `/exercise/:id` e `ExerciseDetailScreen` (PR #30, PR #60) |
 | Navegação Voltar do Treino (US10) | ✅ Aprovado | `context.go('/home')` evitando travamento de pilha (PR #6) |
@@ -77,3 +79,4 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
 | Modo Alto Contraste (US15) | ✅ Aprovado | Suporte WCAG AAA no tema escuro de alto contraste (PR #42) |
 | Intensidade dos Exercícios (US21) | ✅ Aprovado | Modelo com intensidade (1 a 10) e chips de filtro (PR #32) |
 | Pipeline e Análise Estática (Issue #36) | ✅ Aprovado | GitHub Actions com SonarQube Quality Gate ativo (PR #58) |
+| Regras do Firestore e Deploy (Issue #7) | ✅ Aprovado | `firestore.rules` com RBAC e política de release na main (PR #63) |

@@ -2,9 +2,12 @@
 
 Todas as mudanças relevantes do AtivaMente são registradas neste arquivo, seguindo o padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [0.1.0] - 2026-10-16
+## [0.1.0] - 2026-11-04
 
 ### Adicionado
+- **Versionamento Semântico e Deploy:** adoção oficial de SemVer `0.1.0+1` (`pubspec.yaml`), ferramenta `tool/bump_version.dart`, pipeline `.github/workflows/release.yml` e política de deploy exclusivo pela `main` (PR #63).
+- **Regras de Segurança Cloud Firestore:** `firestore.rules` em produção com controle de acesso baseado em papéis (RBAC) para `Pessoas` e leitura pública autenticada de `Exercicios` (PR #63).
+- **Catálogo Oficial do Manual do Idoso (US09):** mapeamento clínico dos 12 exercícios iniciais do Manual do Idoso Ativo (`docs/catalogo-exercicios-manual.md`) e seed idempotente no projeto `ativamente-labican-ufrn` (PR #63).
 - **Detalhe do Exercício (US08):** tela dedicada (`/exercise/:id`) com nome, descrição, categoria, tipo, indicador de intensidade e placeholder para mídia futura (PR #30, PR #60).
 - **Controle de Execução & Cronômetro (US11):** marcação de exercício ativo via `exercicioEmExecucaoProvider`, cronômetro sincronizado por `DateTime` e botão de cancelamento/troca (PR #47, PR #60).
 - **Nível de Intensidade (US21):** suporte a intensidade (1 a 10) nos modelos, seed, chips visuais na lista e filtro dinâmico com suporte a TTS (PR #32).
