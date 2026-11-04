@@ -4,6 +4,7 @@
 *.pyc
 *.swp
 .DS_Store
+*Zone.Identifier
 .atom/
 .build/
 .buildlog/

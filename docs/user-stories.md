@@ -110,22 +110,23 @@
 ### US08 — Ver detalhe do exercício *(nova)*
 **Como** usuário, **quero** tocar em um exercício da lista e ver sua descrição detalhada, **para** saber como executá-lo corretamente.
 
-- **Status:** 🔜 Sprint 2
+- **Status:** ✅ Implementada (PR #30 e PR #60)
 - **Prioridade:** Alta
 - **Origem:** feedback 21/08/2026 (*"ao listar os exercícios... não encaminha para nenhum local — deveria ir para a descrição detalhada, que no futuro terá vídeo/gif animado"*)
 - **Critérios de aceite:**
-  - [ ] Tap no card abre tela de detalhe (rota dedicada) com nome, descrição, categoria e tipo.
-  - [ ] Espaço reservado (widget) para mídia futura (vídeo/GIF), sem quebrar layout hoje.
-  - [ ] Botão voltar da tela de detalhe funciona (retorna à lista mantendo categoria selecionada).
+  - [x] Tap no card abre tela de detalhe (rota dedicada `/exercise/:id`) com nome, descrição, categoria, tipo e intensidade.
+  - [x] Espaço reservado (widget) para mídia futura (vídeo/GIF), sem quebrar layout hoje.
+  - [x] Botão voltar da tela de detalhe funciona (retorna à lista mantendo categoria selecionada).
 
 ### US09 — Seed oficial do catálogo *(atualizada)*
 **Como** administrador, **quero** popular o Firestore com os exercícios oficiais (Manual do Idoso) e as contas de teste (admin/trainer), **para** validar o app com dados reais.
 
-- **Status:** 🔜 Sprint 1 (re-executar no novo projeto Labican)
+- **Status:** ✅ Concluída (povoamento oficial realizado no projeto `ativamente-labican-ufrn`; mapeamento completo em [`docs/catalogo-exercicios-manual.md`](catalogo-exercicios-manual.md))
 - **Critérios de aceite:**
-  - [ ] Seed idempotente (não duplicar exercícios/contas ao rodar 2×).
-  - [ ] Executável pelo admin pela tela de Perfil (fluxo atual mantido).
-  - [ ] Descrições padronizadas permitindo extrair tempo previsto (ex.: `"10 min"`, `"3x de 10 repetições"`).
+  - [x] Seed idempotente (não duplica exercícios ao rodar múltiplas vezes via `SetOptions(merge: true)`).
+  - [x] Executável pelo admin pela tela de Perfil e automático em ambiente controlado.
+  - [x] 12 exercícios iniciais do Manual semeados no Cloud Firestore na nuvem.
+  - [x] Descrições padronizadas permitindo extrair tempo previsto e intensidades calibradas (1 a 10).
 
 ---
 
