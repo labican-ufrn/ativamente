@@ -32,6 +32,10 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
   - Configuração de `cardTheme` com borda visível de alto contraste (`0xFFFFE600`, 2px) e `inputDecorationTheme` para campos de formulário.
   - Substituição de cores fixas por tokens do `colorScheme` em `welcome_screen.dart`, `login_screen.dart`, `register_screen.dart`, `add_user_screen.dart`, `edit_profile_screen.dart` e `profile_screen.dart`.
 
+### Bug Issue #46 — Drift no Cronômetro de Exercício
+- **Sintoma:** O cronômetro podia apresentar descompasso/drift com o tempo real decorrido em execuções prolongadas ou segundo plano devido à acumulação de atrasos de agendamento do `Timer.periodic`.
+- **Solução Aplicada:** Cálculo do tempo decorrido utilizando timestamps de `DateTime` no provider de treino (`elapsed = DateTime.now().difference(inicio)`).
+
 ---
 
 ## 2. Matriz de Casos de Teste (QA)
@@ -43,5 +47,36 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
 | **CT-US05-03** | US05 | Fallback para e-mail | Conta criada via Auth com e-mail `carlos.dev@ativamente.org`, sem nome | 1. Logar com a conta.<br>2. Abrir Home e Perfil. | "carlos.dev" é exibido no cabeçalho e perfil. | ✅ Aprovado |
 | **CT-US05-04** | US05 | Auto-criação de doc `Pessoas` | Conta sem documento na coleção `Pessoas` do Firestore | 1. Efetuar login.<br>2. Verificar coleção `Pessoas` no Firestore. | O documento `Pessoas/{uid}` é auto-criado com os dados básicos do Auth. | ✅ Aprovado |
 | **CT-US05-05** | US05 | Ausência de travamentos em loading | Troca rápida de telas no carregamento inicial | 1. Efetuar login.<br>2. Alternar entre Home e Perfil imediatamente. | Nome do Auth/Fallback aparece de imediato sem travar UI ou mostrar erro bruto. | ✅ Aprovado |
-| **CT-US15-01** | US15 | Separação visual de Cards | Modo Alto Contraste ativado | 1. Ativar Modo Alto Contraste no Perfil.<br>2. Navegar por Home e listas de treinos. | Cards exibem fundo escuro destacado (`0xFF1C1C1C`) e borda amarela contrastante (`0xFFFFE600`). | ✅ Aprovado |
+| **CT-US06-01** | US06 | Máscara e validação de data de nascimento | Tela de edição de perfil aberta | 1. Digitar data inválida (ex.: 31/02/2020 ou data futura).<br>2. Salvar. | Formulário bloqueia submissão e orienta com mensagem clara. | ✅ Aprovado |
+| **CT-US06-02** | US06 | Limites biológicos de peso e altura | Tela de edição de perfil aberta | 1. Inserir peso de 70.5kg e altura 1.72m com vírgula ou ponto.<br>2. Salvar. | Dados são normalizados e salvos com sucesso no Firestore. | ✅ Aprovado |
+| **CT-US08-01** | US08 | Abertura da tela de detalhe | Lista de exercícios carregada | 1. Tocar em um card de exercício.<br>2. Visualizar tela `/exercise/:id`. | Nome, descrição, categoria, tipo, nível de intensidade e placeholder de mídia são renderizados. | ✅ Aprovado |
+| **CT-US08-02** | US08 | Retorno preservando filtros | Tela de detalhe aberta a partir da aba Músculo | 1. Tocar no botão voltar da AppBar. | Retorna à tela de treino mantendo a aba Músculo selecionada. | ✅ Aprovado |
+| **CT-US10-01** | US10 | Voltar da tela de treino | Tela de treino `/workout` aberta | 1. Tocar no botão voltar na AppBar. | Retorna à Home via `context.go('/home')` preservando estado de autenticação. | ✅ Aprovado |
+| **CT-US11-01** | US11 | Marcação de exercício ativo | Tela de treino ou detalhe aberta | 1. Clicar no botão de iniciar exercício. | Exercício fica visualmente marcado como ativo e o cronômetro inicia automaticamente. | ✅ Aprovado |
+| **CT-US11-02** | US11 | Troca e interrupção de exercício | Exercício A em andamento | 1. Iniciar exercício B. | Exercício A é desmarcado, exercício B torna-se o ativo e cronômetro é reiniciado. | ✅ Aprovado |
+| **CT-US15-01** | US15 | Separação visual de Cards | Modo Alto Contraste ativado | 1. Ativar Modo Alto Contraste no Perfil.<br>2. Navegar por Home e listas de treinos. | Cards exibem fundo escuro destacado (`0xFF1C1C1C`) e borda contrastante (`0xFFFFE600`, 2px). | ✅ Aprovado |
 | **CT-US15-02** | US15 | Formulários em Alto Contraste | Modo Alto Contraste ativado | 1. Abrir telas de Login, Registro, Editar Perfil e Adicionar Usuário. | Textos, rótulos e bordas com taxa de contraste WCAG AA >= 4.5:1, sem textos ilegíveis. | ✅ Aprovado |
+| **CT-US09-01** | US09 | Povoamento oficial do catálogo (Manual do Idoso) | Acesso administrativo no projeto `ativamente-labican-ufrn` | 1. Executar seed idempotente do catálogo inicial.<br>2. Consultar coleção `Exercicios` no Cloud Firestore. | 12 exercícios oficiais do Manual semeados com intensidade e idempotência garantida (`docs/catalogo-exercicios-manual.md`). | ✅ Aprovado |
+| **CT-US21-01** | US21 | Chips e filtro por intensidade | Lista de treino carregada | 1. Tocar no chip de intensidade (ex.: Leve). | Lista filtra exercícios pela intensidade selecionada e TTS narra o filtro ativo. | ✅ Aprovado |
+
+---
+
+## 3. Matriz de Regressão da Iteração (Sprints 1 a 4)
+
+| Módulo / Funcionalidade | Status | Evidência / Implementação |
+|---|---|---|
+| Autenticação (Login, Cadastro, Logout) | ✅ Aprovado | `lib/screens/auth/` com Firebase Auth e validações acessíveis |
+| Guarda de Rotas Privadas | ✅ Aprovado | `lib/routes.dart` com redirecionamento de não autenticados |
+| Identificação do Usuário (US05) | ✅ Aprovado | `userDisplayNameProvider` + `getEffectiveDisplayName` (PR #40) |
+| Perfil e Dados Biométricos (US06) | ✅ Aprovado | `EditProfileScreen` com máscaras e validações (PR #23) |
+| Seed Oficial do Catálogo (US09) | ✅ Aprovado | 12 exercícios oficiais semeados com idempotência no Firestore (PR #63) |
+| Catálogo de Exercícios e Categorias (US07) | ✅ Aprovado | Filtragem em abas Coração/Músculo via `exerciciosFiltradosProvider` |
+| Detalhe do Exercício (US08) | ✅ Aprovado | Rota `/exercise/:id` e `ExerciseDetailScreen` (PR #30, PR #60) |
+| Navegação Voltar do Treino (US10) | ✅ Aprovado | `context.go('/home')` evitando travamento de pilha (PR #6) |
+| Marcação de Exercício e Cronômetro (US11) | ✅ Aprovado | `exercicioEmExecucaoProvider` + cálculo por `DateTime` (PR #47, PR #60) |
+| Acessibilidade de Toque (Issue #44) | ✅ Aprovado | Área de toque ampliada nos botões da lista (PR #50) |
+| Leitura de Tela TTS (US14) | ✅ Aprovado | Botão de volume em todas as telas com `flutter_tts` pt-BR |
+| Modo Alto Contraste (US15) | ✅ Aprovado | Suporte WCAG AAA no tema escuro de alto contraste (PR #42) |
+| Intensidade dos Exercícios (US21) | ✅ Aprovado | Modelo com intensidade (1 a 10) e chips de filtro (PR #32) |
+| Pipeline e Análise Estática (Issue #36) | ✅ Aprovado | GitHub Actions com SonarQube Quality Gate ativo (PR #58) |
+| Regras do Firestore e Deploy (Issue #7) | ✅ Aprovado | `firestore.rules` com RBAC e política de release na main (PR #63) |

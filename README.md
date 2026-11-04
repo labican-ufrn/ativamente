@@ -3,7 +3,7 @@
 Aplicativo Flutter para auxiliar **idosos** na prática de exercícios físicos de forma saudável e segura, desenvolvido pelo [Labican/UFRN](https://github.com/labican-ufrn). O projeto segue as orientações do *Manual do Idoso* e visa promover atividades físicas adaptadas, contribuindo para a saúde e qualidade de vida na terceira idade.
 
 - **App publicado (Web):** https://ativamente-labican-ufrn.web.app
-- **Documentação:** [`docs/user-stories.md`](docs/user-stories.md) · [`docs/plano-sprints.md`](docs/plano-sprints.md) · [`docs/versionamento-e-releases.md`](docs/versionamento-e-releases.md) · [`docs/equipe.md`](docs/equipe.md)
+- **Documentação:** [`docs/user-stories.md`](docs/user-stories.md) · [`docs/plano-sprints.md`](docs/plano-sprints.md) · [`docs/versionamento-e-releases.md`](docs/versionamento-e-releases.md) · [`docs/qa-matriz-testes.md`](docs/qa-matriz-testes.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`docs/equipe.md`](docs/equipe.md)
 - **Modelo conceitual da API:** [`ativamente-api/docs/modelo-conceitual.md`](https://github.com/labican-ufrn/ativamente-api/blob/dev/docs/modelo-conceitual.md)
 
 ## Stack
