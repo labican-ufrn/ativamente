@@ -61,21 +61,6 @@ jobs:
             exit 1
           fi
 
-          if [ -n "${{ secrets.GOOGLE_SERVICES_JSON }}" ]; then
-            echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
-            echo "✅ android/app/google-services.json provisionado a partir dos segredos do repositório."
-          elif [ ! -f android/app/google-services.json ]; then
-            echo "❌ ERRO: Segredo GOOGLE_SERVICES_JSON não configurado e arquivo android/app/google-services.json ausente."
-            echo "Para compilar o APK de produção Android com o plugin Google Services, configure o segredo GOOGLE_SERVICES_JSON nas Settings do repositório."
-            exit 1
-          fi
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -91,14 +76,6 @@ jobs:
 
       - name: Run unit & widget tests
         run: flutter test
-
-      - name: Build Android APK
-        run: flutter build apk --release
-
-      - name: Rename APK with Tag
-        run: |
-          TAG="${{ steps.vars.outputs.tag }}"
-          cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/ativamente-${TAG}.apk"
 
       - name: Build Web Release
         run: |
@@ -131,6 +108,4 @@ jobs:
           prerelease: false
           generate_release_notes: true
           files: |
-            build/app/outputs/flutter-apk/ativamente-${{ steps.vars.outputs.tag }}.apk
-            build/app/outputs/flutter-apk/app-release.apk
             ativamente-web-${{ steps.vars.outputs.tag }}.zip

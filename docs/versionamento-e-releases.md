@@ -95,14 +95,13 @@ gitGraph
 O repositório conta com o workflow `.github/workflows/release.yml`.
 
 ### Como Funciona:
-1. **Gatilho**: Ao receber um push de tag com prefixo `v*` (ex.: `git push origin v0.2.0`), ou via disparo manual no GitHub Actions (`workflow_dispatch`).
-2. **Validação**: Roda `flutter analyze` e a suite de testes `flutter test`.
+1. **Gatilho**: Ao receber um push de tag com prefixo `v*` (ex.: `git push origin v0.1.0`), ou via disparo manual no GitHub Actions (`workflow_dispatch`).
+2. **Validação**: Verifica se a release provém da branch `main`, executa `flutter analyze` e a suíte de testes `flutter test`.
 3. **Compilação de Artefatos**:
-   * Gera o APK Android otimizado: `build/app/outputs/flutter-apk/ativamente-v0.2.0.apk`.
-   * Gera o pacote Web compactado: `ativamente-web-v0.2.0.zip`.
+   * Gera o pacote de distribuição Web: `ativamente-web-v0.1.0.zip` (o acesso ao sistema é realizado via navegador no endereço de deploy oficial do Firebase Hosting; a compilação de APKs fica reservada para etapas futuras).
 4. **Publicação no GitHub Releases**:
-   * Extrai automaticamente as notas do `CHANGELOG.md` referentes àquela versão.
-   * Cria a **Release Oficial** no GitHub com o changelog e anexa os artefatos compilados para download direto.
+   * Extrai automaticamente as notas do `CHANGELOG.md` referentes à versão.
+   * Cria a **Release Oficial** no GitHub com o changelog e anexa o pacote Web para download e arquivamento.
 
 ---
 
