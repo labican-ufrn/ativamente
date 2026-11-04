@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || '' }}
 
       - name: Resolve Release Tag
         id: vars
@@ -39,6 +40,35 @@ jobs:
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Processando release para a tag $TAG"
+
+      - name: Validate Release Branch Policy (main only)
+        run: |
+          git fetch origin main --depth=100
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "❌ ERRO: O commit $GITHUB_SHA da tag ${{ steps.vars.outputs.tag }} não pertence ao histórico da branch 'main'."
+            echo "Conforme a política oficial do projeto (AGENTS.md e docs/versionamento-e-releases.md), releases de produção são geradas exclusivamente a partir da main."
+            exit 1
+          fi
+
+      - name: Provision official Firebase configuration for Release
+        run: |
+          if [ -n "${{ secrets.FIREBASE_OPTIONS_DART }}" ]; then
+            echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+            echo "✅ lib/firebase_options.dart provisionado a partir dos segredos do repositório."
+          elif [ ! -f lib/firebase_options.dart ]; then
+            echo "❌ ERRO: Segredo FIREBASE_OPTIONS_DART não configurado e arquivo lib/firebase_options.dart ausente."
+            echo "Para gerar builds de release oficiais funcionais, configure o segredo FIREBASE_OPTIONS_DART nas Settings do repositório."
+            exit 1
+          fi
+
+          if [ -n "${{ secrets.GOOGLE_SERVICES_JSON }}" ]; then
+            echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
+            echo "✅ android/app/google-services.json provisionado a partir dos segredos do repositório."
+          elif [ ! -f android/app/google-services.json ]; then
+            echo "❌ ERRO: Segredo GOOGLE_SERVICES_JSON não configurado e arquivo android/app/google-services.json ausente."
+            echo "Para compilar o APK de produção Android com o plugin Google Services, configure o segredo GOOGLE_SERVICES_JSON nas Settings do repositório."
+            exit 1
+          fi
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -55,26 +85,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Generate placeholder firebase_options.dart for CI/Build
-        run: |
-          if [ ! -f lib/firebase_options.dart ]; then
-            cat << 'EOF' > lib/firebase_options.dart
-          // Placeholder gerado para CI / testes estáticos (não commitar)
-          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-
-          class DefaultFirebaseOptions {
-            static FirebaseOptions get currentPlatform {
-              return const FirebaseOptions(
-                apiKey: 'ci-placeholder-api-key',
-                appId: '1:1234567890:android:abcdef',
-                messagingSenderId: '1234567890',
-                projectId: 'ativamente-ci',
-              );
-            }
-          }
-          EOF
-          fi
 
       - name: Static Analysis
         run: flutter analyze

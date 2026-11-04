@@ -73,7 +73,7 @@ void main() {
       expect(next.fullVersion, equals('0.1.1+3'));
     });
 
-    test('permite definir versão explícita customizada', () {
+    test('permite definir versão explícita customizada com build number', () {
       final current = SemVerInfo(major: 0, minor: 1, patch: 0, build: 1);
       final next = current.bump('0.3.0+10');
 
@@ -82,6 +82,21 @@ void main() {
       expect(next.patch, equals(0));
       expect(next.build, equals(10));
       expect(next.fullVersion, equals('0.3.0+10'));
+    });
+
+    test('versão explícita sem build preserva incremento do build number', () {
+      final current = SemVerInfo(major: 0, minor: 2, patch: 0, build: 7);
+      final next = current.bump('0.3.0');
+
+      expect(next.major, equals(0));
+      expect(next.minor, equals(3));
+      expect(next.patch, equals(0));
+      expect(next.build, equals(8));
+      expect(next.fullVersion, equals('0.3.0+8'));
+
+      final nextKeep = current.bump('0.3.0', keepBuild: true);
+      expect(nextKeep.build, equals(7));
+      expect(nextKeep.fullVersion, equals('0.3.0+7'));
     });
 
     test('lança FormatException ao passar alvo inválido', () {

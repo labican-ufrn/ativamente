@@ -6,12 +6,14 @@ class SemVerInfo {
   final int minor;
   final int patch;
   final int build;
+  final bool hasExplicitBuild;
 
   const SemVerInfo({
     required this.major,
     required this.minor,
     required this.patch,
     required this.build,
+    this.hasExplicitBuild = false,
   });
 
   String get semVer => '$major.$minor.$patch';
@@ -23,11 +25,13 @@ class SemVerInfo {
     final match = regex.firstMatch(text.trim());
     if (match == null) return null;
 
+    final buildGroup = match.group(4);
     return SemVerInfo(
       major: int.parse(match.group(1)!),
       minor: int.parse(match.group(2)!),
       patch: int.parse(match.group(3)!),
-      build: match.group(4) != null ? int.parse(match.group(4)!) : 1,
+      build: buildGroup != null ? int.parse(buildGroup) : 1,
+      hasExplicitBuild: buildGroup != null,
     );
   }
 
@@ -57,7 +61,13 @@ class SemVerInfo {
             'Formato inválido "$target". Use patch, minor, major ou X.Y.Z.',
           );
         }
-        return explicit;
+        return SemVerInfo(
+          major: explicit.major,
+          minor: explicit.minor,
+          patch: explicit.patch,
+          build: explicit.hasExplicitBuild ? explicit.build : newBuild,
+          hasExplicitBuild: explicit.hasExplicitBuild,
+        );
     }
 
     return SemVerInfo(
@@ -65,6 +75,7 @@ class SemVerInfo {
       minor: newMinor,
       patch: newPatch,
       build: newBuild,
+      hasExplicitBuild: true,
     );
   }
 }

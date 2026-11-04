@@ -70,20 +70,22 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    /// Verifica se o usuário autenticado possui e-mail corporativo/sistema (@ativamente.org)
-    function isSystemEmail() {
-      return isAuthenticated() &&
-        ('email' in request.auth.token) &&
-        request.auth.token.email != null &&
-        request.auth.token.email.matches('.*@ativamente[.]org$');
+    /// Retorna os dados do perfil do usuário autenticado na coleção Pessoas
+    function getUserData() {
+      return get(/databases/$(database)/documents/Pessoas/$(request.auth.uid)).data;
     }
 
-    /// Verifica se o usuário é administrador (via Custom Claim ou e-mail institucional)
+    /// Verifica se o documento de perfil do usuário existe na coleção Pessoas
+    function userProfileExists() {
+      return exists(/databases/$(database)/documents/Pessoas/$(request.auth.uid));
+    }
+
+    /// Verifica se o usuário é administrador (via Custom Claim ou perfil verificado em Pessoas)
     function isAdmin() {
       return isAuthenticated() && (
-        isSystemEmail() ||
         (('role' in request.auth.token) && request.auth.token.role == 'admin') ||
-        (('admin' in request.auth.token) && request.auth.token.admin == true)
+        (('admin' in request.auth.token) && request.auth.token.admin == true) ||
+        (userProfileExists() && ('role' in getUserData()) && getUserData().role == 'admin')
       );
     }
 
@@ -92,11 +94,12 @@ service cloud.firestore {
       return isAuthenticated() && (
         isAdmin() ||
         (('role' in request.auth.token) && request.auth.token.role == 'trainer') ||
-        (('trainer' in request.auth.token) && request.auth.token.trainer == true)
+        (('trainer' in request.auth.token) && request.auth.token.trainer == true) ||
+        (userProfileExists() && ('role' in getUserData()) && getUserData().role == 'trainer')
       );
     }
 
-    /// Permissão para gerenciar catálogo de exercícios (admin, trainer ou e-mail de sistema)
+    /// Permissão para gerenciar catálogo de exercícios (admin ou trainer autorizado)
     function canManageExercises() {
       return isAdmin() || isTrainer();
     }
