@@ -10,12 +10,12 @@
 #
 # Fontes de verdade, sem sobreposição:
 #   .ypa/review.yml  -> fluxo de revisão (este arquivo)
-#   sonar-project.properties -> SonarQube (não existe neste projeto: sem CI/Sonar)
+#   sonar-project.properties -> SonarQube (configurado para CI & SonarQube)
 #   AGENTS.md / MEMORY.md -> regras e fatos do projeto
 #
-# Obs.: este repo não tem CI nem SonarQube. A seção `sonarqube` fica declarada só
-# para a skill saber que não há o que consultar — não preencha `host_url` sem que a
-# CI exista.
+# Obs.: A CI foi configurada em .github/workflows/ci.yml e sonar-project.properties.
+# Preencha `host_url` na seção sonarqube abaixo assim que o servidor/endpoint
+# estiver com as credenciais ativas e a primeira execução ocorrer.
 
 project:
   name: ativamente

@@ -8,7 +8,7 @@ class WelcomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const screenText = "AtivaMente. Seja bem-vindo! Botão Entrar. Botão Criar conta.";
+    const screenText = 'AtivaMente. Seja bem-vindo! Botão Entrar. Botão Criar conta.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(

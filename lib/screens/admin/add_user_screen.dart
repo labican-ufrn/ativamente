@@ -64,7 +64,7 @@ class _AddUserScreenState extends ConsumerState<AddUserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final readScreen = ref.watch(readScreenProvider("Tela de adicionar usuário. Preencha os campos para criar um novo usuário."));
+    final readScreen = ref.watch(readScreenProvider('Tela de adicionar usuário. Preencha os campos para criar um novo usuário.'));
 
     return Scaffold(
       appBar: AppBar(

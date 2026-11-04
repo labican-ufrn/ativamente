@@ -23,8 +23,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _pesoController;
   late TextEditingController _alturaController;
 
-  final _dateMask = MaskTextInputFormatter(mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
-  final _phoneMask = MaskTextInputFormatter(mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
+  final _dateMask = MaskTextInputFormatter(mask: '##/##/####', filter: {'#': RegExp(r'[0-9]')});
+  final _phoneMask = MaskTextInputFormatter(mask: '(##) #####-####', filter: {'#': RegExp(r'[0-9]')});
   
   bool _isInitialized = false;
   bool _isLoading = false;
@@ -89,7 +89,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       await FirebaseFirestore.instance
           .collection('Pessoas')
           .doc(user.uid)
-          .update(data);
+          .set(data, SetOptions(merge: true))
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () => throw Exception('Tempo limite esgotado. Verifique a conexão com o banco de dados.'),
+          );
           
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -180,7 +184,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = "Tela de edição de perfil. Altere seus dados pessoais como nome, data de nascimento, telefone, peso e altura.";
+    const screenText = 'Tela de edição de perfil. Altere seus dados pessoais como nome, data de nascimento, telefone, peso e altura.';
     final readScreen = ref.watch(readScreenProvider(screenText));
     final userDataAsync = ref.watch(userDataProvider);
 

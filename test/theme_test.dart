@@ -21,7 +21,7 @@ void main() {
 
       expect(cardTheme.color, equals(const Color(0xFF1C1C1C)));
       expect(cardTheme.shape, isA<RoundedRectangleBorder>());
-      
+
       final border = cardTheme.shape as RoundedRectangleBorder;
       expect(border.side.color, equals(const Color(0xFFFFE600)));
       expect(border.side.width, equals(2.0));

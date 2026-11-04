@@ -9,7 +9,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const screenText = "AtivaMente. Tela inicial. Botão Treinos em Casa. Botão Treinos na Rua. Botão Treinos Sugeridos.";
+    const screenText = 'AtivaMente. Tela inicial. Botão Treinos em Casa. Botão Treinos na Rua. Botão Treinos Sugeridos.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(

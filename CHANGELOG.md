@@ -1,30 +1,21 @@
 # Changelog
 
-Todas as mudanças relevantes do AtivaMente são registradas neste arquivo.
+Todas as mudanças relevantes do AtivaMente são registradas neste arquivo, seguindo o padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [1.0.0-qa.20261009] - 2026-10-09
+## [0.1.0] - 2026-10-16
 
-### Documentação e qualidade
+### Adicionado
+- **Detalhe do Exercício (US08):** tela dedicada (`/exercise/:id`) com nome, descrição, categoria, tipo, indicador de intensidade e placeholder para mídia futura (PR #30, PR #60).
+- **Controle de Execução & Cronômetro (US11):** marcação de exercício ativo via `exercicioEmExecucaoProvider`, cronômetro sincronizado por `DateTime` e botão de cancelamento/troca (PR #47, PR #60).
+- **Nível de Intensidade (US21):** suporte a intensidade (1 a 10) nos modelos, seed, chips visuais na lista e filtro dinâmico com suporte a TTS (PR #32).
+- **Edição de Perfil Biométrico (US06):** tela de edição de perfil com dados biométricos (altura, peso, data de nascimento e telefone), máscaras automáticas, validações de faixa biológica e TTS (PR #23).
+- **Acessibilidade e Alto Contraste (US15):** suporte completo ao Modo Alto Contraste com tokens de tema semânticos, separação visual de cards e contraste WCAG AAA (PR #42).
+- **Acessibilidade de Toque:** ampliação da área de toque do botão de execução na lista de exercícios para atender o público idoso (PR #50).
+- **Infraestrutura e CI:** integração com SonarQube Quality Gate no GitHub Actions para análise estática contínua e cobertura de testes (PR #58).
+- **Garantia de Qualidade:** matriz formal de testes de regressão e diagnóstico de causas raízes (`docs/qa-matriz-testes.md`).
 
-- adiciona a matriz completa de QA da iteração para Android e Web;
-- registra os resultados automatizados, os bloqueios de ambiente e as pendências de integração;
-- atualiza o status das histórias de usuário para refletir o branch avaliado;
-- documenta o gate de release e os itens que precisam de issue antes da publicação.
-
-### Funcionalidades disponíveis no branch avaliado
-
-- autenticação, cadastro, logout e papéis administrativos;
-- catálogo de exercícios e filtros por categoria;
-- cronômetro básico de treino;
-- edição de dados biométricos;
-- leitura de tela e modo de alto contraste;
-- seed idempotente do catálogo em ambiente Firebase configurado.
-
-### Pendências conhecidas
-
-- integrar e validar os fluxos de detalhe e execução marcada;
-- implementar os alertas de tempo previsto;
-- persistir o registro de conclusão do exercício;
-- corrigir o fallback do nome do usuário;
-- executar a matriz em Android e Web com `firebase_options.dart` disponível.
-
+### Corrigido
+- **Nome de Usuário (US05):** correção do bug de exibição no cabeçalho e perfil através de precedência resiliente (`getEffectiveDisplayName`), provider síncrono e auto-criação de documentos `Pessoas` (PR #40).
+- **Navegação de Retorno (US10):** substituição de `pop` por navegação declarativa `context.go('/home')` na tela de treino, evitando travamentos na pilha de rotas (PR #6).
+- **Drift no Cronômetro:** cálculo do tempo decorrido utilizando timestamps de `DateTime` em vez de contagem de ticks do timer periódico (PR #47).
+- **Inicialização do Seed:** reutilização de instância no setup de usuários de teste em ambiente de emulador (PR #39).

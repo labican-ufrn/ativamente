@@ -28,7 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = "AtivaMente. Tela de Cadastro. Preencha seus dados. Campo nome. Campo email. Campo senha. Botão Cadastrar.";
+    const screenText = 'AtivaMente. Tela de Cadastro. Preencha seus dados. Campo nome. Campo email. Campo senha. Botão Cadastrar.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(

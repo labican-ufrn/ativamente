@@ -27,7 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = "AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.";
+    const screenText = 'AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(

@@ -11,7 +11,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const screenText = "Tela de Perfil. Configurações de acessibilidade. Sair da conta.";
+    const screenText = 'Tela de Perfil. Configurações de acessibilidade. Sair da conta.';
     final readScreen = ref.watch(readScreenProvider(screenText));
     final userDataAsync = ref.watch(userDataProvider);
     final isHighContrast = ref.watch(highContrastProvider);

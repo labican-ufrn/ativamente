@@ -131,13 +131,6 @@ flutter build web        # build Web
 firebase deploy --only hosting  # publicar Web (requer firebase login)
 ```
 
-## Status da release
-
-A iteração `1.0.0-qa.20261009` está marcada como candidata de QA, não como release de
-produção. A matriz registra os bloqueios atuais: configuração local do FlutterFire,
-validação em Android/Web e integração dos fluxos de detalhe, alertas e registro.
-Consulte [`docs/qa-matriz-testes.md`](docs/qa-matriz-testes.md) antes de publicar.
-
 ## Estrutura do projeto
 
 ```

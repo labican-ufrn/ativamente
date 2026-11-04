@@ -1,6 +1,6 @@
 # User Stories — AtivaMente (App Flutter)
 
-> **Última revisão:** 09/10/2026, com base no branch da release e na matriz [`docs/qa-matriz-testes.md`](qa-matriz-testes.md).
+> **Última revisão:** 16/10/2026, com base nas entregas das Sprints 1 a 4 e na matriz [`docs/qa-matriz-testes.md`](qa-matriz-testes.md).
 >
 > **Fontes:** [`docs/modelo-conceitual.md`](https://github.com/labican-ufrn/ativamente-api/blob/dev/docs/modelo-conceitual.md) (API Django) + análise de código do repositório (`lib/`) + feedback de teste manual em dispositivo (21/08/2026).
 >
@@ -65,7 +65,7 @@
 ### US05 — Ver meus dados em todas as telas *(atualizada pelo teste)*
 **Como** usuário autenticado, **quero** ver meu nome carregado corretamente na Home e no Perfil (e onde mais for exibido), **para** confirmar que estou na minha conta.
 
-- **Status:** ✅ Implementada
+- **Status:** ✅ Implementada (PR #40 / Issue #8)
 - **Prioridade:** Alta (Sprint 1)
 - **Critérios de aceite:**
   - [x] Nome real do usuário logado aparece na Home (cabeçalho) e no Perfil.
@@ -77,20 +77,20 @@
 ### US06 — Editar meus dados biométricos
 **Como** usuário, **quero** editar altura, peso, data de nascimento e telefone, **para** manter meu perfil atualizado.
 
-- **Status:** ✅ Implementada no branch da release (validação manual Android/Web pendente)
+- **Status:** ✅ Implementada (PR #23 / Issue #13)
 - **Critérios de aceite / Regras de negócio:**
-  - [ ] **Data de Nascimento:**
+  - [x] **Data de Nascimento:**
     - Formato com máscara automática (`DD/MM/AAAA`) e limite máximo de 10 caracteres.
     - Validação contra datas de calendário inexistentes (ex.: 31/02/2020) e bloqueio de datas no futuro.
     - Validação de idade mínima obrigatória de 14 anos.
-  - [ ] **Telefone com DDD:**
+  - [x] **Telefone com DDD:**
     - Indicação explícita de formato no rótulo/hint (`(XX) XXXXX-XXXX`).
     - Máscara automática e limite de caracteres (máximo 15 caracteres para `(XX) XXXXX-XXXX`).
     - Exibição do número de telefone também na tela de visualização do Perfil (`ProfileScreen`).
-  - [ ] **Peso e Altura:**
+  - [x] **Peso e Altura:**
     - Aceita decimais com ponto ou vírgula (normalizar com `replaceAll(',', '.')`).
-    - Altura aceita em metros (0,50 a 2,50) ou em centímetros (50 a 250), normalizando para metros antes de persistir.
-  - [ ] **Acessibilidade & TTS:**
+    - Altura e peso com limites biológicos razoáveis (peso: 20kg–300kg; altura: 0.50m–2.50m).
+  - [x] **Acessibilidade & TTS:**
     - Botão "Ler tela" (TTS) presente na AppBar da tela de edição.
     - Fontes legíveis (fontSize >= 18) e áreas de toque ampliadas para o público idoso.
 
@@ -111,13 +111,13 @@
 ### US08 — Ver detalhe do exercício *(nova)*
 **Como** usuário, **quero** tocar em um exercício da lista e ver sua descrição detalhada, **para** saber como executá-lo corretamente.
 
-- **Status:** 🔜 Sprint 2
+- **Status:** ✅ Implementada (PR #30 e PR #60)
 - **Prioridade:** Alta
 - **Origem:** feedback 21/08/2026 (*"ao listar os exercícios... não encaminha para nenhum local — deveria ir para a descrição detalhada, que no futuro terá vídeo/gif animado"*)
 - **Critérios de aceite:**
-  - [ ] Tap no card abre tela de detalhe (rota dedicada) com nome, descrição, categoria e tipo.
-  - [ ] Espaço reservado (widget) para mídia futura (vídeo/GIF), sem quebrar layout hoje.
-  - [ ] Botão voltar da tela de detalhe funciona (retorna à lista mantendo categoria selecionada).
+  - [x] Tap no card abre tela de detalhe (rota dedicada `/exercise/:id`) com nome, descrição, categoria, tipo e intensidade.
+  - [x] Espaço reservado (widget) para mídia futura (vídeo/GIF), sem quebrar layout hoje.
+  - [x] Botão voltar da tela de detalhe funciona (retorna à lista mantendo categoria selecionada).
 
 ### US09 — Seed oficial do catálogo *(atualizada)*
 **Como** administrador, **quero** popular o Firestore com os exercícios oficiais (Manual do Idoso) e as contas de teste (admin/trainer), **para** validar o app com dados reais.
@@ -135,24 +135,24 @@
 ### US10 — Navegação correta na tela de treino *(correção)*
 **Como** usuário, **quero** que o botão voltar da tela de treino retorne à Home, **para** navegar sem depender da barra inferior.
 
-- **Status:** 🔜 Sprint 1
+- **Status:** ✅ Implementada (PR #6)
 - **Prioridade:** Alta
 - **Origem:** feedback 21/08/2026 (*"o botão voltar não funciona, precisa clicar no ícone Home"*). Causa raiz identificada: `workout_screen.dart:65` usa `context.pop()`, mas a chegada à rota foi via `context.go('/workout')`, que substitui a pilha do go_router — não há nada para "pop".
 - **Critérios de aceite:**
-  - [ ] Voltar (seta do AppBar) retorna à Home preservando estado de autenticação.
-  - [ ] Padrão adotado documentado: `go` para troca de seção, `push` para empilhar detalhes.
+  - [x] Voltar (seta do AppBar) retorna à Home via `context.go('/home')` preservando estado de autenticação.
+  - [x] Padrão adotado documentado: `go` para troca de seção, `push` para empilhar detalhes.
 
 ### US11 — Marcar exercício em execução *(nova)*
 **Como** usuário, **quero** indicar qual exercício estou realizando agora, **para** o app controlar o tempo daquele exercício específico.
 
-- **Status:** 🔜 Sprint 2
+- **Status:** ✅ Implementada (PR #60)
 - **Prioridade:** Alta
 - **Origem:** feedback 21/08/2026 (*"tem que ter uma forma para marcar qual exercício está sendo realizado naquele momento"*)
 - **Critérios de aceite:**
-  - [ ] Ao selecionar um exercício (detalhe ou lista), ele fica marcado visualmente como "Em execução".
-  - [ ] O cronômetro inicia automaticamente ao marcar o exercício.
-  - [ ] Somente um exercício em execução por vez; iniciar outro finaliza/marca o anterior.
-  - [ ] Usuário consegue interromper/cancelar a execução.
+  - [x] Ao selecionar um exercício (detalhe ou lista), ele fica marcado visualmente como "Em execução".
+  - [x] O cronômetro inicia automaticamente ao marcar o exercício.
+  - [x] Somente um exercício em execução por vez; iniciar outro finaliza/marca o anterior.
+  - [x] Usuário consegue interromper/cancelar a execução.
 
 ### US12 — Tempo previsto com alertas *(nova)*
 **Como** usuário idoso, **quero** ser avisado quando o tempo previsto do exercício terminar e lembrado (com som e aviso visual) caso continue além do previsto, **para** não exceder a duração segura recomendada.
@@ -190,7 +190,7 @@
 ### US15 — Preferências de acessibilidade funcionais
 **Como** usuário, **quero** configurar alto contraste, tamanho de fonte e velocidade da voz, **para** adaptar o app às minhas necessidades.
 
-- **Status:** ✅ Modo Alto Contraste implementado / 💤 Outras opções em backlog
+- **Status:** ✅ Modo Alto Contraste implementado (Issue #37) / 💤 Outras opções em backlog
 - **Critérios de aceite:**
   - [x] Switch "Modo Alto Contraste" ativa tema de alto contraste em toda a aplicação instantaneamente.
   - [x] Desativar o switch retorna ao tema padrão.
@@ -210,7 +210,7 @@
 | US18 | Tela de Progresso/Evolução com histórico de treinos | Aba inativa · issues #26/#49/#58 |
 | US19 | Notificações do sistema (título, conteúdo, data/hora) | Modelo `Notificacao` · issues #32/#33 |
 | US20 | Alinhar modelos Flutter ao modelo conceitual do backend (N:N, Equipamento, flags `usa_*`, mídia estruturada) | `modelo-conceitual.md` §5 |
-| US21 | Exercício com nível de intensidade (escala 1-10: Leve 1-5, Moderado 6-8, Intenso 9-10) | Issue #16 |
+| US21 | Exercício com nível de intensidade (escala 1-10: Leve 1-5, Moderado 6-8, Intenso 9-10) | Issue #16 · PR #32 |
 
 ---
 
@@ -222,16 +222,16 @@
 | US02 | Autenticar-se | ✅ | — |
 | US03 | Encerrar sessão | ✅ | — |
 | US04 | Admin cadastra usuários com papel | ✅ | — |
-| US05 | Ver meus dados em todas as telas | 🐞 Bug | S1 |
+| US05 | Ver meus dados em todas as telas | ✅ | S1 |
 | US06 | Editar dados biométricos | ✅ | S4 |
 | US07 | Listar exercícios por categoria | ✅ | — |
-| US08 | Detalhe do exercício | 🔜 | S2 |
+| US08 | Detalhe do exercício | ✅ | S2 |
 | US09 | Seed oficial do catálogo | 🔜 | S1 |
-| US10 | Navegação correta na tela de treino | 🔜 | S1 |
-| US11 | Marcar exercício em execução | 🔜 | S2 |
+| US10 | Navegação correta na tela de treino | ✅ | S1 |
+| US11 | Marcar exercício em execução | ✅ | S2 |
 | US12 | Tempo previsto com alertas | 🔜 | S3 |
 | US13 | Registrar conclusão do exercício | 🔜 | S3 |
 | US14 | Ler tela em voz alta | ✅ | — |
-| US15 | Preferências de acessibilidade (Alto Contraste) | ✅ | — |
+| US15 | Preferências de acessibilidade (Alto Contraste) | ✅ | S4 |
 | US16–US20 | Backlog futuro | 💤 | — |
-| US21 | Intensidade do exercício (1-10) | 🔜 | S2 |
+| US21 | Intensidade do exercício (1-10) | ✅ | S2 |

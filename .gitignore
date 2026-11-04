@@ -56,8 +56,15 @@ lib/firebase_options.dart
 # Firebase - configuração do projeto (seção flutter é específica por dev)
 firebase.json
 
+# Firebase Emulator - dados persistentes (--import/--export-on-exit)
+.firebase/emulator-data/
+
 # DevTools - configuração local
 devtools_options.yaml
 
 # Skills de agente (artefatos auto-instalados via `npx skills add`)
 .agents/
+
+# Sessões e handoff de agentes de IA
+.handoff/
+HANDOFF.md
