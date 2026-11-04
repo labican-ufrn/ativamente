@@ -1,0 +1,255 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Este arquivo de regras de segurança assume as seguintes estruturas de dados:
+//
+// Coleção: Exercicios
+// Document ID: código identificador do exercício (ex: 'coracao-cardio-01a') ou ID automático
+// Campos:
+//   - codigo: string (opcional, máx 100 caracteres, imutável após criação)
+//   - nome: string (obrigatório, 1 a 150 caracteres) - Título do exercício
+//   - descricao: string (obrigatório, máx 1000 caracteres) - Instruções do exercício
+//   - midia: string (opcional, máx 500 caracteres) - Link ou referência à mídia
+//   - gifUrl: string (opcional, máx 500 caracteres) - Link do GIF demonstrativo
+//   - statusRealizado: bool (opcional) - Flag de status de realização
+//   - intensidade: int (obrigatório, 1 a 10) - Escala de intensidade do esforço
+//   - categoria: map (obrigatório, chaves 'nome' e 'icone' de até 100 caracteres cada)
+//   - tipo: map (obrigatório, chaves 'nome' e 'icone' de até 100 caracteres cada)
+//   - criadoEm / createdAt: timestamp (opcional, imutável)
+//   - atualizadoEm / updatedAt: timestamp (opcional)
+//
+// Coleção: Pessoas
+// Document ID: UID do usuário autenticado (request.auth.uid)
+// Campos:
+//   - role: string (opcional, 'idoso' | 'user' | 'trainer' | 'admin', padrão 'user')
+//   - tipoUsuario: string (opcional, 'idoso' | 'user' | 'trainer' | 'admin', alias de role)
+//   - nome: string (obrigatório, 1 a 150 caracteres) - Nome completo do usuário
+//   - cpf: string (opcional, máx 20 caracteres)
+//   - nomeLogin: string (opcional, máx 150 caracteres) - Login ou e-mail de acesso
+//   - email: string (opcional, máx 150 caracteres) - E-mail de contato
+//   - numTelefone: string (opcional, máx 30 caracteres) - Telefone
+//   - telefone: string (opcional, máx 30 caracteres) - Alias de telefone
+//   - dataNascimento: string (opcional, máx 30 caracteres)
+//   - altura: number (opcional, entre 0 e 300 cm)
+//   - peso: number (opcional, entre 0 e 500 kg)
+//   - genero: string (opcional, máx 50 caracteres)
+//   - cidade: string (opcional, máx 100 caracteres)
+//   - comorbidade: string (opcional, máx 500 caracteres)
+//   - freqAtivFisica: string (opcional, máx 200 caracteres)
+//   - histEsportivo: string (opcional, máx 500 caracteres)
+//   - notificacoes: list (opcional, máx 100 itens)
+//   - criadoEm / createdAt: timestamp (opcional, imutável)
+//   - atualizadoEm / updatedAt: timestamp (opcional)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -----------------------------------------------------------
+    // Negação Padrão (Default Deny)
+    // -----------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===========================================================
+    // Funções Auxiliares (Helper Functions)
+    // ===========================================================
+
+    /// Verifica se a requisição é de um usuário autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /// Verifica se o usuário autenticado é o dono do documento
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    /// Verifica se o usuário autenticado possui e-mail corporativo/sistema (@ativamente.org)
+    function isSystemEmail() {
+      return isAuthenticated() &&
+        ('email' in request.auth.token) &&
+        request.auth.token.email != null &&
+        request.auth.token.email.matches('.*@ativamente[.]org$');
+    }
+
+    /// Verifica se o usuário é administrador (via Custom Claim ou e-mail institucional)
+    function isAdmin() {
+      return isAuthenticated() && (
+        isSystemEmail() ||
+        (('role' in request.auth.token) && request.auth.token.role == 'admin') ||
+        (('admin' in request.auth.token) && request.auth.token.admin == true)
+      );
+    }
+
+    /// Verifica se o usuário é instrutor/trainer ou administrador
+    function isTrainer() {
+      return isAuthenticated() && (
+        isAdmin() ||
+        (('role' in request.auth.token) && request.auth.token.role == 'trainer') ||
+        (('trainer' in request.auth.token) && request.auth.token.trainer == true)
+      );
+    }
+
+    /// Permissão para gerenciar catálogo de exercícios (admin, trainer ou e-mail de sistema)
+    function canManageExercises() {
+      return isAdmin() || isTrainer();
+    }
+
+    /// Valida que campos imutáveis não foram alterados no update
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    /// Valida string opcional respeitando tamanho máximo
+    function isValidOptionalString(data, field, maxLen) {
+      return !(field in data) || (data[field] is string && data[field].size() <= maxLen);
+    }
+
+    /// Valida número opcional respeitando limites mínimo e máximo
+    function isValidOptionalNumber(data, field, minVal, maxVal) {
+      return !(field in data) || (data[field] is number && data[field] >= minVal && data[field] <= maxVal);
+    }
+
+    /// Valida booleano opcional
+    function isValidOptionalBool(data, field) {
+      return !(field in data) || data[field] is bool;
+    }
+
+    /// Valida timestamp opcional
+    function isValidOptionalTimestamp(data, field) {
+      return !(field in data) || data[field] is timestamp;
+    }
+
+    /// Valida lista opcional respeitando tamanho máximo
+    function isValidOptionalList(data, field, maxSize) {
+      return !(field in data) || (data[field] is list && data[field].size() <= maxSize);
+    }
+
+    /// Valida objeto categoria ou tipo de exercício
+    function isValidCategoriaOrTipo(obj) {
+      return obj is map &&
+        obj.keys().hasAll(['nome', 'icone']) &&
+        obj.keys().hasOnly(['nome', 'icone']) &&
+        obj.nome is string && obj.nome.size() <= 100 &&
+        obj.icone is string && obj.icone.size() <= 100;
+    }
+
+    // ===========================================================
+    // Validadores de Domínio (Validator Function Pattern)
+    // ===========================================================
+
+    /// Validação estrita de esquema para a entidade Exercicio
+    function isValidExercicio(data) {
+      return data.keys().hasOnly([
+        'codigo', 'nome', 'descricao', 'midia', 'gifUrl',
+        'statusRealizado', 'intensidade', 'categoria', 'tipo',
+        'criadoEm', 'createdAt', 'atualizadoEm', 'updatedAt'
+      ]) &&
+      data.keys().hasAll(['nome', 'descricao', 'intensidade', 'categoria', 'tipo']) &&
+      data.nome is string && data.nome.size() >= 1 && data.nome.size() <= 150 &&
+      data.descricao is string && data.descricao.size() <= 1000 &&
+      data.intensidade is int && data.intensidade >= 1 && data.intensidade <= 10 &&
+      isValidCategoriaOrTipo(data.categoria) &&
+      isValidCategoriaOrTipo(data.tipo) &&
+      isValidOptionalString(data, 'codigo', 100) &&
+      isValidOptionalString(data, 'midia', 500) &&
+      isValidOptionalString(data, 'gifUrl', 500) &&
+      isValidOptionalBool(data, 'statusRealizado') &&
+      isValidOptionalTimestamp(data, 'criadoEm') &&
+      isValidOptionalTimestamp(data, 'createdAt') &&
+      isValidOptionalTimestamp(data, 'atualizadoEm') &&
+      isValidOptionalTimestamp(data, 'updatedAt');
+    }
+
+    /// Validação estrita de esquema para a entidade Pessoa
+    function isValidPessoa(data) {
+      return data.keys().hasOnly([
+        'role', 'tipoUsuario', 'nome', 'cpf', 'nomeLogin', 'email',
+        'numTelefone', 'telefone', 'dataNascimento', 'altura', 'peso',
+        'genero', 'cidade', 'comorbidade', 'freqAtivFisica', 'histEsportivo',
+        'notificacoes', 'criadoEm', 'createdAt', 'atualizadoEm', 'updatedAt'
+      ]) &&
+      ('nome' in data) && data.nome is string && data.nome.size() >= 1 && data.nome.size() <= 150 &&
+      (!('role' in data) || data.role in ['user', 'idoso', 'trainer', 'admin']) &&
+      (!('tipoUsuario' in data) || data.tipoUsuario in ['user', 'idoso', 'trainer', 'admin']) &&
+      isValidOptionalString(data, 'cpf', 20) &&
+      isValidOptionalString(data, 'nomeLogin', 150) &&
+      isValidOptionalString(data, 'email', 150) &&
+      isValidOptionalString(data, 'numTelefone', 30) &&
+      isValidOptionalString(data, 'telefone', 30) &&
+      isValidOptionalString(data, 'dataNascimento', 30) &&
+      isValidOptionalNumber(data, 'altura', 0, 300) &&
+      isValidOptionalNumber(data, 'peso', 0, 500) &&
+      isValidOptionalString(data, 'genero', 50) &&
+      isValidOptionalString(data, 'cidade', 100) &&
+      isValidOptionalString(data, 'comorbidade', 500) &&
+      isValidOptionalString(data, 'freqAtivFisica', 200) &&
+      isValidOptionalString(data, 'histEsportivo', 500) &&
+      isValidOptionalList(data, 'notificacoes', 100) &&
+      isValidOptionalTimestamp(data, 'criadoEm') &&
+      isValidOptionalTimestamp(data, 'createdAt') &&
+      isValidOptionalTimestamp(data, 'atualizadoEm') &&
+      isValidOptionalTimestamp(data, 'updatedAt');
+    }
+
+    /// Assegura que um usuário comum não possa atribuir privilégios a si mesmo
+    function isNonPrivilegedRole(data) {
+      return (!('role' in data) || data.role in ['user', 'idoso']) &&
+             (!('tipoUsuario' in data) || data.tipoUsuario in ['user', 'idoso']);
+    }
+
+    /// Impede escalada de privilégio: campos de papel não podem ser alterados pelo próprio usuário comum
+    function areRoleFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'tipoUsuario']);
+    }
+
+    // ===========================================================
+    // Regras de Coleções
+    // ===========================================================
+
+    // Coleção: Exercicios
+    // Catálogo geral de exercícios para os idosos
+    match /Exercicios/{exercicioId} {
+      // Leitura permitida para qualquer usuário autenticado
+      allow read: if isAuthenticated();
+
+      // Criação permitida para administradores, instrutores ou contas com e-mail institucional
+      allow create: if canManageExercises() &&
+                    isValidExercicio(request.resource.data);
+
+      // Atualização permitida para administradores/instrutores com integridade de campos imutáveis
+      allow update: if canManageExercises() &&
+                    isValidExercicio(request.resource.data) &&
+                    areImmutableFieldsUnchanged(['codigo', 'criadoEm', 'createdAt']);
+
+      // Exclusão permitida para administradores/instrutores
+      allow delete: if canManageExercises();
+    }
+
+    // Coleção: Pessoas
+    // Perfis individuais dos usuários (contém PII e dados de saúde)
+    match /Pessoas/{userId} {
+      // Proteção de PII: somente o próprio dono ou administradores podem ler
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Criação: o próprio usuário ao cadastrar (com papel comum) ou admin criando perfis secundários
+      allow create: if isAuthenticated() &&
+                    isValidPessoa(request.resource.data) &&
+                    (isAdmin() || (isOwner(userId) && isNonPrivilegedRole(request.resource.data)));
+
+      // Atualização: o próprio dono (sem alterar papéis nem timestamps) ou admin
+      allow update: if isAuthenticated() &&
+                    isValidPessoa(request.resource.data) &&
+                    (isAdmin() || (isOwner(userId) && areRoleFieldsUnchanged() && areImmutableFieldsUnchanged(['criadoEm', 'createdAt'])));
+
+      // Exclusão: restrita exclusivamente a administradores
+      allow delete: if isAdmin();
+    }
+  }
+}

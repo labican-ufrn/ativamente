@@ -80,6 +80,15 @@ Regras:
 2. Branches de trabalho: `feature/nome-da-funcionalidade` (kebab-case, sem acentos).
 3. PRs apontam para `dev`; releases fazem merge de `dev` → `main`.
 4. Manter PRs pequenos e revisáveis.
+5. O deploy de produção (Firebase Hosting e releases públicas) é realizado exclusivamente a partir da branch `main`.
+
+## Versionamento Semântico e Releases
+
+O projeto segue o [Versionamento Semântico (SemVer)](docs/versionamento-e-releases.md) no formato `MAJOR.MINOR.PATCH+BUILD` em `pubspec.yaml` e tags Git no padrão `vMAJOR.MINOR.PATCH` (iniciando em `v0.1.0` / `0.1.0+1`).
+
+- Bumping de versão: `dart run tool/bump_version.dart [patch|minor|major]`
+- Histórico de alterações documentado em `CHANGELOG.md`
+- Releases publicadas automaticamente via `.github/workflows/release.yml` ao criar tag `v*`
 
 ## Conventional Commits (obrigatório)
 

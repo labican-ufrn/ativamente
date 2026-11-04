@@ -2,8 +2,8 @@
 
 Aplicativo Flutter para auxiliar **idosos** na prática de exercícios físicos de forma saudável e segura, desenvolvido pelo [Labican/UFRN](https://github.com/labican-ufrn). O projeto segue as orientações do *Manual do Idoso* e visa promover atividades físicas adaptadas, contribuindo para a saúde e qualidade de vida na terceira idade.
 
-- **App publicado (Web):** https://ativamente-97e20.web.app
-- **Documentação:** [`docs/user-stories.md`](docs/user-stories.md) · [`docs/plano-sprints.md`](docs/plano-sprints.md) · [`docs/equipe.md`](docs/equipe.md)
+- **App publicado (Web):** https://ativamente-labican-ufrn.web.app
+- **Documentação:** [`docs/user-stories.md`](docs/user-stories.md) · [`docs/plano-sprints.md`](docs/plano-sprints.md) · [`docs/versionamento-e-releases.md`](docs/versionamento-e-releases.md) · [`docs/equipe.md`](docs/equipe.md)
 - **Modelo conceitual da API:** [`ativamente-api/docs/modelo-conceitual.md`](https://github.com/labican-ufrn/ativamente-api/blob/dev/docs/modelo-conceitual.md)
 
 ## Stack
@@ -128,7 +128,17 @@ flutter run -d web-server --web-port=3000 --dart-define-from-file=.env  # execut
 flutter build apk        # build Android
 flutter build web        # build Web
 firebase deploy --only hosting  # publicar Web (requer firebase login)
+dart run tool/bump_version.dart patch  # versionamento semântico (patch, minor, major)
 ```
+
+## Versionamento e Releases
+
+O projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/) (`v0.x.y+z`) e mantém o histórico de alterações no `CHANGELOG.md`.
+
+- **Incremento de versão:** `dart run tool/bump_version.dart [patch|minor|major]`
+- **Tags de Release:** `vMAJOR.MINOR.PATCH` (ex.: `v0.1.0`)
+- **Automação de CI/CD:** A criação e envio de tags `v*` dispara automaticamente o workflow de release do GitHub Actions gerando o APK Android, pacote Web e GitHub Release.
+- Veja o guia completo em [`docs/versionamento-e-releases.md`](docs/versionamento-e-releases.md).
 
 ## Estrutura do projeto
 

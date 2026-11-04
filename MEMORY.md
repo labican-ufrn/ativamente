@@ -31,11 +31,10 @@
 - **Resolução de Conflitos no `pubspec.yaml`:** Sempre preservar as dependências atualizadas do Firebase vindas da branch `dev`.
 
 ## 🗺️ PRs & Pendências Ativas (Em Fila para Revisão)
-1. **[PR #58](https://github.com/labican-ufrn/ativamente/pull/58):** `feat(ci): configura SonarQube com sonar-project.properties e pipeline de CI (#36)` (Taciano Silva / Revisor: @nlopesr / Merge: @LuizFelixDev ou @Icaro-Nonato / Sprint 4).
-2. **[PR #30](https://github.com/labican-ufrn/ativamente/pull/30):** `Feat/detalhes exercicio` (Tomé Arcanjo - US08).
-3. **[PR #32](https://github.com/labican-ufrn/ativamente/pull/32):** `feat: adiciona nível de intensidade (1-10) aos exercícios` (Taciano Silva).
-4. **[PR #31](https://github.com/labican-ufrn/ativamente/pull/31):** `feat: Ativar o botão de Alto Contraste #27` (Luiz Felix).
-5. **[PR #33](https://github.com/labican-ufrn/ativamente/pull/33):** `feat: implementa controle e cronômetro de exercício em execução` (Nathan Lopes - US11).
+1. **[PR #59](https://github.com/labican-ufrn/ativamente/pull/59):** `Fix/erro workout screen` (Luiz Felix / Revisor solicitado: @Icaro-Nonato / Assignee para merge: @tacianosilva).
+2. **[PR #48](https://github.com/labican-ufrn/ativamente/pull/48):** `docs: prepara release de QA da iteracao` (Isaac Ribeiro / Revisor solicitado: @LuizFelixDev / Assignee para merge: @tacianosilva).
+3. **[PR #40](https://github.com/labican-ufrn/ativamente/pull/40):** `fix(auth): diagnostica e corrige exibição do nome do usuário logado (#8)` (Luiz Felix / Revisores: @Icaro-Nonato e @tacianosilva / Assignee para merge: @tacianosilva).
+*(Nota: PRs #58, #60 e #50 foram revisados e mesclados em `dev` em 04/11/2026).*
 
 ## 📋 Demandas e Pautas para a Próxima Reunião
 1. **Identificação e Login por Nome vs. E-mail ([Issue #21](https://github.com/labican-ufrn/ativamente/issues/21)):**
