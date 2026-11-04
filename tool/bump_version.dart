@@ -1,16 +1,75 @@
 import 'dart:io';
 
+/// Representa a versão calculada com SemVer e Build Number.
+class SemVerInfo {
+  final int major;
+  final int minor;
+  final int patch;
+  final int build;
+
+  const SemVerInfo({
+    required this.major,
+    required this.minor,
+    required this.patch,
+    required this.build,
+  });
+
+  String get semVer => '$major.$minor.$patch';
+  String get fullVersion => '$semVer+$build';
+  String get tagName => 'v$semVer';
+
+  static SemVerInfo? parse(String text) {
+    final regex = RegExp(r'^(\d+)\.(\d+)\.(\d+)(?:\+(\d+))?$');
+    final match = regex.firstMatch(text.trim());
+    if (match == null) return null;
+
+    return SemVerInfo(
+      major: int.parse(match.group(1)!),
+      minor: int.parse(match.group(2)!),
+      patch: int.parse(match.group(3)!),
+      build: match.group(4) != null ? int.parse(match.group(4)!) : 1,
+    );
+  }
+
+  SemVerInfo bump(String target, {bool keepBuild = false}) {
+    int newMajor = major;
+    int newMinor = minor;
+    int newPatch = patch;
+    int newBuild = keepBuild ? build : build + 1;
+
+    switch (target.toLowerCase()) {
+      case 'patch':
+        newPatch += 1;
+        break;
+      case 'minor':
+        newMinor += 1;
+        newPatch = 0;
+        break;
+      case 'major':
+        newMajor += 1;
+        newMinor = 0;
+        newPatch = 0;
+        break;
+      default:
+        final explicit = SemVerInfo.parse(target);
+        if (explicit == null) {
+          throw FormatException(
+            'Formato inválido "$target". Use patch, minor, major ou X.Y.Z.',
+          );
+        }
+        return explicit;
+    }
+
+    return SemVerInfo(
+      major: newMajor,
+      minor: newMinor,
+      patch: newPatch,
+      build: newBuild,
+    );
+  }
+}
+
 /// Script utilitário para gerenciamento de Versionamento Semântico (SemVer) no AtivaMente.
-///
-/// Uso:
-///   dart run tool/bump_version.dart [patch|minor|major]
-///   dart run tool/bump_version.dart 0.2.0
-///   dart run tool/bump_version.dart patch --dry-run
-///
-/// Regras:
-///   - patch: 0.1.0+1 -> 0.1.1+2 (correções de bugs retrocompatíveis)
-///   - minor: 0.1.0+1 -> 0.2.0+2 (novas funcionalidades retrocompatíveis)
-///   - major: 0.1.0+1 -> 1.0.0+2 (mudanças com quebra de compatibilidade)
 void main(List<String> args) {
   if (args.isEmpty || args.contains('--help') || args.contains('-h')) {
     _printUsage();
@@ -21,7 +80,6 @@ void main(List<String> args) {
   final keepBuild = args.contains('--keep-build');
   final noChangelog = args.contains('--no-changelog');
 
-  // Filtra flags
   final positionalArgs =
       args.where((arg) => !arg.startsWith('--') && !arg.startsWith('-')).toList();
 
@@ -31,7 +89,7 @@ void main(List<String> args) {
     exit(1);
   }
 
-  final target = positionalArgs.first.toLowerCase();
+  final target = positionalArgs.first;
 
   final pubspecFile = File('pubspec.yaml');
   if (!pubspecFile.existsSync()) {
@@ -40,58 +98,34 @@ void main(List<String> args) {
   }
 
   final pubspecContent = pubspecFile.readAsStringSync();
-  final versionRegex = RegExp(r'^version:\s*(\d+)\.(\d+)\.(\d+)(?:\+(\d+))?', multiLine: true);
+  final versionRegex = RegExp(r'^version:\s*([^\r\n]+)', multiLine: true);
   final match = versionRegex.firstMatch(pubspecContent);
 
   if (match == null) {
-    stderr.writeln('Erro: não foi possível localizar o campo "version:" em pubspec.yaml.');
+    stderr.writeln('Erro: campo "version:" não localizado em pubspec.yaml.');
     exit(1);
   }
 
-  int major = int.parse(match.group(1)!);
-  int minor = int.parse(match.group(2)!);
-  int patch = int.parse(match.group(3)!);
-  int build = int.parse(match.group(4) ?? '1');
-
-  final currentVersion = '$major.$minor.$patch+$build';
-
-  if (target == 'patch') {
-    patch += 1;
-  } else if (target == 'minor') {
-    minor += 1;
-    patch = 0;
-  } else if (target == 'major') {
-    major += 1;
-    minor = 0;
-    patch = 0;
-  } else {
-    // Tenta interpretar como versão semântica explícita (ex: 0.2.0 ou 0.2.0+2)
-    final customRegex = RegExp(r'^(\d+)\.(\d+)\.(\d+)(?:\+(\d+))?$');
-    final customMatch = customRegex.firstMatch(target);
-    if (customMatch == null) {
-      stderr.writeln('Erro: formato de versão inválido "$target". Use patch, minor, major ou X.Y.Z.');
-      exit(1);
-    }
-    major = int.parse(customMatch.group(1)!);
-    minor = int.parse(customMatch.group(2)!);
-    patch = int.parse(customMatch.group(3)!);
-    if (customMatch.group(4) != null) {
-      build = int.parse(customMatch.group(4)!);
-    }
+  final currentRaw = match.group(1)!.trim();
+  final current = SemVerInfo.parse(currentRaw);
+  if (current == null) {
+    stderr.writeln('Erro: formato da versão atual "$currentRaw" em pubspec.yaml é inválido.');
+    exit(1);
   }
 
-  if (!keepBuild && target != 'explicit-with-build') {
-    build += 1;
+  final SemVerInfo next;
+  try {
+    next = current.bump(target, keepBuild: keepBuild);
+  } catch (e) {
+    stderr.writeln('Erro: $e');
+    exit(1);
   }
-
-  final newSemVer = '$major.$minor.$patch';
-  final newFullVersion = '$newSemVer+$build';
 
   stdout.writeln('----------------------------------------------------');
   stdout.writeln('🔖 Atualização de Versionamento Semântico (SemVer)');
   stdout.writeln('----------------------------------------------------');
-  stdout.writeln('Versão atual:  $currentVersion');
-  stdout.writeln('Nova versão:   $newFullVersion (Tag sugerida: v$newSemVer)');
+  stdout.writeln('Versão atual:  ${current.fullVersion}');
+  stdout.writeln('Nova versão:   ${next.fullVersion} (Tag sugerida: ${next.tagName})');
   stdout.writeln('Modo Dry Run:  ${dryRun ? "SIM (nada será alterado)" : "NÃO"}');
   stdout.writeln('----------------------------------------------------');
 
@@ -103,7 +137,7 @@ void main(List<String> args) {
   // Atualiza pubspec.yaml
   final updatedPubspec = pubspecContent.replaceFirst(
     versionRegex,
-    'version: $newFullVersion',
+    'version: ${next.fullVersion}',
   );
   pubspecFile.writeAsStringSync(updatedPubspec);
   stdout.writeln('✔ pubspec.yaml atualizado com sucesso.');
@@ -116,25 +150,23 @@ void main(List<String> args) {
 
     if (changelogContent.contains('## [Unreleased]')) {
       final releaseSection =
-          '## [Unreleased]\n\n---\n\n## [$newSemVer] - $today';
+          '## [Unreleased]\n\n---\n\n## [${next.semVer}] - $today';
       final updatedChangelog = changelogContent.replaceFirst(
         '## [Unreleased]',
         releaseSection,
       );
       changelogFile.writeAsStringSync(updatedChangelog);
-      stdout.writeln('✔ CHANGELOG.md atualizado com a seção [$newSemVer] - $today.');
-    } else {
-      stdout.writeln('ℹ Marcador "## [Unreleased]" não encontrado no CHANGELOG.md. Seção não adicionada.');
+      stdout.writeln('✔ CHANGELOG.md atualizado com a seção [${next.semVer}] - $today.');
     }
   }
 
   stdout.writeln('\nPróximos passos recomendados (GitFlow):');
-  stdout.writeln('  1. git checkout -b release/v$newSemVer');
+  stdout.writeln('  1. git checkout -b release/${next.tagName}');
   stdout.writeln('  2. git add pubspec.yaml CHANGELOG.md');
-  stdout.writeln('  3. git commit -m "chore(release): prepara versao v$newSemVer"');
+  stdout.writeln('  3. git commit -m "chore(release): prepara versao ${next.tagName}"');
   stdout.writeln('  4. Abra o PR para a branch `main`');
-  stdout.writeln('  5. Após o merge na `main`, crie a tag: git tag -a v$newSemVer -m "Release v$newSemVer"');
-  stdout.writeln('  6. Envie a tag: git push origin v$newSemVer');
+  stdout.writeln('  5. Após o merge na `main`, crie a tag: git tag -a ${next.tagName} -m "Release ${next.tagName}"');
+  stdout.writeln('  6. Envie a tag: git push origin ${next.tagName}');
 }
 
 String _formatDate(DateTime date) {
