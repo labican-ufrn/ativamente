@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_academia/core/utils/intensity.dart';
 import 'package:app_academia/models/exercicio.dart';
 import 'package:app_academia/providers/active_exercise_provider.dart';
 import 'package:app_academia/providers/firestore_provider.dart';
@@ -342,5 +343,87 @@ void main() {
         }
       },
     );
+  });
+
+  group('ExerciseDetailScreen - Chip de intensidade (US21 / Issue #53)', () {
+    Exercicio comIntensidade(int valor) => Exercicio(
+      id: 'ex-i',
+      nome: 'Exercício $valor',
+      descricao: 'Descrição.',
+      midia: '',
+      intensidade: valor,
+      categoria: Categoria(nome: 'Coracao', icone: 'favorite'),
+      tipo: Tipo(nome: 'Cardio', icone: 'directions_run'),
+    );
+
+    Future<void> abrir(WidgetTester tester, int intensidade) async {
+      final container = ProviderContainer(
+        overrides: [
+          nowProvider.overrideWithValue(relogio),
+          exerciciosProvider.overrideWith(
+            (ref) => Stream.value([comIntensidade(intensidade)]),
+          ),
+          readScreenProvider.overrideWith((ref, text) {
+            return () => textosLidosPeloTts.add(text);
+          }),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.theme,
+            home: const ExerciseDetailScreen(exerciseId: 'ex-i'),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    for (final caso in [
+      (valor: 1, rotulo: 'Leve', cor: AppTheme.intensityLight),
+      (valor: 5, rotulo: 'Leve', cor: AppTheme.intensityLight),
+      (valor: 6, rotulo: 'Moderado', cor: AppTheme.intensityModerate),
+      (valor: 8, rotulo: 'Moderado', cor: AppTheme.intensityModerate),
+      (valor: 9, rotulo: 'Intenso', cor: AppTheme.intensityHeavy),
+      (valor: 10, rotulo: 'Intenso', cor: AppTheme.intensityHeavy),
+    ]) {
+      testWidgets(
+        'intensidade ${caso.valor} exibe "${caso.rotulo}" com a cor da listagem',
+        (tester) async {
+          await abrir(tester, caso.valor);
+
+          expect(find.text(caso.rotulo), findsOneWidget);
+          final chip = tester.widget<Chip>(
+            find.ancestor(
+              of: find.text(caso.rotulo),
+              matching: find.byType(Chip),
+            ),
+          );
+          expect(chip.backgroundColor, caso.cor);
+          expect(chip.backgroundColor, corIntensidade(caso.valor));
+        },
+      );
+    }
+
+    testWidgets('chip é informativo: não é botão nem tem tooltip de filtro', (
+      tester,
+    ) async {
+      await abrir(tester, 3);
+
+      expect(find.byType(ActionChip), findsNothing);
+      expect(find.byTooltip('Filtrar por leve'), findsNothing);
+      expect(find.bySemanticsLabel('Intensidade: Leve'), findsOneWidget);
+    });
+
+    testWidgets('Ler tela inclui a intensidade', (tester) async {
+      await abrir(tester, 9);
+
+      await tester.tap(find.byTooltip('Ler tela'));
+      await tester.pump();
+
+      expect(textosLidosPeloTts.single, contains('Intensidade: Intenso'));
+    });
   });
 }
