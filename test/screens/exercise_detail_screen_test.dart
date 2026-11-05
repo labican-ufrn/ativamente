@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_academia/models/exercicio.dart';
 import 'package:app_academia/providers/active_exercise_provider.dart';
+import 'package:app_academia/providers/auth_provider.dart';
 import 'package:app_academia/providers/firestore_provider.dart';
 import 'package:app_academia/providers/tts_provider.dart';
 import 'package:app_academia/screens/workout/exercise_detail_screen.dart';
@@ -44,6 +45,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         nowProvider.overrideWithValue(relogio),
+        userDataProvider.overrideWith((ref) => Stream.value(null)),
         exerciciosProvider.overrideWith(
           (ref) => Stream.value([testExercicio, outroExercicio]),
         ),
