@@ -43,6 +43,10 @@ sonar.coverageExclusions=**/test/**,lib/firebase_options.dart,**/*.g.dart,**/*.f
 sonar.dart.lcov.reportPaths=coverage/lcov.info
 sonar.dart.coverage.reportPaths=coverage/lcov.info
 
+# Importação de issues do analisador nativo Dart (Generic Issue Import)
+# Importa diagnósticos do analisador oficial sem dependência exclusiva de plugins legados.
+sonar.externalIssuesReportPaths=build/sonar-generic-issues.json
+
 # Bloqueio até avaliação do Quality Gate
 sonar.qualitygate.wait=true
 ```
@@ -70,6 +74,12 @@ A action utiliza a versão oficial segura `SonarSource/sonarqube-scan-action@v6`
 - Não são enviados parâmetros comerciais como `-Dsonar.pullrequest.*` ou `-Dsonar.branch.name`, evitando rejeição por falta de licença comercial no servidor Community Edition.
 - Com `-Dsonar.qualitygate.wait=true`, o job aguarda a avaliação das métricas no servidor antes de concluir a execução, garantindo que qualquer violação do Quality Gate falhe a esteira no GitHub com **barra vermelha**.
 - Em branches protegidas (`main` e `dev`), a presença do `SONAR_TOKEN` é obrigatória; caso ausente, a esteira falha imediatamente.
+
+### 4.1. Importação de Issues Nativas do Dart (Generic Issue Import)
+Para evitar dependência exclusiva de plugins comunitários legados de Dart que aplicam regras obsoletas de transição, a esteira utiliza a estratégia moderna de **Generic Issue Import** do SonarQube:
+1. O comando `dart analyze --format=json` gera o diagnóstico nativo oficial da versão exata do Dart/Flutter em execução no pipeline.
+2. O script utilitário `tool/convert_analyzer_to_sonar.dart` converte esses diagnósticos para o formato oficial `build/sonar-generic-issues.json`.
+3. O scanner do SonarQube ingere as issues via `sonar.externalIssuesReportPaths`, garantindo que apenas lints e erros oficiais configurados no `analysis_options.yaml` sejam reportados.
 
 ---
 

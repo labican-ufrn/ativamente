@@ -67,8 +67,12 @@ jobs:
           EOF
           fi
 
-      - name: Static Analysis (flutter analyze)
-        run: flutter analyze
+      - name: Static Analysis (dart & flutter analyze)
+        run: |
+          mkdir -p build
+          dart analyze --format=json > build/analyzer-report.json || true
+          dart run tool/convert_analyzer_to_sonar.dart build/analyzer-report.json build/sonar-generic-issues.json
+          flutter analyze
 
       - name: Run unit & widget tests with coverage
         run: flutter test --coverage
