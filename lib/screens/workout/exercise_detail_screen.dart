@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/exercicio.dart';
 import '../../providers/active_exercise_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
+import 'edit_exercise_screen.dart' show papeisEditoresExercicio;
 
 class ExerciseDetailScreen extends ConsumerWidget {
   const ExerciseDetailScreen({super.key, required this.exerciseId});
@@ -136,6 +138,9 @@ class _ExerciseDetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final podeEditar = papeisEditoresExercicio.contains(
+      ref.watch(userDataProvider).value?.role,
+    );
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -146,6 +151,13 @@ class _ExerciseDetailBody extends ConsumerWidget {
         ),
         title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          if (podeEditar)
+            IconButton(
+              icon: const Icon(Icons.edit, size: 28),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              onPressed: () => context.push('/edit-exercise/${exercicio.id}'),
+              tooltip: 'Editar exercício',
+            ),
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
