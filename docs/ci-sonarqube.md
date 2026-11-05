@@ -15,7 +15,7 @@ O pipeline realiza os seguintes passos:
 1. **Checkout completo** do repositório (`fetch-depth: 0`), necessário para cálculo de blame, novas linhas de código e histórico no SonarQube.
 2. **Setup do Java 21** e **Flutter 3.47.1-stable** (alinhado com o `.tool-versions`).
 3. **Instalação de dependências:** `flutter pub get`.
-4. **Análise estática:** `flutter analyze` garantindo conformidade com o linter (`analysis_options.yaml`).
+4. **Análise estática:** `flutter analyze --no-fatal-infos` garantindo conformidade com o linter (`analysis_options.yaml`) e delegando o bloqueio de code smells ao Quality Gate do SonarQube via importação genérica de issues.
 5. **Execução de testes e cobertura:** `flutter test --coverage`, gerando `coverage/lcov.info`.
 6. **SonarQube Scan:** Execução do scanner com avaliação bloqueante do Quality Gate no SonarQube (modo unificado compatível com a Community Edition).
 

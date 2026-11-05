@@ -105,7 +105,14 @@ class SonarIssueConverter {
   }
 
   List<Map<String, dynamic>> parseJsonReport(String jsonContent) {
-    final parsed = jsonDecode(jsonContent);
+    var raw = jsonContent.trim();
+    final firstBrace = raw.indexOf('{');
+    final lastBrace = raw.lastIndexOf('}');
+    if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+      raw = raw.substring(firstBrace, lastBrace + 1);
+    }
+
+    final parsed = jsonDecode(raw);
     if (parsed is! Map<String, dynamic>) return [];
 
     final diagnostics = parsed['diagnostics'];

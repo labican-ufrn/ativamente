@@ -83,6 +83,37 @@ void main() {
       expect(textRange['endColumn'], equals(20));
     });
 
+    test('converte saída JSON do dart analyze mesmo com texto antes do JSON', () {
+      const noisyJsonInput = '''
+      Analyzing ativamente...
+      {
+        "version": 1,
+        "diagnostics": [
+          {
+            "code": "avoid_print",
+            "severity": "INFO",
+            "type": "LINT",
+            "location": {
+              "file": "/home/user/project/lib/utils.dart",
+              "range": {
+                "start": { "line": 5, "column": 3 },
+                "end": { "line": 5, "column": 10 }
+              }
+            },
+            "problemMessage": "Avoid print."
+          }
+        ]
+      }
+      ''';
+
+      final result = converter.convert(noisyJsonInput);
+      final issues = result['issues'] as List;
+      expect(issues.length, equals(1));
+      final issue = issues.first as Map<String, dynamic>;
+      expect(issue['ruleId'], equals('avoid_print'));
+      expect((issue['primaryLocation'] as Map)['filePath'], equals('lib/utils.dart'));
+    });
+
     test('converte saída de texto simples do flutter analyze', () {
       const textInput = '''
 Analyzing ativamente...
