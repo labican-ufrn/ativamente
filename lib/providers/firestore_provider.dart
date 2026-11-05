@@ -34,3 +34,10 @@ final exerciciosFiltradosProvider = Provider.family<AsyncValue<List<Exercicio>>,
     return list.where((e) => e.intensidade >= min && e.intensidade <= max).toList();
   });
 });
+
+/// Atualiza campos de um exercício existente (`update()`, nunca `set`).
+final atualizarExercicioProvider =
+    Provider<Future<void> Function(String id, Map<String, dynamic> dados)>((ref) {
+  return (id, dados) =>
+      FirebaseFirestore.instance.collection('Exercicios').doc(id).update(dados);
+});
