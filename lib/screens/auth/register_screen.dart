@@ -26,21 +26,55 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+    });
+    try {
+      final signedIn = await ref
+          .read(authControllerProvider)
+          .signInWithGoogle();
+      if (signedIn && mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        final message = e is FirebaseAuthException
+            ? (e.message ?? 'Erro ao entrar com o Google.')
+            : e.toString().replaceAll('Exception: ', '');
+        setState(() {
+          _errorMessage = message;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message, style: const TextStyle(fontSize: 18)),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const screenText = 'AtivaMente. Tela de Cadastro. Preencha seus dados. Campo nome. Campo email. Campo senha. Botão Cadastrar.';
+    const screenText =
+        'AtivaMente. Tela de Cadastro. Preencha seus dados. Campo nome. Campo email. Campo senha. Botão Cadastrar. Botão Entrar com Google.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
+          tooltip: 'Voltar',
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           onPressed: () => context.go('/'),
         ),
         title: const Text('Criar Conta', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: readScreen,
             tooltip: 'Ler tela',
           ),
@@ -155,6 +189,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             const SizedBox(height: 48),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+              ),
               onPressed: () async {
                 setState(() {
                   _errorMessage = null;
@@ -186,6 +223,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 }
               },
               child: const Text('Cadastrar', style: TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(height: 16),
+            Tooltip(
+              message: 'Entrar com conta Google',
+              excludeFromSemantics: true,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerLow,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                onPressed: _handleGoogleSignIn,
+                icon: const Icon(Icons.g_mobiledata, size: 36),
+                label: const Text(
+                  'Entrar com Google',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
         ),

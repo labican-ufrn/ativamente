@@ -38,6 +38,8 @@ class Pessoa {
   final String id;
   final String role; // 'admin', 'trainer', 'user'
   final String nome;
+  final String email;
+  final String foto;
   final String cpf;
   final String nomeLogin;
   final String numTelefone;
@@ -55,6 +57,8 @@ class Pessoa {
     required this.id,
     this.role = 'user',
     required this.nome,
+    this.email = '',
+    this.foto = '',
     this.cpf = '',
     this.nomeLogin = '',
     this.numTelefone = '',
@@ -79,8 +83,10 @@ class Pessoa {
       id: documentId,
       role: json['role'] ?? 'user',
       nome: json['nome'] ?? '',
+      email: json['email'] ?? json['nomeLogin'] ?? '',
+      foto: json['foto'] ?? '',
       cpf: json['cpf'] ?? '',
-      nomeLogin: json['nomeLogin'] ?? '',
+      nomeLogin: json['nomeLogin'] ?? json['email'] ?? '',
       numTelefone: json['numTelefone'] ?? '',
       dataNascimento: json['dataNascimento'] ?? '',
       altura: (json['altura'] ?? 0.0).toDouble(),
@@ -95,11 +101,15 @@ class Pessoa {
   }
 
   Map<String, dynamic> toJson() {
+    final effectiveEmail = email.isNotEmpty ? email : nomeLogin;
+    final effectiveLogin = nomeLogin.isNotEmpty ? nomeLogin : email;
     return {
       'role': role,
       'nome': nome,
+      'email': effectiveEmail,
+      'foto': foto,
       'cpf': cpf,
-      'nomeLogin': nomeLogin,
+      'nomeLogin': effectiveLogin,
       'numTelefone': numTelefone,
       'dataNascimento': dataNascimento,
       'altura': altura,

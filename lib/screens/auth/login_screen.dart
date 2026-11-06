@@ -25,21 +25,55 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _errorMessage = null;
+    });
+    try {
+      final signedIn = await ref
+          .read(authControllerProvider)
+          .signInWithGoogle();
+      if (signedIn && mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        final message = e is FirebaseAuthException
+            ? (e.message ?? 'Erro ao entrar com o Google.')
+            : e.toString().replaceAll('Exception: ', '');
+        setState(() {
+          _errorMessage = message;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message, style: const TextStyle(fontSize: 18)),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const screenText = 'AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.';
+    const screenText =
+        'AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Botão Entrar com Google. Não possui uma conta? Cadastre-se.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
+          tooltip: 'Voltar',
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           onPressed: () => context.go('/'),
         ),
         title: const Text('Acessar Conta', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: readScreen,
             tooltip: 'Ler tela',
           ),
@@ -141,6 +175,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                 ),
                 suffixIcon: IconButton(
+                  tooltip: _obscurePassword ? 'Mostrar senha' : 'Ocultar senha',
+                  constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                   icon: Icon(
                     _obscurePassword ? Icons.visibility : Icons.visibility_off,
                     color: Theme.of(context).colorScheme.primary,
@@ -158,6 +194,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(48, 48),
+                ),
                 onPressed: () {},
                 child: Text(
                   'Esqueci minha senha',
@@ -171,6 +210,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+              ),
               onPressed: () async {
                 setState(() {
                   _errorMessage = null;
@@ -208,7 +250,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 16),
+            Tooltip(
+              message: 'Entrar com conta Google',
+              excludeFromSemantics: true,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerLow,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                onPressed: _handleGoogleSignIn,
+                icon: const Icon(Icons.g_mobiledata, size: 36),
+                label: const Text(
+                  'Entrar com Google',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
             Divider(color: Theme.of(context).colorScheme.outlineVariant, thickness: 1),
             const SizedBox(height: 16),
             Text(
@@ -217,6 +282,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                minimumSize: const Size(48, 48),
+              ),
               onPressed: () => context.go('/register'),
               child: Text(
                 'Cadastre-se',
