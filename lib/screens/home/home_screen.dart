@@ -58,7 +58,12 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 _buildMenuCard(context, 'Treinos em\nCasa', Icons.accessibility_new, () => context.go('/workout')),
                 const SizedBox(height: 16),
-                _buildMenuCard(context, 'Treinos na\nRua', Icons.directions_run, () {}),
+                _buildMenuCard(
+                  context,
+                  'Treinos na\nRua',
+                  Icons.directions_run,
+                  () => context.go('/workout/outdoor'),
+                ),
                 const SizedBox(height: 16),
                 _buildMenuCard(context, 'Treinos\nSugeridos', Icons.assignment_turned_in, () {}),
               ],
