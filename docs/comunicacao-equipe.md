@@ -55,21 +55,30 @@ Valeu! 🚀
 
 ---
 
-### 2. Mensagem Geral para Grupo da Equipe (WhatsApp)
+### 2. Mensagem Geral para Todos os Revisores da Milestone (WhatsApp)
 
-Usado para avisar no grupo geral quando um PR importante ou release estiver aberto ou integrado.
+Usado para avisar no grupo geral todos os revisores sobre os PRs abertos e com prazo para o milestone atual, de forma enxuta e direta em uma única mensagem.
 
 ```text
-Equipe, bom dia/tarde! 📢
+Fala, equipe! 👋 Lembrete de PRs abertos para a *{Nome da Milestone}*:
 
-Novo PR aberto apontando para *dev*:
+• *PR #{ID}* — {Título reduzido} (Issue #{IssueID}) ➔ Revisor: *@{Revisor}*
+  👉 https://github.com/labican-ufrn/ativamente/pull/{ID}
 
-🚀 *PR #{Número do PR}:* {Título do PR}
-📌 *Issue:* #{Número da Issue}
-👉 *Link:* https://github.com/labican-ufrn/ativamente/pull/{Número do PR}
+Quem puder priorizar a revisão para fecharmos o prazo da sprint, agradeço! 🚀
+```
 
-Revisores solicitados: *@{Nome do Revisor}*
-Quem puder dar uma força na validação, fique à vontade! 🙌
+#### Exemplo real:
+```text
+Fala, equipe! 👋 Lembrete de PRs abertos para a *Sprint 4 — Consistência & QA*:
+
+• *PR #63* — SemVer, regras do Firestore e política de deploy (Issue #7) ➔ Revisor: *@Tome-arcanjo*
+  👉 https://github.com/labican-ufrn/ativamente/pull/63
+
+• *PR #72* — Padronização de login para e-mail (Issue #21) ➔ Revisor: *@Isaac-Ribeiro*
+  👉 https://github.com/labican-ufrn/ativamente/pull/72
+
+Quem puder priorizar a revisão para fecharmos o prazo da sprint, agradeço! 🚀
 ```
 
 ---
