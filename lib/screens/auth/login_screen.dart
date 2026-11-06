@@ -97,15 +97,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 24),
             ],
             Text(
-              'Usuário',
+              'E-mail',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                hintText: 'Email ou Nome',
-                prefixIcon: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
+                hintText: 'Digite seu e-mail...',
+                prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.primary),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
                 hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),

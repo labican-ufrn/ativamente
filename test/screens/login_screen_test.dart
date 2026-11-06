@@ -7,7 +7,7 @@ import 'package:app_academia/theme.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Tela de Login possui campos de Usuário e Senha com estilos padronizados (Issue #20)', (WidgetTester tester) async {
+  testWidgets('Tela de Login possui campos de E-mail e Senha com estilos padronizados (Issues #20 e #21)', (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
@@ -18,6 +18,10 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+
+    expect(find.text('E-mail'), findsOneWidget);
+    expect(find.text('Digite seu e-mail...'), findsOneWidget);
+    expect(find.text('Senha '), findsOneWidget);
 
     final textFields = find.byType(TextField);
     expect(textFields, findsNWidgets(2));
