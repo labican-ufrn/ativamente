@@ -146,3 +146,9 @@ recomeça o banco.
 
 - Issues: `.github/ISSUE_TEMPLATE/` — usar o template adequado (tarefa/feature ou bug).
 - Milestones: uma milestone por sprint (15 dias, início/fim às sextas) — ver `docs/plano-sprints.md`.
+
+## Notificação de Pull Requests (WhatsApp)
+
+Sempre que um PR for aberto ou quando solicitado pelo usuário (ex.: *"gere a mensagem de review"*, *"avise o revisor"*, *"notifique o revisor"*), o agente deve gerar a mensagem pronta para envio no WhatsApp seguindo os modelos documentados em [`docs/comunicacao-equipe.md`](docs/comunicacao-equipe.md).
+
+**Regra obrigatória de formatação:** O formato/formatador da mensagem **DEVE ser estritamente no estilo do WhatsApp** (`*negrito*`, `_itálico_`, links com URLs cruas na própria linha). **Nunca** use sintaxe Markdown tradicional como `**negrito**` ou links mascarados com `[texto](url)`, pois o WhatsApp não os renderiza.
