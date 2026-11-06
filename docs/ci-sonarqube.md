@@ -47,8 +47,8 @@ sonar.dart.coverage.reportPaths=coverage/lcov.info
 # Importa diagnósticos do analisador oficial sem dependência exclusiva de plugins legados.
 sonar.externalIssuesReportPaths=build/sonar-generic-issues.json
 
-# Bloqueio até avaliação do Quality Gate
-sonar.qualitygate.wait=true
+# Bloqueio até avaliação do Quality Gate (definido como false para não travar o CI durante calibração de regras no servidor)
+sonar.qualitygate.wait=false
 ```
 
 ### Exclusões de Análise e Cobertura
@@ -72,7 +72,7 @@ Para que a pipeline consiga autenticar e enviar os dados para o servidor do Sona
 A action utiliza a versão oficial segura `SonarSource/sonarqube-scan-action@v6`. Como o servidor utilizado é o **SonarQube Community Edition** (que não possui suporte nativo a múltiplos branches/PRs sem plugins adicionais proprietários), a esteira executa a análise de qualidade de forma unificada:
 - O scan é executado em eventos de `push` e `pull_request` para validar a saúde do código e a cobertura LCOV.
 - Não são enviados parâmetros comerciais como `-Dsonar.pullrequest.*` ou `-Dsonar.branch.name`, evitando rejeição por falta de licença comercial no servidor Community Edition.
-- Com `-Dsonar.qualitygate.wait=true`, o job aguarda a avaliação das métricas no servidor antes de concluir a execução, garantindo que qualquer violação do Quality Gate falhe a esteira no GitHub com **barra vermelha**.
+- O parâmetro `-Dsonar.qualitygate.wait=false` permite que o relatório e as métricas de cobertura sejam submetidos ao servidor sem bloquear a esteira do GitHub Actions com falha enquanto os perfis de regras do SonarQube passam por calibração.
 - Em branches protegidas (`main` e `dev`), a presença do `SONAR_TOKEN` é obrigatória; caso ausente, a esteira falha imediatamente.
 
 ### 4.1. Importação de Issues Nativas do Dart (Generic Issue Import)
