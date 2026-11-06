@@ -48,9 +48,12 @@ assignees: []
 
 ## 🏁 Definição de Pronto (DoD)
 
-- [ ] Causa raiz identificada e documentada.
-- [ ] Rolagem da tela de treino unificada para o conteúdo inteiro.
-- [ ] Remoção do botão de play abaixo do relógio, mantendo apenas Pause e Stop vinculados ao exercício ativo.
-- [ ] Correção verificada no cenário de reprodução mobile.
-- [ ] Testes de widget atualizados e cobrindo os novos comportamentos (`test/screens/workout_screen_test.dart` e `test/workout_screen_test.dart`).
-- [ ] `flutter analyze` sem erros/avisos.
+- [x] Causa raiz identificada e documentada.
+- [x] Rolagem da tela de treino unificada para o conteúdo inteiro (`SingleChildScrollView`).
+- [x] Remoção do botão de play indevido abaixo do relógio quando inativo, mantendo apenas Pause e Stop vinculados ao exercício ativo.
+- [x] Nome do exercício ativo visível no cronômetro com link direto para a tela de detalhes (`context.push('/exercise/:id')`).
+- [x] Indicador visual claro de status no cronômetro ("EM EXECUÇÃO" / "PAUSADO") e botão de pausa que alterna para Play ao pausar.
+- [x] Resumo da descrição (apenas a primeira frase como legenda) nos cards da lista para economizar espaço e evitar sobrecarga cognitiva.
+- [x] Descrição completa em destaque logo abaixo dos metadados na tela de detalhes (`ExerciseDetailScreen`).
+- [x] Testes de widget atualizados cobrindo rolagem, link do cabeçalho, legenda curta e alternância pause/play (`test/screens/workout_screen_test.dart`).
+- [x] `flutter analyze` sem erros/avisos e `flutter test` com 100% dos testes passando.

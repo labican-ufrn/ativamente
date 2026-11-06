@@ -23,6 +23,15 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
+  String _resumoDescricao(String descricao) {
+    if (descricao.isEmpty) return '';
+    final pontoIndex = descricao.indexOf('.');
+    if (pontoIndex != -1) {
+      return descricao.substring(0, pontoIndex + 1).trim();
+    }
+    return descricao.trim();
+  }
+
   void _filterByIntensity(int? intensidade) {
     ref.read(intensidadeFilterProvider.notifier).setIntensidade(intensidade);
   }
@@ -66,11 +75,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(exercicio.descricao, style: const TextStyle(fontSize: 16)),
+            Text(
+              _resumoDescricao(exercicio.descricao),
+              style: const TextStyle(fontSize: 16),
+            ),
             if (isActive) ...[
               const SizedBox(height: 8),
               Text(
-                'Em execução',
+                activeState.isRunning ? 'Em execução' : 'Pausado',
                 style: TextStyle(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -120,6 +132,11 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     final selectedIntensity = ref.watch(intensidadeFilterProvider);
     final hasIntensityFilter = selectedIntensity != null;
 
+    final exerciciosAsync = ref.watch(exerciciosProvider);
+    final activeExercise = exerciciosAsync.asData?.value
+        .where((e) => e.id == activeState.exerciseId)
+        .firstOrNull;
+
     final screenText = hasIntensityFilter
         ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
         : 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
@@ -156,9 +173,84 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             Container(
               width: double.infinity,
               color: Theme.of(context).colorScheme.primary,
-              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 24.0,
+                horizontal: 16.0,
+              ),
               child: Column(
                 children: [
+                  if (activeState.exerciseId != null) ...[
+                    InkWell(
+                      onTap: () =>
+                          context.push('/exercise/${activeState.exerciseId}'),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimary
+                                .withValues(alpha: 0.4),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.fitness_center,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                activeExercise?.nome ??
+                                    'Exercício em andamento',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ] else ...[
+                    Text(
+                      'Selecione um exercício abaixo para iniciar',
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimary
+                            .withValues(alpha: 0.8),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   Text(
                     _formatTime(activeState.elapsedSeconds),
                     style: TextStyle(
@@ -167,35 +259,92 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (activeState.exerciseId != null) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: activeState.isRunning
+                            ? Colors.green.shade700
+                            : Colors.orange.shade800,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            activeState.isRunning
+                                ? Icons.play_arrow
+                                : Icons.pause,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 6),
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              activeState.isRunning ? 'EM EXECUÇÃO' : 'PAUSADO',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Semantics(
                         button: true,
-                        enabled: activeState.isRunning,
-                        label: 'Pausar exercício',
+                        enabled: activeState.exerciseId != null,
+                        label: activeState.isRunning
+                            ? 'Pausar exercício'
+                            : 'Retomar exercício',
                         child: Tooltip(
-                          message: activeState.isRunning
+                          message: activeState.exerciseId == null
+                              ? 'Exercício parado'
+                              : activeState.isRunning
                               ? 'Pausar exercício'
-                              : 'Exercício parado',
+                              : 'Retomar exercício',
                           child: InkWell(
-                            onTap: activeState.isRunning
-                                ? () => ref
-                                    .read(activeExerciseProvider.notifier)
-                                    .pauseExercise()
-                                : null,
+                            onTap: activeState.exerciseId == null
+                                ? null
+                                : () {
+                                    if (activeState.isRunning) {
+                                      ref
+                                          .read(activeExerciseProvider.notifier)
+                                          .pauseExercise();
+                                    } else {
+                                      ref
+                                          .read(activeExerciseProvider.notifier)
+                                          .startExercise(
+                                            activeState.exerciseId!,
+                                          );
+                                    }
+                                  },
                             borderRadius: BorderRadius.circular(30),
                             child: CircleAvatar(
                               radius: 30,
-                              backgroundColor: activeState.isRunning
+                              backgroundColor: activeState.exerciseId != null
                                   ? Theme.of(context).colorScheme.onPrimary
                                   : Theme.of(context)
                                       .colorScheme
                                       .onPrimary
                                       .withValues(alpha: 0.4),
                               child: Icon(
-                                Icons.pause,
+                                activeState.exerciseId != null &&
+                                        !activeState.isRunning
+                                    ? Icons.play_arrow
+                                    : Icons.pause,
                                 size: 40,
                                 color: Theme.of(context).colorScheme.primary,
                               ),

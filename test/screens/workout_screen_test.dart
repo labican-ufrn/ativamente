@@ -180,12 +180,19 @@ void main() {
   );
 
   testWidgets(
-    'Controles abaixo do cronometro possuem apenas pause e stop, sem botao de play geral',
+    'Controles abaixo do cronometro possuem indicativo visual, link para o exercicio e botao vira play quando pausado',
     (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       final testExercicio = Exercicio(
         id: 'ex-coracao-1',
         nome: 'Caminhada Orientada',
-        descricao: '15 min de caminhada suave',
+        descricao: '15 min de caminhada suave. Mantenha os bracos em movimento.',
         midia: '',
         statusRealizado: false,
         categoria: Categoria(nome: 'Coracao', icone: 'favorite'),
@@ -212,19 +219,23 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Abaixo do cronometro (fora dos Cards de exercicio):
-      // Nao deve existir icone play_arrow abaixo do relogio
+      // Card deve exibir apenas a primeira frase como legenda
+      expect(find.text('15 min de caminhada suave.'), findsOneWidget);
+      expect(find.text('Mantenha os bracos em movimento.'), findsNothing);
+
       final headerFinder = find.ancestor(
         of: find.text('00:00'),
         matching: find.byType(Container),
       );
+
+      // Inicialmente sem exercício ativo:
+      expect(find.text('Selecione um exercício abaixo para iniciar'), findsOneWidget);
       expect(
         find.descendant(of: headerFinder, matching: find.byIcon(Icons.play_arrow)),
         findsNothing,
-        reason: 'O botao de play abaixo do relogio nao deve existir; play e no exercicio',
+        reason: 'O botao de play abaixo do relogio nao deve existir sem exercicio ativo',
       );
 
-      // Abaixo do relogio deve ter apenas pause e stop
       final pauseHeaderFinder = find.descendant(
         of: headerFinder,
         matching: find.byIcon(Icons.pause),
@@ -235,15 +246,6 @@ void main() {
       );
       expect(pauseHeaderFinder, findsOneWidget);
       expect(stopHeaderFinder, findsOneWidget);
-
-      // Inicialmente desabilitados
-      await tester.tap(pauseHeaderFinder);
-      await tester.pumpAndSettle();
-      expect(container.read(activeExerciseProvider).exerciseId, isNull);
-
-      await tester.tap(stopHeaderFinder);
-      await tester.pumpAndSettle();
-      expect(container.read(activeExerciseProvider).exerciseId, isNull);
 
       // Inicia o exercicio pelo card
       final cardPlayButton = find.descendant(
@@ -257,13 +259,32 @@ void main() {
       expect(container.read(activeExerciseProvider).exerciseId, equals('ex-coracao-1'));
       expect(container.read(activeExerciseProvider).isRunning, isTrue);
 
-      // Agora o botao de pausa do cronometro pausa o exercicio
+      // Agora no relógio superior deve aparecer o nome do exercício e o indicativo EM EXECUÇÃO
+      expect(find.text('Caminhada Orientada'), findsWidgets);
+      expect(find.text('EM EXECUÇÃO'), findsOneWidget);
+
+      // Clica em pausar no relógio
       await tester.tap(pauseHeaderFinder);
       await tester.pumpAndSettle();
-      expect(container.read(activeExerciseProvider).isRunning, isFalse);
-      expect(container.read(activeExerciseProvider).exerciseId, equals('ex-coracao-1'));
 
-      // E o botao stop encerra a sessao
+      // Quando pausado:
+      expect(container.read(activeExerciseProvider).isRunning, isFalse);
+      expect(find.text('PAUSADO'), findsOneWidget);
+
+      // O botão de pausa no relógio VIRA o botão PLAY
+      final resumePlayFinder = find.descendant(
+        of: headerFinder,
+        matching: find.byIcon(Icons.play_arrow),
+      );
+      expect(resumePlayFinder, findsOneWidget);
+
+      // Tocar no botão play do relógio retoma o exercício
+      await tester.tap(resumePlayFinder);
+      await tester.pumpAndSettle();
+      expect(container.read(activeExerciseProvider).isRunning, isTrue);
+      expect(find.text('EM EXECUÇÃO'), findsOneWidget);
+
+      // E o botão stop encerra a sessão
       await tester.tap(stopHeaderFinder);
       await tester.pumpAndSettle();
       expect(container.read(activeExerciseProvider).exerciseId, isNull);

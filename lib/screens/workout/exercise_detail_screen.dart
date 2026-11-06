@@ -173,10 +173,6 @@ class _ExerciseDetailBody extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 24),
-            _ExecutionControlCard(exerciseId: exercicio.id),
-            const SizedBox(height: 24),
-            const _MediaPlaceholder(),
-            const SizedBox(height: 24),
             Text(
               'Descrição',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -189,8 +185,15 @@ class _ExerciseDetailBody extends ConsumerWidget {
               exercicio.descricao.isNotEmpty
                   ? exercicio.descricao
                   : 'Sem descrição disponível.',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.4),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: 18,
+                height: 1.5,
+              ),
             ),
+            const SizedBox(height: 24),
+            _ExecutionControlCard(exerciseId: exercicio.id),
+            const SizedBox(height: 24),
+            const _MediaPlaceholder(),
           ],
         ),
       ),

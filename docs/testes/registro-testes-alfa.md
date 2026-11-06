@@ -80,6 +80,17 @@ Este documento consolida os testes manuais e feedbacks recebidos após o deploy 
 
 ---
 
+## 📅 Sessão de Refinamento — 06/11/2026
+
+- **Contexto:** Teste local no navegador web mobile com emuladores Firebase.
+- **Observações e melhorias solicitadas:**
+  1. **Descrição na lista vs tela de detalhe:** Na lista de exercícios (`WorkoutScreen`), a descrição longa poluía o card no celular; foi ajustada para exibir apenas a primeira frase (legenda do exercício). Ao tocar no exercício (`ExerciseDetailScreen`), a descrição completa deve reaparecer com destaque (posicionada logo após o título e chips, antes dos controles de tempo e mídia).
+  2. **Identificação do exercício no relógio superior:** Quando um exercício está ativo, o cronômetro superior agora exibe o nome do exercício ativo como link clicável direto para a tela de detalhes.
+  3. **Indicativo de pausa e botão dinâmico no relógio:** Quando pausado, exibe um badge visual âmbar "PAUSADO" (com `Semantics(liveRegion: true)`) e o botão de pausa no relógio vira automaticamente o botão Play (`Icons.play_arrow`), permitindo retomar o exercício tanto pelo relógio quanto pelo card.
+  4. **Acessibilidade reforçada:** Fontes grandes (18sp, altura 1.5), áreas de toque >= 48dp, contrastes semânticos e suporte completo a leitores de tela.
+
+---
+
 ### 🔗 Rastreabilidade
 
 - **User Stories Impactadas:**
