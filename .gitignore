@@ -4,6 +4,7 @@
 *.pyc
 *.swp
 .DS_Store
+*Zone.Identifier
 .atom/
 .build/
 .buildlog/
@@ -58,6 +59,7 @@ firebase.json
 
 # Firebase Emulator - dados persistentes (--import/--export-on-exit)
 .firebase/emulator-data/
+.firebase/hosting.*.cache
 
 # DevTools - configuração local
 devtools_options.yaml
