@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../config/app_environment.dart';
 import '../models/pessoa.dart';
 import '../utils/auth_errors.dart';
@@ -9,6 +10,13 @@ import 'firestore_provider.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
+});
+
+/// Alias para [firebaseFirestoreProvider] mantido para compatibilidade.
+final firestoreProvider = firebaseFirestoreProvider;
+
+final googleSignInProvider = Provider<GoogleSignIn>((ref) {
+  return GoogleSignIn();
 });
 
 final authStateProvider = StreamProvider<User?>((ref) {
@@ -182,6 +190,63 @@ class AuthController {
     }
   }
 
+  Future<bool> signInWithGoogle() async {
+    try {
+      final googleUser = await ref.read(googleSignInProvider).signIn();
+      if (googleUser == null) {
+        return false;
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await ref
+          .read(firebaseAuthProvider)
+          .signInWithCredential(credential);
+
+      final user = userCredential.user;
+      if (user != null) {
+        await _ensureGoogleUserDocument(user);
+      }
+      return true;
+    } on FirebaseAuthException catch (e) {
+      throw FirebaseAuthException(
+        code: e.code,
+        message: getFriendlyErrorMessage(e),
+      );
+    } catch (e) {
+      throw Exception(getFriendlyErrorMessage(e));
+    }
+  }
+
+  Future<void> _ensureGoogleUserDocument(User user) async {
+    final docRef = ref
+        .read(firestoreProvider)
+        .collection('Pessoas')
+        .doc(user.uid);
+    final snapshot = await docRef.get();
+
+    if (!snapshot.exists || snapshot.data() == null) {
+      final email = user.email ?? '';
+      final pessoa = Pessoa(
+        id: user.uid,
+        role: 'user',
+        nome: getEffectiveDisplayName(null, user),
+        email: email,
+        nomeLogin: email,
+        foto: user.photoURL ?? '',
+        dataNascimento: '',
+        peso: 0.0,
+        altura: 0.0,
+        notificacoes: const [],
+      );
+      await docRef.set(pessoa.toJson());
+    }
+  }
+
   Future<void> createSecondaryUser(String name, String email, String password, String role) async {
     // Reusa um único app/auth secundário para criar usuários sem derrubar a
     // sessão atual. Antes, Firebase.initializeApp(name: 'tempApp') rodava por
@@ -194,6 +259,7 @@ class AuthController {
       id: userCredential.user!.uid,
       nome: name,
       role: role,
+      email: email,
       nomeLogin: email,
       dataNascimento: '',
       peso: 0.0,
@@ -209,6 +275,11 @@ class AuthController {
   }
 
   Future<void> logout() async {
+    try {
+      await ref.read(googleSignInProvider).signOut();
+    } catch (_) {
+      // Ignora erro caso a sessão atual não tenha sido iniciada via Google
+    }
     await ref.read(firebaseAuthProvider).signOut();
   }
 }

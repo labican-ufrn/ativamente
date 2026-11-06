@@ -19,6 +19,11 @@ String getFriendlyErrorMessage(Object error) {
         return 'A senha deve ter pelo menos 6 caracteres.';
       case 'too-many-requests':
         return 'Muitas tentativas de acesso. Por favor, aguarde alguns minutos.';
+      case 'account-exists-with-different-credential':
+        return 'Este e-mail já está vinculado a outro método de acesso.';
+      case 'popup-closed-by-user':
+      case 'canceled':
+        return 'O acesso com o Google foi cancelado.';
       default:
         return error.message ?? 'Erro na autenticação. Verifique os dados e tente novamente.';
     }
@@ -37,7 +42,13 @@ String getFriendlyErrorMessage(Object error) {
   if (errorStr.contains('email-already-in-use')) {
     return 'Este e-mail já está cadastrado.';
   }
-  if (errorStr.contains('network-request-failed')) {
+  if (errorStr.contains('account-exists-with-different-credential')) {
+    return 'Este e-mail já está vinculado a outro método de acesso.';
+  }
+  if (errorStr.contains('sign_in_canceled') || errorStr.contains('popup-closed-by-user')) {
+    return 'O acesso com o Google foi cancelado.';
+  }
+  if (errorStr.contains('network-request-failed') || errorStr.contains('network_error')) {
     return 'Falha na conexão de rede. Verifique se está conectado à internet.';
   }
 
