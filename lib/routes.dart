@@ -50,6 +50,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const WorkoutScreen(),
       ),
       GoRoute(
+        path: '/workout/outdoor',
+        builder: (context, state) => const WorkoutScreen(category: 'NaRua'),
+      ),
+      GoRoute(
         path: '/exercise/:id',
         builder: (context, state) => ExerciseDetailScreen(
           exerciseId: state.pathParameters['id'] ?? '',
