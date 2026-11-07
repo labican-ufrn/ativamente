@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/pessoa.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/firestore_provider.dart';
 import '../../providers/tts_provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -86,7 +87,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         if (altura case final double a) 'altura': a,
       };
 
-      await FirebaseFirestore.instance
+      await ref
+          .read(firebaseFirestoreProvider)
           .collection('Pessoas')
           .doc(user.uid)
           .set(data, SetOptions(merge: true))

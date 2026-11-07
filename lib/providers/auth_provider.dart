@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../config/app_environment.dart';
 import '../models/pessoa.dart';
 import '../utils/auth_errors.dart';
+import 'firestore_provider.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
@@ -48,7 +49,8 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
   if (user == null) {
     return Stream.value(null);
   }
-  return FirebaseFirestore.instance
+  final firestore = ref.watch(firebaseFirestoreProvider);
+  return firestore
       .collection('Pessoas')
       .doc(user.uid)
       .snapshots()
@@ -70,7 +72,7 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
       'notificacoes': [],
     };
     try {
-      await FirebaseFirestore.instance
+      await firestore
           .collection('Pessoas')
           .doc(user.uid)
           .set(dadosIdentidade, SetOptions(merge: true));
@@ -164,7 +166,8 @@ class AuthController {
           altura: 0.0,
           notificacoes: [],
         );
-        await FirebaseFirestore.instance
+        await ref
+            .read(firebaseFirestoreProvider)
             .collection('Pessoas')
             .doc(userCredential.user!.uid)
             .set(pessoa.toJson());
@@ -198,13 +201,14 @@ class AuthController {
       notificacoes: [],
     );
 
-    await FirebaseFirestore.instance
+    await ref
+        .read(firebaseFirestoreProvider)
         .collection('Pessoas')
         .doc(userCredential.user!.uid)
         .set(pessoa.toJson());
   }
 
   Future<void> logout() async {
-    await FirebaseAuth.instance.signOut();
+    await ref.read(firebaseAuthProvider).signOut();
   }
 }
