@@ -7,6 +7,17 @@ import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
 import '../../providers/active_exercise_provider.dart';
 
+/// Fatia do estado de execução que a tela observa: muda só ao iniciar,
+/// pausar, parar ou trocar de exercício — nunca a cada tick do cronômetro.
+typedef _ExecucaoAtiva = ({String? exerciseId, bool isRunning});
+
+/// Comportamento ao sair da tela (Issue #45): o cronômetro **continua
+/// contando**. O `activeExerciseProvider` é global (sem `autoDispose`) de
+/// propósito — é a mesma sessão de execução exibida na lista e no detalhe do
+/// exercício, e o tempo é calculado pelo relógio, então segue correto mesmo
+/// com o app em segundo plano. Ao voltar para esta tela, o cronômetro mostra o
+/// tempo total decorrido e o exercício continua marcado como "Em execução".
+/// Para encerrar, o usuário usa Pausar ou Parar. Ver `docs/cronometro-exercicio.md`.
 class WorkoutScreen extends ConsumerStatefulWidget {
   const WorkoutScreen({super.key});
 
@@ -17,22 +28,14 @@ class WorkoutScreen extends ConsumerStatefulWidget {
 class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
   String _selectedCategory = 'Coracao'; // Coracao or Musculo
 
-  String _formatTime(int seconds) {
-    int minutes = seconds ~/ 60;
-    int remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
-  }
-
   void _filterByIntensity(int? intensidade) {
     ref.read(intensidadeFilterProvider.notifier).setIntensidade(intensidade);
   }
 
-  Widget _buildExerciseTile(
-    Exercicio exercicio,
-    ActiveExerciseState activeState,
-  ) {
+  Widget _buildExerciseTile(Exercicio exercicio, _ExecucaoAtiva execucao) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isActive = activeState.exerciseId == exercicio.id;
+    final isActive = execucao.exerciseId == exercicio.id;
+    final isRunning = isActive && execucao.isRunning;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -89,20 +92,13 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(
-                isActive && activeState.isRunning
-                    ? Icons.pause_circle_filled
-                    : Icons.play_circle_fill,
+                isRunning ? Icons.pause_circle_filled : Icons.play_circle_fill,
               ),
               color: colorScheme.primary,
               iconSize: 36,
               padding: const EdgeInsets.all(8),
-              constraints: const BoxConstraints(
-                minWidth: 48,
-                minHeight: 48,
-              ),
-              tooltip: isActive && activeState.isRunning
-                  ? 'Pausar exercício'
-                  : 'Iniciar exercício',
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              tooltip: isRunning ? 'Pausar exercício' : 'Iniciar exercício',
               onPressed: () => ref
                   .read(activeExerciseProvider.notifier)
                   .toggleExercise(exercicio.id),
@@ -116,7 +112,15 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activeState = ref.watch(activeExerciseProvider);
+    // Observa só "qual exercício" e "se está rodando" (mudam ao iniciar,
+    // pausar ou parar). O tick de cada segundo altera apenas elapsedSeconds,
+    // que é observado isoladamente por _CronometroTexto — assim a lista de
+    // exercícios não é reconstruída por segundo (Issue #45).
+    final execucao = ref.watch(
+      activeExerciseProvider.select(
+        (s) => (exerciseId: s.exerciseId, isRunning: s.isRunning),
+      ),
+    );
     final selectedIntensity = ref.watch(intensidadeFilterProvider);
     final hasIntensityFilter = selectedIntensity != null;
 
@@ -157,21 +161,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             padding: const EdgeInsets.symmetric(vertical: 24.0),
             child: Column(
               children: [
-                Text(
-                  _formatTime(activeState.elapsedSeconds),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    fontSize: 72,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const _CronometroTexto(),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
                       onTap: () {
-                        final activeId = activeState.exerciseId;
+                        final activeId = execucao.exerciseId;
                         if (activeId != null) {
                           ref
                               .read(activeExerciseProvider.notifier)
@@ -180,15 +177,13 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                       },
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: activeState.exerciseId != null
+                        backgroundColor: execucao.exerciseId != null
                             ? Theme.of(context).colorScheme.onPrimary
                             : Theme.of(
                                 context,
                               ).colorScheme.onPrimary.withValues(alpha: 0.4),
                         child: Icon(
-                          activeState.isRunning
-                              ? Icons.pause
-                              : Icons.play_arrow,
+                          execucao.isRunning ? Icons.pause : Icons.play_arrow,
                           size: 40,
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -203,7 +198,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                       },
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: activeState.exerciseId != null
+                        backgroundColor: execucao.exerciseId != null
                             ? Theme.of(context).colorScheme.onPrimary
                             : Theme.of(
                                 context,
@@ -296,7 +291,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                               itemBuilder: (context, index) {
                                 return _buildExerciseTile(
                                   filteredExercicios[index],
-                                  activeState,
+                                  execucao,
                                 );
                               },
                             );
@@ -364,12 +359,35 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
         child: CircleAvatar(
           radius: 30,
           backgroundColor: colorScheme.primary,
-          child: Icon(
-            icon,
-            color: colorScheme.onPrimary,
-            size: 30,
-          ),
+          child: Icon(icon, color: colorScheme.onPrimary, size: 30),
         ),
+      ),
+    );
+  }
+}
+
+/// Mostra o tempo decorrido. É o único widget da tela que observa
+/// `elapsedSeconds`, então o tick de 1 s reconstrói só este texto.
+class _CronometroTexto extends ConsumerWidget {
+  const _CronometroTexto();
+
+  static String formatarTempo(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final elapsed = ref.watch(
+      activeExerciseProvider.select((s) => s.elapsedSeconds),
+    );
+    return Text(
+      formatarTempo(elapsed),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onPrimary,
+        fontSize: 72,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
