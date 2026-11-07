@@ -10,6 +10,10 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
 });
 
+final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
+  return FirebaseFirestore.instance;
+});
+
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
 });
@@ -48,7 +52,7 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
   if (user == null) {
     return Stream.value(null);
   }
-  return FirebaseFirestore.instance
+  return ref.watch(firebaseFirestoreProvider)
       .collection('Pessoas')
       .doc(user.uid)
       .snapshots()
@@ -69,7 +73,7 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
       notificacoes: [],
     );
     try {
-      await FirebaseFirestore.instance
+      await ref.read(firebaseFirestoreProvider)
           .collection('Pessoas')
           .doc(user.uid)
           .set(newPessoa.toJson(), SetOptions(merge: true));
@@ -155,7 +159,7 @@ class AuthController {
           altura: 0.0,
           notificacoes: [],
         );
-        await FirebaseFirestore.instance
+        await ref.read(firebaseFirestoreProvider)
             .collection('Pessoas')
             .doc(userCredential.user!.uid)
             .set(pessoa.toJson());
@@ -189,13 +193,13 @@ class AuthController {
       notificacoes: [],
     );
 
-    await FirebaseFirestore.instance
+    await ref.read(firebaseFirestoreProvider)
         .collection('Pessoas')
         .doc(userCredential.user!.uid)
         .set(pessoa.toJson());
   }
 
   Future<void> logout() async {
-    await FirebaseAuth.instance.signOut();
+    await ref.read(firebaseAuthProvider).signOut();
   }
 }
