@@ -2,8 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/exercicio.dart';
 
+/// Instância do Firestore usada pelo app. Sobrescreva em teste (ex.: com
+/// `FakeFirebaseFirestore`) para não depender do Firebase real.
+final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
+  return FirebaseFirestore.instance;
+});
+
 final exerciciosProvider = StreamProvider<List<Exercicio>>((ref) {
-  return FirebaseFirestore.instance.collection('Exercicios').snapshots().map((snapshot) {
+  return ref.watch(firebaseFirestoreProvider).collection('Exercicios').snapshots().map((snapshot) {
     return snapshot.docs.map((doc) => Exercicio.fromJson(doc.data(), doc.id)).toList();
   });
 });
