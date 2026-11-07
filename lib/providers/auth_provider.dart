@@ -52,35 +52,16 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) {
   if (user == null) {
     return Stream.value(null);
   }
-  return ref.watch(firebaseFirestoreProvider)
+  return ref
+      .watch(firebaseFirestoreProvider)
       .collection('Pessoas')
       .doc(user.uid)
       .snapshots()
-      .asyncMap((snapshot) async {
+      .map((snapshot) {
     if (snapshot.exists && snapshot.data() != null) {
       return Pessoa.fromJson(snapshot.data()!, snapshot.id);
     }
-    // Auto-criação on-demand para contas sem documento Pessoas no Firestore
-    final fallbackName = getEffectiveDisplayName(null, user);
-    final newPessoa = Pessoa(
-      id: user.uid,
-      nome: fallbackName,
-      nomeLogin: user.email ?? '',
-      role: 'user',
-      dataNascimento: '',
-      peso: 0.0,
-      altura: 0.0,
-      notificacoes: [],
-    );
-    try {
-      await ref.read(firebaseFirestoreProvider)
-          .collection('Pessoas')
-          .doc(user.uid)
-          .set(newPessoa.toJson(), SetOptions(merge: true));
-    } catch (_) {
-      // Ignora falhas de escrita (ex.: offline/regras em execução local)
-    }
-    return newPessoa;
+    return null;
   });
 });
 
