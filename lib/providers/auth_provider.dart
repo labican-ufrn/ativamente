@@ -47,16 +47,13 @@ final userDisplayNameProvider = Provider<String>((ref) {
   return getEffectiveDisplayName(pessoa, user);
 });
 
-final userDataProvider = StreamProvider<Pessoa?>((ref) {
-  final authAsync = ref.watch(authStateProvider);
-  if (authAsync.isLoading) {
-    return const Stream.empty();
-  }
-  final user = authAsync.value;
+final userDataProvider = StreamProvider<Pessoa?>((ref) async* {
+  final user = await ref.watch(authStateProvider.future);
   if (user == null) {
-    return Stream.value(null);
+    yield null;
+    return;
   }
-  return ref
+  yield* ref
       .watch(firebaseFirestoreProvider)
       .collection('Pessoas')
       .doc(user.uid)
