@@ -130,10 +130,29 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 48),
           userDataAsync.maybeWhen(
             data: (pessoa) {
-              if (pessoa?.role == 'admin') {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+              final role = pessoa?.role;
+              final isTrainer = role == 'trainer' || role == 'admin';
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (isTrainer) ...[
+                    Text(
+                      'Personal Trainer',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const Divider(),
+                    ElevatedButton(
+                      onPressed: () => context.push('/add-exercise'),
+                      child: const Text('Cadastrar Novo Exercício'),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                  if (role == 'admin') ...[
                     Text(
                       'Admin (Testes)',
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
@@ -167,9 +186,8 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 24),
                   ],
-                );
-              }
-              return const SizedBox.shrink();
+                ],
+              );
             },
             orElse: () => const SizedBox.shrink(),
           ),
