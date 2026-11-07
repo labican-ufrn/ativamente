@@ -48,7 +48,11 @@ final userDisplayNameProvider = Provider<String>((ref) {
 });
 
 final userDataProvider = StreamProvider<Pessoa?>((ref) {
-  final user = ref.watch(authStateProvider).value;
+  final authAsync = ref.watch(authStateProvider);
+  if (authAsync.isLoading) {
+    return const Stream.empty();
+  }
+  final user = authAsync.value;
   if (user == null) {
     return Stream.value(null);
   }
