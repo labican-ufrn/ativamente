@@ -37,7 +37,16 @@ class FakeFirebaseAuth extends Fake implements FirebaseAuth {
   User? get currentUser => currentUserMock;
 
   @override
-  Stream<User?> authStateChanges() => Stream.value(currentUserMock);
+  Stream<User?> authStateChanges() {
+    late StreamController<User?> controller;
+    controller = StreamController<User?>(
+      sync: true,
+      onListen: () {
+        controller.add(currentUserMock);
+      },
+    );
+    return controller.stream;
+  }
 
   @override
   Future<UserCredential> signInWithEmailAndPassword({
@@ -110,6 +119,7 @@ class FakeDocumentReference extends Fake implements DocumentReference<Map<String
     late StreamController<DocumentSnapshot<Map<String, dynamic>>> controller;
     StreamSubscription? sub;
     controller = StreamController<DocumentSnapshot<Map<String, dynamic>>>(
+      sync: true,
       onListen: () {
         controller.add(_createSnapshot());
         sub = _controller.stream.listen(controller.add);
