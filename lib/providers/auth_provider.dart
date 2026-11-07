@@ -106,12 +106,21 @@ class AuthController {
   final Ref ref;
   AuthController(this.ref);
 
-  Future<void> login(String email, String password) async {
+  Future<UserCredential> login(String email, String password) async {
+    return signIn(email, password);
+  }
+
+  Future<UserCredential> signIn(String email, String password) async {
     try {
-      await ref.read(firebaseAuthProvider).signInWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
+      final userCredential =
+          await ref.read(firebaseAuthProvider).signInWithEmailAndPassword(
+                email: email,
+                password: password,
+              );
+      if (userCredential.user != null) {
+        await ensureUserProfile(userCredential.user);
+      }
+      return userCredential;
     } on FirebaseAuthException catch (e) {
       throw FirebaseAuthException(
         code: e.code,
@@ -119,6 +128,40 @@ class AuthController {
       );
     } catch (e) {
       throw Exception(getFriendlyErrorMessage(e));
+    }
+  }
+
+  Future<void> ensureUserProfile(User? user) async {
+    if (user == null) return;
+    try {
+      final docRef = ref
+          .read(firebaseFirestoreProvider)
+          .collection('Pessoas')
+          .doc(user.uid);
+      final snapshot = await docRef.get();
+      if (!snapshot.exists || snapshot.data() == null) {
+        final fallbackName = getEffectiveDisplayName(null, user);
+        final newPessoa = Pessoa(
+          id: user.uid,
+          nome: fallbackName,
+          nomeLogin: user.email ?? '',
+          role: 'user',
+          dataNascimento: '',
+          peso: 0.0,
+          altura: 0.0,
+          notificacoes: [],
+        );
+        await docRef.set(newPessoa.toJson(), SetOptions(merge: true));
+      }
+    } catch (_) {
+      // Ignora falhas de escrita (ex.: offline/regras em execução local)
+    }
+  }
+
+  Future<void> initializeSession() async {
+    final user = ref.read(firebaseAuthProvider).currentUser;
+    if (user != null) {
+      await ensureUserProfile(user);
     }
   }
 
