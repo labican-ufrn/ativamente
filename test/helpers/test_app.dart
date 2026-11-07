@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -62,7 +64,9 @@ Future<GoRouter> pumpTelaComRouter(
     ),
   );
   if (empilhar && rotaInicial != '/') {
-    router.push(rotaInicial);
+    // push() só completa quando a rota empilhada é removida (pop); aguardá-lo
+    // travaria o teste. O pumpAndSettle abaixo já espera a navegação terminar.
+    unawaited(router.push(rotaInicial));
   }
   await tester.pumpAndSettle();
   return router;
