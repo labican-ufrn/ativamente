@@ -3,25 +3,26 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../config/app_environment.dart';
 import 'auth_provider.dart';
+import 'firestore_provider.dart';
 
 final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
   return () async {
-    // Proteção de segurança: o seed NUNCA deve ser executado em produção ou sem emuladores ativos
-    if (!kDebugMode || !AppEnvironment.useEmulators) {
+    // Proteção de segurança: o seed NUNCA deve ser executado em produção ou conectado ao Firebase em nuvem
+    if (!kDebugMode || (!AppEnvironment.useEmulators && Firebase.apps.isNotEmpty)) {
       debugPrint('⛔ [Seed] Operação cancelada: o povoamento automático só é permitido em ambiente de desenvolvimento (debug) com emuladores locais ativos.');
       return;
     }
 
-    final firestore = FirebaseFirestore.instance;
-    final auth = FirebaseAuth.instance;
+    final firestore = ref.read(firebaseFirestoreProvider);
+    final auth = Firebase.apps.isNotEmpty ? ref.read(firebaseAuthProvider) : null;
     final exerciciosCollection = firestore.collection('Exercicios');
 
     debugPrint('🌱 [Seed] Iniciando povoamento de exercícios e usuários padrão no emulador...');
 
-    final initialUser = auth.currentUser;
+    final initialUser = auth?.currentUser;
     bool loggedInForSeed = false;
 
     // 1. Assegura criação da conta Admin de teste
@@ -38,7 +39,7 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     }
 
     // 2. Se não houver sessão ativa, autentica temporariamente como Admin para satisfazer as regras de segurança do Firestore
-    if (auth.currentUser == null) {
+    if (auth != null && auth.currentUser == null) {
       try {
         await auth.signInWithEmailAndPassword(
           email: AppEnvironment.seedAdminEmail,
@@ -85,7 +86,7 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     }
 
     // 5. Restaura o estado da sessão original caso tenha logado apenas para o seed
-    if (loggedInForSeed && initialUser == null) {
+    if (loggedInForSeed && initialUser == null && auth != null) {
       await auth.signOut();
       debugPrint('🔓 [Seed] Sessão temporária de seed finalizada.');
     }
