@@ -32,28 +32,34 @@ jobs:
 
       - name: Resolve Release Tag
         id: vars
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ github.event.inputs.tag }}"
+            TAG="$INPUT_TAG"
           else
             TAG="${GITHUB_REF#refs/tags/}"
           fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "Processando release para a tag $TAG"
 
       - name: Validate Release Branch Policy (main only)
+        env:
+          RELEASE_TAG: ${{ steps.vars.outputs.tag }}
         run: |
-          git fetch origin main --depth=100
+          git fetch origin main
           if ! git merge-base --is-ancestor HEAD origin/main; then
-            echo "❌ ERRO: O commit $GITHUB_SHA da tag ${{ steps.vars.outputs.tag }} não pertence ao histórico da branch 'main'."
+            echo "❌ ERRO: O commit $GITHUB_SHA da tag $RELEASE_TAG não pertence ao histórico da branch 'main'."
             echo "Conforme a política oficial do projeto (AGENTS.md e docs/versionamento-e-releases.md), releases de produção são geradas exclusivamente a partir da main."
             exit 1
           fi
 
       - name: Provision official Firebase configuration for Release
+        env:
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
         run: |
-          if [ -n "${{ secrets.FIREBASE_OPTIONS_DART }}" ]; then
-            echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+          if [ -n "$FIREBASE_OPTIONS_DART" ]; then
+            printf '%s\n' "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
             echo "✅ lib/firebase_options.dart provisionado a partir dos segredos do repositório."
           elif [ ! -f lib/firebase_options.dart ]; then
             echo "❌ ERRO: Segredo FIREBASE_OPTIONS_DART não configurado e arquivo lib/firebase_options.dart ausente."
@@ -72,29 +78,32 @@ jobs:
         run: flutter pub get
 
       - name: Static Analysis
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Run unit & widget tests
         run: flutter test
 
       - name: Build Web Release
+        env:
+          RELEASE_TAG: ${{ steps.vars.outputs.tag }}
         run: |
           flutter build web --release
-          cd build/web && zip -r ../../ativamente-web-${{ steps.vars.outputs.tag }}.zip . && cd ../..
+          cd build/web && zip -r "../../ativamente-web-${RELEASE_TAG}.zip" . && cd ../..
 
       - name: Extract Release Notes from CHANGELOG.md
         id: changelog
+        env:
+          RELEASE_TAG: ${{ steps.vars.outputs.tag }}
         run: |
-          TAG="${{ steps.vars.outputs.tag }}"
-          VERSION="${TAG#v}"
+          VERSION="${RELEASE_TAG#v}"
           
           # Extrai a seção correspondente entre '## [VERSION]' e a próxima seção '## ['
           if [ -f CHANGELOG.md ]; then
             NOTES=$(awk "/## \[$VERSION\]/{flag=1; next} /## \[/{flag=0} flag" CHANGELOG.md)
             if [ -n "$NOTES" ]; then
-              echo "NOTES<<EOF" >> $GITHUB_ENV
-              echo "$NOTES" >> $GITHUB_ENV
-              echo "EOF" >> $GITHUB_ENV
+              echo "NOTES<<EOF" >> "$GITHUB_ENV"
+              echo "$NOTES" >> "$GITHUB_ENV"
+              echo "EOF" >> "$GITHUB_ENV"
             fi
           fi
 

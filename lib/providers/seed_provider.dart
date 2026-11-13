@@ -4,15 +4,22 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../config/app_environment.dart';
 import 'auth_provider.dart';
 
 final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
   return () async {
+    // Proteção de segurança: o seed NUNCA deve ser executado em produção ou sem emuladores ativos
+    if (!kDebugMode || !AppEnvironment.useEmulators) {
+      debugPrint('⛔ [Seed] Operação cancelada: o povoamento automático só é permitido em ambiente de desenvolvimento (debug) com emuladores locais ativos.');
+      return;
+    }
+
     final firestore = FirebaseFirestore.instance;
     final auth = FirebaseAuth.instance;
     final exerciciosCollection = firestore.collection('Exercicios');
 
-    debugPrint('🌱 [Seed] Iniciando povoamento de exercícios e usuários padrão...');
+    debugPrint('🌱 [Seed] Iniciando povoamento de exercícios e usuários padrão no emulador...');
 
     final initialUser = auth.currentUser;
     bool loggedInForSeed = false;
@@ -21,8 +28,8 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     try {
       await ref.read(authControllerProvider).createSecondaryUser(
         'Admin Ativamente',
-        'ativamente@ativamente.org',
-        'dev123456',
+        AppEnvironment.seedAdminEmail,
+        AppEnvironment.seedAdminPassword,
         'admin',
       );
       debugPrint('✅ [Seed] Usuário Admin verificado/criado.');
@@ -34,8 +41,8 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     if (auth.currentUser == null) {
       try {
         await auth.signInWithEmailAndPassword(
-          email: 'ativamente@ativamente.org',
-          password: 'dev123456',
+          email: AppEnvironment.seedAdminEmail,
+          password: AppEnvironment.seedAdminPassword,
         );
         loggedInForSeed = true;
         debugPrint('🔐 [Seed] Autenticado como Admin para povoamento seguro.');
@@ -68,8 +75,8 @@ final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
     try {
       await ref.read(authControllerProvider).createSecondaryUser(
         'Personal Trainer',
-        'personal@ativamente.org',
-        'dev123456',
+        AppEnvironment.seedTrainerEmail,
+        AppEnvironment.seedTrainerPassword,
         'trainer',
       );
       debugPrint('✅ [Seed] Usuário Personal Trainer verificado/criado.');

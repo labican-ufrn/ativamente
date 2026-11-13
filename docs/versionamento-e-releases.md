@@ -103,6 +103,14 @@ O repositório conta com o workflow `.github/workflows/release.yml`.
    * Extrai automaticamente as notas do `CHANGELOG.md` referentes à versão.
    * Cria a **Release Oficial** no GitHub com o changelog e anexa o pacote Web para download e arquivamento.
 
+### Segredos do Repositório (Repository Secrets) para Releases
+
+Para que o workflow consiga compilar a aplicação Web de produção e gerar as credenciais oficiais sem expô-las no repositório Git, configure o seguinte segredo em **Settings > Secrets and variables > Actions**:
+
+| Segredo | Obrigatório | Descrição |
+|---|---|---|
+| `FIREBASE_OPTIONS_DART` | Sim | Conteúdo integral do arquivo `lib/firebase_options.dart` oficial gerado pelo comando `flutterfire configure` apontando para o projeto Firebase de produção (`ativamente-labican-ufrn`). |
+
 ---
 
 ## 5. Política de Deploy em Produção
