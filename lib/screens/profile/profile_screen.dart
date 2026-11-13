@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/app_environment.dart';
 import '../../providers/accessibility_provider.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -145,26 +147,28 @@ class ProfileScreen extends ConsumerWidget {
                       },
                       child: const Text('Adicionar Usuário'),
                     ),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await ref.read(seedDatabaseProvider)();
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Banco Semeado com sucesso!')),
-                            );
+                    if (kDebugMode && AppEnvironment.useEmulators) ...[
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            await ref.read(seedDatabaseProvider)();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Banco Semeado com sucesso!')),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Erro: $e')),
+                              );
+                            }
                           }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Erro: $e')),
-                            );
-                          }
-                        }
-                      },
-                      child: const Text('Seed Database (Exercícios & Contas)'),
-                    ),
+                        },
+                        child: const Text('Seed Database (Exercícios & Contas)'),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                   ],
                 );
