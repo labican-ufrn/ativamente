@@ -17,7 +17,7 @@ O pipeline realiza os seguintes passos:
 3. **Instalação de dependências:** `flutter pub get`.
 4. **Análise estática:** `flutter analyze --no-fatal-infos` garantindo conformidade com o linter (`analysis_options.yaml`) e delegando o bloqueio de code smells ao Quality Gate do SonarQube via importação genérica de issues.
 5. **Execução de testes e cobertura:** `flutter test --coverage`, gerando `coverage/lcov.info`.
-6. **SonarQube Scan:** Execução do scanner com avaliação bloqueante do Quality Gate no SonarQube (modo unificado compatível com a Community Edition).
+6. **SonarQube Scan:** Execução do scanner do SonarQube com envio de métricas de cobertura e issues (com `sonar.qualitygate.wait=false` temporário durante a calibração de regras no servidor).
 
 ---
 
