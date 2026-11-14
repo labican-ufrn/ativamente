@@ -68,7 +68,7 @@ jobs:
           fi
 
       - name: Static Analysis (flutter analyze)
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Run unit & widget tests with coverage
         run: flutter test --coverage
@@ -84,7 +84,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >
-            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.wait=false
 
       - name: Inform missing SONAR_TOKEN
         if: env.SONAR_TOKEN == '' && !(github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'))

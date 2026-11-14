@@ -32,8 +32,7 @@ void main() {
         matching: find.byWidgetPredicate(
           (widget) =>
               widget is Container &&
-              widget.decoration is BoxDecoration &&
-              (widget.decoration as BoxDecoration).borderRadius ==
+              (widget.decoration as BoxDecoration?)?.borderRadius ==
                   BorderRadius.circular(16),
         ),
       );
@@ -42,8 +41,7 @@ void main() {
         matching: find.byWidgetPredicate(
           (widget) =>
               widget is Container &&
-              widget.decoration is BoxDecoration &&
-              (widget.decoration as BoxDecoration).borderRadius ==
+              (widget.decoration as BoxDecoration?)?.borderRadius ==
                   BorderRadius.circular(16),
         ),
       );
