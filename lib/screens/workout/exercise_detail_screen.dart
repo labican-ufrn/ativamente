@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/utils/intensity.dart';
 import '../../models/exercicio.dart';
 import '../../providers/active_exercise_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -131,7 +132,8 @@ class _ExerciseDetailBody extends ConsumerWidget {
         'Detalhe do exercício. ${exercicio.nome}. Status: $statusLabel. '
         'Tempo decorrido: $formattedTime. '
         'Categoria: ${exercicio.categoria.nome}. '
-        'Tipo: ${exercicio.tipo.nome}. Descrição: ${exercicio.descricao}';
+        'Tipo: ${exercicio.tipo.nome}. '
+        'Intensidade: ${rotuloIntensidade(exercicio.intensidade)}. Descrição: ${exercicio.descricao}';
     ref.read(readScreenProvider(screenText))();
   }
 
@@ -181,6 +183,12 @@ class _ExerciseDetailBody extends ConsumerWidget {
               children: [
                 _InfoChip(icon: Icons.category, label: exercicio.categoria.nome),
                 _InfoChip(icon: Icons.fitness_center, label: exercicio.tipo.nome),
+                Semantics(
+                  label:
+                      'Intensidade: ${rotuloIntensidade(exercicio.intensidade)}',
+                  excludeSemantics: true,
+                  child: intensityChip(intensidade: exercicio.intensidade),
+                ),
               ],
             ),
             const SizedBox(height: 24),
