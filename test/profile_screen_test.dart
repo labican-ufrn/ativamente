@@ -76,6 +76,19 @@ void main() {
       await tester.pumpAndSettle();
 
       final shouldShowTrainerPanel = role == 'trainer' || role == 'admin';
+      if (shouldShowTrainerPanel) {
+        await tester.scrollUntilVisible(
+          find.text('Personal Trainer'),
+          300,
+          scrollable: find.byType(Scrollable).first,
+        );
+      } else {
+        await tester.drag(
+          find.byType(ListView),
+          const Offset(0, -1000),
+        );
+        await tester.pumpAndSettle();
+      }
       expect(find.text('Personal Trainer'), shouldShowTrainerPanel ? findsOneWidget : findsNothing);
       expect(find.text('Cadastrar Novo Exercício'), shouldShowTrainerPanel ? findsOneWidget : findsNothing);
     });
