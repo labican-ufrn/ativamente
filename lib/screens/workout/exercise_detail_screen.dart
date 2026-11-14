@@ -137,8 +137,8 @@ class _ExerciseDetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userRole = ref.watch(userDataProvider).value?.role;
-    final canEdit = userRole == 'trainer' || userRole == 'admin';
+    final canEdit =
+        ref.watch(userDataProvider).value?.podeGerenciarExercicios ?? false;
 
     return Scaffold(
       appBar: AppBar(

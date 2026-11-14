@@ -15,8 +15,7 @@ class ExerciseManagementGuard extends ConsumerWidget {
         .watch(userDataProvider)
         .when(
           data: (pessoa) {
-            final role = pessoa?.role;
-            if (role == 'trainer' || role == 'admin') return child;
+            if (pessoa?.podeGerenciarExercicios ?? false) return child;
             return const _AccessStateScreen(
               title: 'Acesso restrito',
               message: 'Você não tem autorização para gerenciar exercícios.',

@@ -131,7 +131,7 @@ class ProfileScreen extends ConsumerWidget {
           userDataAsync.maybeWhen(
             data: (pessoa) {
               final role = pessoa?.role;
-              final isTrainer = role == 'trainer' || role == 'admin';
+              final isTrainer = pessoa?.podeGerenciarExercicios ?? false;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

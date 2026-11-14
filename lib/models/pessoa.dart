@@ -69,6 +69,8 @@ class Pessoa {
     this.notificacoes = const [],
   });
 
+  bool get podeGerenciarExercicios => role == 'trainer' || role == 'admin';
+
   factory Pessoa.fromJson(Map<String, dynamic> json, String documentId) {
     var notifsFromJson = json['notificacoes'] as List<dynamic>? ?? [];
     List<Notificacao> notifList = notifsFromJson
