@@ -10,6 +10,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/workout/exercise_detail_screen.dart';
 import 'screens/workout/workout_screen.dart';
+import 'screens/workout/add_exercise_screen.dart';
 import 'screens/admin/add_user_screen.dart';
 import 'screens/profile/edit_profile_screen.dart';
 
@@ -20,40 +21,42 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     redirect: (context, state) {
       final isAuth = authState.value != null;
-      final isLoggingIn = state.matchedLocation == '/' || 
-                          state.matchedLocation == '/login' || 
-                          state.matchedLocation == '/register';
+      final isLoggingIn =
+          state.matchedLocation == '/' ||
+          state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register';
 
       if (!isAuth && !isLoggingIn) return '/';
       if (isAuth && isLoggingIn) return '/home';
+      if (state.matchedLocation == '/add-exercise') {
+        final userData = ref.watch(userDataProvider);
+        if (userData.hasError || userData.hasValue) {
+          final role = userData.value?.role;
+          if (role != 'trainer' && role != 'admin') return '/home';
+        }
+      }
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const WelcomeScreen(),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const WelcomeScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
+      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
       GoRoute(
         path: '/workout',
         builder: (context, state) => const WorkoutScreen(),
       ),
       GoRoute(
+        path: '/add-exercise',
+        builder: (context, state) => const AddExerciseScreen(),
+      ),
+      GoRoute(
         path: '/exercise/:id',
-        builder: (context, state) => ExerciseDetailScreen(
-          exerciseId: state.pathParameters['id'] ?? '',
-        ),
+        builder: (context, state) =>
+            ExerciseDetailScreen(exerciseId: state.pathParameters['id'] ?? ''),
       ),
       GoRoute(
         path: '/add-user',
