@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app_academia/models/pessoa.dart';
 import 'package:app_academia/providers/auth_provider.dart';
+import 'package:app_academia/providers/firestore_provider.dart';
 
 class FakeUser extends Fake implements User {
   @override
@@ -67,7 +68,8 @@ class FakeFirebaseAuth extends Fake implements FirebaseAuth {
   }
 }
 
-class FakeDocumentSnapshot extends Fake implements DocumentSnapshot<Map<String, dynamic>> {
+class FakeDocumentSnapshot extends Fake
+    implements DocumentSnapshot<Map<String, dynamic>> {
   @override
   final String id;
   final Map<String, dynamic>? snapshotData;
@@ -84,7 +86,8 @@ class FakeDocumentSnapshot extends Fake implements DocumentSnapshot<Map<String, 
   Map<String, dynamic>? data() => snapshotData;
 }
 
-class FakeDocumentReference extends Fake implements DocumentReference<Map<String, dynamic>> {
+class FakeDocumentReference extends Fake
+    implements DocumentReference<Map<String, dynamic>> {
   @override
   final String id;
   Map<String, dynamic>? documentData;
@@ -132,7 +135,9 @@ class FakeDocumentReference extends Fake implements DocumentReference<Map<String
   }
 
   @override
-  Future<DocumentSnapshot<Map<String, dynamic>>> get([GetOptions? options]) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> get([
+    GetOptions? options,
+  ]) async {
     return _createSnapshot();
   }
 
@@ -154,7 +159,8 @@ class FakeDocumentReference extends Fake implements DocumentReference<Map<String
   }
 }
 
-class FakeCollectionReference extends Fake implements CollectionReference<Map<String, dynamic>> {
+class FakeCollectionReference extends Fake
+    implements CollectionReference<Map<String, dynamic>> {
   final Map<String, FakeDocumentReference> docs = {};
 
   @override
@@ -188,19 +194,28 @@ void main() {
       expect(getEffectiveDisplayName(pessoa, user), equals('Maria Silva'));
     });
 
-    test('usa displayName de User quando pessoa for nula ou tiver nome vazio', () {
-      final pessoaVazia = Pessoa(id: '1', nome: '   ');
-      final user = FakeUser(displayName: 'João Auth', email: 'joao@test.com');
+    test(
+      'usa displayName de User quando pessoa for nula ou tiver nome vazio',
+      () {
+        final pessoaVazia = Pessoa(id: '1', nome: '   ');
+        final user = FakeUser(displayName: 'João Auth', email: 'joao@test.com');
 
-      expect(getEffectiveDisplayName(null, user), equals('João Auth'));
-      expect(getEffectiveDisplayName(pessoaVazia, user), equals('João Auth'));
-    });
+        expect(getEffectiveDisplayName(null, user), equals('João Auth'));
+        expect(getEffectiveDisplayName(pessoaVazia, user), equals('João Auth'));
+      },
+    );
 
-    test('usa prefixo do e-mail quando pessoa.nome e user.displayName forem nulos/vazios', () {
-      final user = FakeUser(displayName: '', email: 'carlos.dev@ativamente.org');
+    test(
+      'usa prefixo do e-mail quando pessoa.nome e user.displayName forem nulos/vazios',
+      () {
+        final user = FakeUser(
+          displayName: '',
+          email: 'carlos.dev@ativamente.org',
+        );
 
-      expect(getEffectiveDisplayName(null, user), equals('carlos.dev'));
-    });
+        expect(getEffectiveDisplayName(null, user), equals('carlos.dev'));
+      },
+    );
 
     test('retorna Usuário quando todas as fontes forem nulas ou em branco', () {
       final user = FakeUser(displayName: '', email: '');
@@ -211,174 +226,274 @@ void main() {
   });
 
   group('firebaseFirestoreProvider & userDataProvider (leitura pura)', () {
-    test('firebaseFirestoreProvider pode ser injetado e sobrescrito via ProviderContainer', () {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'firebaseFirestoreProvider pode ser injetado e sobrescrito via ProviderContainer',
+      () {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      expect(container.read(firebaseFirestoreProvider), equals(fakeFirestore));
-    });
+        expect(
+          container.read(firebaseFirestoreProvider),
+          equals(fakeFirestore),
+        );
+      },
+    );
 
-    test('userDataProvider emite null quando authStateProvider for null', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final fakeAuth = FakeFirebaseAuth()..currentUserMock = null;
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'userDataProvider emite null quando authStateProvider for null',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth()..currentUserMock = null;
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final result = await container.read(userDataProvider.future);
-      expect(result, isNull);
-    });
+        final result = await container.read(userDataProvider.future);
+        expect(result, isNull);
+      },
+    );
 
-    test('userDataProvider realiza leitura pura e mapeia Pessoa quando documento existe no Firestore', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final fakeAuth = FakeFirebaseAuth()
-        ..currentUserMock = FakeUser(uid: 'user-123', email: 'florinda@test.com');
-      final col = fakeFirestore.collection('Pessoas') as FakeCollectionReference;
-      final docRef = col.doc('user-123') as FakeDocumentReference;
-      docRef.documentExists = true;
-      docRef.documentData = {
-        'nome': 'Dona Florinda',
-        'role': 'user',
-        'nomeLogin': 'florinda@test.com',
-      };
+    test(
+      'userDataProvider realiza leitura pura e mapeia Pessoa quando documento existe no Firestore',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth()
+          ..currentUserMock = FakeUser(
+            uid: 'user-123',
+            email: 'florinda@test.com',
+          );
+        final col =
+            fakeFirestore.collection('Pessoas') as FakeCollectionReference;
+        final docRef = col.doc('user-123') as FakeDocumentReference;
+        docRef.documentExists = true;
+        docRef.documentData = {
+          'nome': 'Dona Florinda',
+          'role': 'user',
+          'nomeLogin': 'florinda@test.com',
+        };
 
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final pessoa = await container.read(userDataProvider.future);
-      expect(pessoa, isNotNull);
-      expect(pessoa!.id, equals('user-123'));
-      expect(pessoa.nome, equals('Dona Florinda'));
-      expect(pessoa.role, equals('user'));
-      // Garante que o provider não realizou nenhuma escrita (efeito colateral)
-      expect(docRef.setCallCount, equals(0));
-    });
+        final pessoa = await container.read(userDataProvider.future);
+        expect(pessoa, isNotNull);
+        expect(pessoa!.id, equals('user-123'));
+        expect(pessoa.nome, equals('Dona Florinda'));
+        expect(pessoa.role, equals('user'));
+        // Garante que o provider não realizou nenhuma escrita (efeito colateral)
+        expect(docRef.setCallCount, equals(0));
+      },
+    );
 
-    test('userDataProvider realiza leitura pura sem efeitos colaterais de escrita quando documento nao existe', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final fakeAuth = FakeFirebaseAuth()
-        ..currentUserMock = FakeUser(uid: 'user-inexistente', email: 'inexistente@test.com');
-      final col = fakeFirestore.collection('Pessoas') as FakeCollectionReference;
-      final docRef = col.doc('user-inexistente') as FakeDocumentReference;
-      docRef.documentExists = false;
+    test(
+      'userDataProvider realiza leitura pura sem efeitos colaterais de escrita quando documento nao existe',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth()
+          ..currentUserMock = FakeUser(
+            uid: 'user-inexistente',
+            email: 'inexistente@test.com',
+          );
+        final col =
+            fakeFirestore.collection('Pessoas') as FakeCollectionReference;
+        final docRef = col.doc('user-inexistente') as FakeDocumentReference;
+        docRef.documentExists = false;
 
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final pessoa = await container.read(userDataProvider.future);
-      expect(pessoa, isNull);
-      // Confirma que não houve chamada de escrita on-demand dentro da stream
-      expect(docRef.setCallCount, equals(0));
-    });
+        final pessoa = await container.read(userDataProvider.future);
+        expect(pessoa, isNull);
+        // Confirma que não houve chamada de escrita on-demand dentro da stream
+        expect(docRef.setCallCount, equals(0));
+      },
+    );
   });
 
   group('AuthController (inicialização pós-login e injeção)', () {
-    test('signIn e login inicializam o perfil on-demand quando o documento nao existe no Firestore', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final fakeAuth = FakeFirebaseAuth();
-      final fakeUser = FakeUser(uid: 'user-pos-login', email: 'novo@test.com', displayName: 'Novo Usuário');
-      fakeAuth.currentUserMock = fakeUser;
-      fakeAuth.onSignIn = (email, password) async => FakeUserCredential(user: fakeUser);
+    test(
+      'signIn e login inicializam o perfil on-demand quando o documento nao existe no Firestore',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth();
+        final fakeUser = FakeUser(
+          uid: 'user-pos-login',
+          email: 'novo@test.com',
+          displayName: 'Novo Usuário',
+        );
+        fakeAuth.currentUserMock = fakeUser;
+        fakeAuth.onSignIn = (email, password) async =>
+            FakeUserCredential(user: fakeUser);
 
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final col = fakeFirestore.collection('Pessoas') as FakeCollectionReference;
-      final docRef = col.doc('user-pos-login') as FakeDocumentReference;
-      expect(docRef.documentExists, isFalse);
+        final col =
+            fakeFirestore.collection('Pessoas') as FakeCollectionReference;
+        final docRef = col.doc('user-pos-login') as FakeDocumentReference;
+        expect(docRef.documentExists, isFalse);
 
-      await container.read(authControllerProvider).signIn('novo@test.com', 'senha123');
+        await container
+            .read(authControllerProvider)
+            .signIn('novo@test.com', 'senha123');
 
-      expect(docRef.setCallCount, equals(1));
-      expect(docRef.lastSetOptions?.merge, isTrue);
-      expect(docRef.lastSetData?['nome'], equals('Novo Usuário'));
-      expect(docRef.lastSetData?['nomeLogin'], equals('novo@test.com'));
-    });
+        expect(docRef.setCallCount, equals(1));
+        expect(docRef.lastSetOptions?.merge, isTrue);
+        expect(docRef.lastSetData?['nome'], equals('Novo Usuário'));
+        expect(docRef.lastSetData?['nomeLogin'], equals('novo@test.com'));
+        expect(docRef.lastSetData, isNot(contains('role')));
+      },
+    );
 
-    test('signIn nao sobrescreve perfil quando documento ja existe no Firestore', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final fakeAuth = FakeFirebaseAuth();
-      final fakeUser = FakeUser(uid: 'user-existente', email: 'existente@test.com');
-      fakeAuth.currentUserMock = fakeUser;
-      fakeAuth.onSignIn = (email, password) async => FakeUserCredential(user: fakeUser);
+    test(
+      'signIn nao sobrescreve perfil quando documento ja existe no Firestore',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth();
+        final fakeUser = FakeUser(
+          uid: 'user-existente',
+          email: 'existente@test.com',
+        );
+        fakeAuth.currentUserMock = fakeUser;
+        fakeAuth.onSignIn = (email, password) async =>
+            FakeUserCredential(user: fakeUser);
 
-      final col = fakeFirestore.collection('Pessoas') as FakeCollectionReference;
-      final docRef = col.doc('user-existente') as FakeDocumentReference;
-      docRef.documentExists = true;
-      docRef.documentData = {
-        'nome': 'Usuário Existente',
-        'role': 'user',
-      };
+        final col =
+            fakeFirestore.collection('Pessoas') as FakeCollectionReference;
+        final docRef = col.doc('user-existente') as FakeDocumentReference;
+        docRef.documentExists = true;
+        docRef.documentData = {'nome': 'Usuário Existente', 'role': 'user'};
 
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await container.read(authControllerProvider).login('existente@test.com', 'senha123');
+        await container
+            .read(authControllerProvider)
+            .signIn('existente@test.com', 'senha123');
 
-      expect(docRef.setCallCount, equals(0));
-      expect(docRef.documentData?['nome'], equals('Usuário Existente'));
-    });
+        expect(docRef.setCallCount, equals(0));
+        expect(docRef.documentData?['nome'], equals('Usuário Existente'));
+      },
+    );
 
-    test('signIn e resiliente a falhas de rede na gravacao de perfil', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final fakeAuth = FakeFirebaseAuth();
-      final fakeUser = FakeUser(uid: 'user-sem-rede', email: 'offline@test.com');
-      fakeAuth.onSignIn = (email, password) async => FakeUserCredential(user: fakeUser);
+    test(
+      'signIn e resiliente a falhas de rede na gravacao de perfil',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth();
+        final fakeUser = FakeUser(
+          uid: 'user-sem-rede',
+          email: 'offline@test.com',
+        );
+        fakeAuth.onSignIn = (email, password) async =>
+            FakeUserCredential(user: fakeUser);
 
-      final col = fakeFirestore.collection('Pessoas') as FakeCollectionReference;
-      final docRef = col.doc('user-sem-rede') as FakeDocumentReference;
-      docRef.shouldThrowOnSet = true;
+        final col =
+            fakeFirestore.collection('Pessoas') as FakeCollectionReference;
+        final docRef = col.doc('user-sem-rede') as FakeDocumentReference;
+        docRef.shouldThrowOnSet = true;
 
-      final container = ProviderContainer(
-        overrides: [
-          firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      // Não deve lançar exceção mesmo com falha de escrita no Firestore
-      await expectLater(
-        container.read(authControllerProvider).signIn('offline@test.com', 'senha123'),
-        completes,
-      );
-    });
+        // Não deve lançar exceção mesmo com falha de escrita no Firestore
+        await expectLater(
+          container
+              .read(authControllerProvider)
+              .signIn('offline@test.com', 'senha123'),
+          completes,
+        );
+        expect(docRef.setCallCount, equals(1));
+      },
+    );
+
+    test(
+      'initializeSession cria o perfil da sessao autenticada quando nao existe',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth()
+          ..currentUserMock = FakeUser(
+            uid: 'sessao-salva',
+            email: 'salvo@test.com',
+          );
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final docRef =
+            (fakeFirestore.collection('Pessoas') as FakeCollectionReference)
+                    .doc('sessao-salva')
+                as FakeDocumentReference;
+
+        await container.read(authControllerProvider).initializeSession();
+
+        expect(docRef.setCallCount, equals(1));
+        expect(docRef.lastSetData?['nomeLogin'], equals('salvo@test.com'));
+        expect(docRef.lastSetData, isNot(contains('role')));
+      },
+    );
+
+    test(
+      'initializeSession nao escreve quando nao ha usuario autenticado',
+      () async {
+        final fakeFirestore = FakeFirebaseFirestore();
+        final fakeAuth = FakeFirebaseAuth()..currentUserMock = null;
+        final container = ProviderContainer(
+          overrides: [
+            firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
+            firebaseAuthProvider.overrideWithValue(fakeAuth),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await container.read(authControllerProvider).initializeSession();
+
+        expect(fakeFirestore.collections, isEmpty);
+      },
+    );
 
     test('logout executa signOut no firebaseAuthProvider', () async {
       final fakeAuth = FakeFirebaseAuth();
       final container = ProviderContainer(
-        overrides: [
-          firebaseAuthProvider.overrideWithValue(fakeAuth),
-        ],
+        overrides: [firebaseAuthProvider.overrideWithValue(fakeAuth)],
       );
       addTearDown(container.dispose);
 
