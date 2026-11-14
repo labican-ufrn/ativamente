@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config/app_environment.dart';
 import 'firebase_options.dart';
 import 'providers/accessibility_provider.dart';
+import 'providers/auth_provider.dart';
 import 'providers/seed_provider.dart';
 import 'routes.dart';
 import 'theme.dart';
@@ -14,11 +15,11 @@ import 'theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   if (AppEnvironment.useEmulators) {
-    debugPrint('🔥 [Firebase] Conectando aos emuladores em ${AppEnvironment.emulatorHost} (Auth: ${AppEnvironment.authPort}, Firestore: ${AppEnvironment.firestorePort})...');
+    debugPrint(
+      '🔥 [Firebase] Conectando aos emuladores em ${AppEnvironment.emulatorHost} (Auth: ${AppEnvironment.authPort}, Firestore: ${AppEnvironment.firestorePort})...',
+    );
     await FirebaseAuth.instance.useAuthEmulator(
       AppEnvironment.emulatorHost,
       AppEnvironment.authPort,
@@ -28,7 +29,9 @@ void main() async {
       AppEnvironment.firestorePort,
     );
   } else {
-    debugPrint('☁️ [Firebase] Usando ambiente de NUVEM (Emuladores desativados).');
+    debugPrint(
+      '☁️ [Firebase] Usando ambiente de NUVEM (Emuladores desativados).',
+    );
   }
 
   runApp(
@@ -54,6 +57,7 @@ class _AppAcademiaState extends ConsumerState<AppAcademia> {
     super.initState();
     // Executa seed automático e idempotente assim que a árvore de widgets estiver montada e o rootBundle de assets pronto
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(authControllerProvider).initializeSession();
       try {
         await ref.read(seedDatabaseProvider)();
       } catch (e) {
@@ -75,4 +79,3 @@ class _AppAcademiaState extends ConsumerState<AppAcademia> {
     );
   }
 }
-

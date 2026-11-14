@@ -1,17 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../config/app_environment.dart';
 import '../models/pessoa.dart';
 import '../utils/auth_errors.dart';
+import 'firestore_provider.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
-});
-
-final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
-  return FirebaseFirestore.instance;
 });
 
 final authStateProvider = StreamProvider<User?>((ref) {
@@ -59,11 +57,11 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) async* {
       .doc(user.uid)
       .snapshots()
       .map((snapshot) {
-    if (snapshot.exists && snapshot.data() != null) {
-      return Pessoa.fromJson(snapshot.data()!, snapshot.id);
-    }
-    return null;
-  });
+        if (snapshot.exists && snapshot.data() != null) {
+          return Pessoa.fromJson(snapshot.data()!, snapshot.id);
+        }
+        return null;
+      });
 });
 
 final authControllerProvider = Provider<AuthController>((ref) {
@@ -107,17 +105,11 @@ class AuthController {
   final Ref ref;
   AuthController(this.ref);
 
-  Future<UserCredential> login(String email, String password) async {
-    return signIn(email, password);
-  }
-
   Future<UserCredential> signIn(String email, String password) async {
     try {
-      final userCredential =
-          await ref.read(firebaseAuthProvider).signInWithEmailAndPassword(
-                email: email,
-                password: password,
-              );
+      final userCredential = await ref
+          .read(firebaseAuthProvider)
+          .signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
         await ensureUserProfile(userCredential.user);
       }
@@ -142,25 +134,24 @@ class AuthController {
       final snapshot = await docRef.get();
       if (!snapshot.exists || snapshot.data() == null) {
         final fallbackName = getEffectiveDisplayName(null, user);
-        final newPessoa = Pessoa(
-          id: user.uid,
-          nome: fallbackName,
-          nomeLogin: user.email ?? '',
-          role: 'user',
-          dataNascimento: '',
-          peso: 0.0,
-          altura: 0.0,
-          notificacoes: [],
-        );
-        await docRef.set(newPessoa.toJson(), SetOptions(merge: true));
+        final dadosPerfil = <String, dynamic>{
+          'nome': fallbackName,
+          'nomeLogin': user.email ?? '',
+          'dataNascimento': '',
+          'peso': 0.0,
+          'altura': 0.0,
+          'notificacoes': [],
+        };
+        await docRef.set(dadosPerfil, SetOptions(merge: true));
       }
-    } catch (_) {
-      // Ignora falhas de escrita (ex.: offline/regras em execução local)
+    } on FirebaseException catch (error, stackTrace) {
+      debugPrint('Falha ao criar perfil de ${user.uid} no Firestore: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 
   Future<void> initializeSession() async {
-    final user = ref.read(firebaseAuthProvider).currentUser;
+    final user = await ref.read(authStateProvider.future);
     if (user != null) {
       await ensureUserProfile(user);
     }
@@ -168,11 +159,10 @@ class AuthController {
 
   Future<void> register(String name, String email, String password) async {
     try {
-      final userCredential = await ref.read(firebaseAuthProvider).createUserWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
-      
+      final userCredential = await ref
+          .read(firebaseAuthProvider)
+          .createUserWithEmailAndPassword(email: email, password: password);
+
       // Create the Pessoa document in Firestore
       if (userCredential.user != null) {
         final pessoa = Pessoa(
@@ -184,7 +174,8 @@ class AuthController {
           altura: 0.0,
           notificacoes: [],
         );
-        await ref.read(firebaseFirestoreProvider)
+        await ref
+            .read(firebaseFirestoreProvider)
             .collection('Pessoas')
             .doc(userCredential.user!.uid)
             .set(pessoa.toJson());
@@ -199,13 +190,20 @@ class AuthController {
     }
   }
 
-  Future<void> createSecondaryUser(String name, String email, String password, String role) async {
+  Future<void> createSecondaryUser(
+    String name,
+    String email,
+    String password,
+    String role,
+  ) async {
     // Reusa um único app/auth secundário para criar usuários sem derrubar a
     // sessão atual. Antes, Firebase.initializeApp(name: 'tempApp') rodava por
     // chamada e o 2º usuário falhava com duplicate-app (issue #38).
     final tempAuth = await _getSeedTempAuth();
     final userCredential = await tempAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
+      email: email,
+      password: password,
+    );
 
     final pessoa = Pessoa(
       id: userCredential.user!.uid,
@@ -218,7 +216,8 @@ class AuthController {
       notificacoes: [],
     );
 
-    await ref.read(firebaseFirestoreProvider)
+    await ref
+        .read(firebaseFirestoreProvider)
         .collection('Pessoas')
         .doc(userCredential.user!.uid)
         .set(pessoa.toJson());

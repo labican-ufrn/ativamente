@@ -27,7 +27,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText = 'AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.';
+    const screenText =
+        'AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -36,7 +37,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => context.go('/'),
         ),
-        title: const Text('Acessar Conta', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Acessar Conta',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
@@ -74,12 +78,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.errorContainer,
-                  border: Border.all(color: Theme.of(context).colorScheme.error, width: 2),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.error,
+                    width: 2,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Theme.of(context).colorScheme.onErrorContainer, size: 28),
+                    Icon(
+                      Icons.error_outline,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                      size: 28,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -96,35 +107,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
             ],
-            Text(
-              'Usuário',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Usuário', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 hintText: 'Email ou Nome',
-                prefixIcon: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
+                prefixIcon: Icon(
+                  Icons.person,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 20),
               ),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 18,
+              ),
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                Text(
-                  'Senha ',
-                  style: Theme.of(context).textTheme.titleLarge,
+                Text('Senha ', style: Theme.of(context).textTheme.titleLarge),
+                Icon(
+                  Icons.lock,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
-                Icon(Icons.lock, color: Theme.of(context).colorScheme.onSurface),
               ],
             ),
             const SizedBox(height: 8),
@@ -135,10 +153,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 hintText: 'Digite sua senha...',
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -151,9 +173,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     });
                   },
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 16,
+                ),
               ),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 18,
+              ),
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -176,14 +204,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _errorMessage = null;
                 });
                 try {
-                  await ref.read(authControllerProvider).login(
-                    _emailController.text.trim(),
-                    _passwordController.text,
-                  );
+                  await ref
+                      .read(authControllerProvider)
+                      .signIn(
+                        _emailController.text.trim(),
+                        _passwordController.text,
+                      );
                   if (context.mounted) context.go('/home');
                 } catch (e) {
                   if (context.mounted) {
-                    final message = e is FirebaseAuthException ? (e.message ?? 'Erro ao fazer login.') : e.toString().replaceAll('Exception: ', '');
+                    final message = e is FirebaseAuthException
+                        ? (e.message ?? 'Erro ao fazer login.')
+                        : e.toString().replaceAll('Exception: ', '');
                     setState(() {
                       _errorMessage = message;
                     });
@@ -209,7 +241,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             const SizedBox(height: 48),
-            Divider(color: Theme.of(context).colorScheme.outlineVariant, thickness: 1),
+            Divider(
+              color: Theme.of(context).colorScheme.outlineVariant,
+              thickness: 1,
+            ),
             const SizedBox(height: 16),
             Text(
               'Não possui uma conta?',
