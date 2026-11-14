@@ -25,6 +25,14 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     _selectedCategory = widget.category ?? 'Coracao';
   }
 
+  @override
+  void didUpdateWidget(covariant WorkoutScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.category != widget.category) {
+      _selectedCategory = widget.category ?? 'Coracao';
+    }
+  }
+
   bool get _hasFixedCategory => widget.category != null;
 
   String get _categoryLabel {
@@ -39,8 +47,8 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
   }
 
   String _formatTime(int seconds) {
-    int minutes = seconds ~/ 60;
-    int remainingSeconds = seconds % 60;
+    final int minutes = seconds ~/ 60;
+    final int remainingSeconds = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
