@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_academia/core/utils/intensity.dart';
 import 'package:app_academia/models/exercicio.dart';
+import 'package:app_academia/models/pessoa.dart';
+import 'package:app_academia/providers/auth_provider.dart';
 import 'package:app_academia/providers/active_exercise_provider.dart';
 import 'package:app_academia/providers/firestore_provider.dart';
 import 'package:app_academia/providers/tts_provider.dart';
@@ -41,10 +43,12 @@ void main() {
     tipo: Tipo(nome: 'Força', icone: 'fitness_center'),
   );
 
-  ProviderContainer criarContainer() {
+  ProviderContainer criarContainer({String role = 'user'}) {
+    final pessoa = Pessoa(id: 'pessoa-1', nome: 'Usuário Teste', role: role);
     final container = ProviderContainer(
       overrides: [
         nowProvider.overrideWithValue(relogio),
+        userDataProvider.overrideWith((ref) => Stream.value(pessoa)),
         exerciciosProvider.overrideWith(
           (ref) => Stream.value([testExercicio, outroExercicio]),
         ),
@@ -72,6 +76,29 @@ void main() {
     textosLidosPeloTts = [];
     chamadasProviderTts = 0;
   });
+
+  for (final role in ['trainer', 'admin', 'user']) {
+    testWidgets('Ícone de edição respeita o role $role', (WidgetTester tester) async {
+      final container = criarContainer(role: role);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.theme,
+            home: const ExerciseDetailScreen(exerciseId: 'ex-1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final shouldShowEditButton = role == 'trainer' || role == 'admin';
+      expect(
+        find.byTooltip('Editar exercício'),
+        shouldShowEditButton ? findsOneWidget : findsNothing,
+      );
+    });
+  }
 
   group('ExerciseDetailScreen - Controle de Execução (US11 / Issue #52)', () {
     testWidgets(

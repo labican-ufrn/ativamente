@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/utils/intensity.dart';
 import '../../models/exercicio.dart';
 import '../../providers/active_exercise_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
 
@@ -138,6 +139,9 @@ class _ExerciseDetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userRole = ref.watch(userDataProvider).value?.role;
+    final canEdit = userRole == 'trainer' || userRole == 'admin';
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -148,6 +152,13 @@ class _ExerciseDetailBody extends ConsumerWidget {
         ),
         title: const Text('Voltar', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          if (canEdit)
+            IconButton(
+              icon: const Icon(Icons.edit, size: 28),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              onPressed: () => context.push('/edit-exercise/${exercicio.id}'),
+              tooltip: 'Editar exercício',
+            ),
           IconButton(
             icon: const Icon(Icons.volume_up, size: 28),
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
