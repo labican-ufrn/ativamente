@@ -57,11 +57,11 @@ final userDataProvider = StreamProvider<Pessoa?>((ref) async* {
       .doc(user.uid)
       .snapshots()
       .map((snapshot) {
-        if (snapshot.exists && snapshot.data() != null) {
-          return Pessoa.fromJson(snapshot.data()!, snapshot.id);
-        }
-        return null;
-      });
+    if (snapshot.exists && snapshot.data() != null) {
+      return Pessoa.fromJson(snapshot.data()!, snapshot.id);
+    }
+    return null;
+  });
 });
 
 final authControllerProvider = Provider<AuthController>((ref) {

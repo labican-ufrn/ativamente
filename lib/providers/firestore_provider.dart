@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/exercicio.dart';
 
-/// Instância do Firestore usada pelo app e sobrescrita em testes.
+/// Instância do Firestore usada pelo app. Sobrescreva em testes (ex.:
+/// `FakeFirebaseFirestore`) para não depender do Firebase real.
 final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
 });
@@ -13,10 +14,10 @@ final exerciciosProvider = StreamProvider<List<Exercicio>>((ref) {
       .collection('Exercicios')
       .snapshots()
       .map((snapshot) {
-        return snapshot.docs
-            .map((doc) => Exercicio.fromJson(doc.data(), doc.id))
-            .toList();
-      });
+    return snapshot.docs
+        .map((doc) => Exercicio.fromJson(doc.data(), doc.id))
+        .toList();
+  });
 });
 
 class _IntensidadeFilterNotifier extends Notifier<int?> {

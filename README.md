@@ -4,6 +4,7 @@ Aplicativo Flutter para auxiliar **idosos** na prática de exercícios físicos 
 
 - **App publicado (Web):** https://ativamente-97e20.web.app
 - **Documentação:** [`docs/user-stories.md`](docs/user-stories.md) · [`docs/plano-sprints.md`](docs/plano-sprints.md) · [`docs/equipe.md`](docs/equipe.md)
+- **QA da iteração:** [`docs/qa-matriz-testes.md`](docs/qa-matriz-testes.md) · [`CHANGELOG.md`](CHANGELOG.md)
 - **Modelo conceitual da API:** [`ativamente-api/docs/modelo-conceitual.md`](https://github.com/labican-ufrn/ativamente-api/blob/dev/docs/modelo-conceitual.md)
 
 ## Stack

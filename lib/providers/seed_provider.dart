@@ -4,10 +4,11 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth_provider.dart';
+import 'firestore_provider.dart';
 
 final seedDatabaseProvider = Provider<Future<void> Function()>((ref) {
   return () async {
-    final firestore = FirebaseFirestore.instance;
+    final firestore = ref.read(firebaseFirestoreProvider);
     final exerciciosCollection = firestore.collection('Exercicios');
 
     debugPrint('🌱 [Seed] Iniciando povoamento de exercícios e usuários padrão...');
