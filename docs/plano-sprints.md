@@ -16,6 +16,8 @@
 | M2 | S2 | sex 04/09 → sex 18/09/2026 | Detalhe do exercício & execução marcada |
 | M3 | S3 | sex 18/09 → sex 02/10/2026 | Tempo previsto, alertas acessíveis e registro de conclusão |
 | M4 | S4 | sex 02/10 → sex 16/10/2026 | Consistência de perfil & QA de regressão |
+| M5 | S5 | sáb 31/10 → dom 15/11/2026 | Refinamento Alfa, Acessibilidade & Gestão de Treino |
+| M6 | S6 | seg 16/11 → seg 30/11/2026 | Treinos ao Ar Livre (Rua), Histórico de Evolução & Release Beta |
 
 ```mermaid
 gantt
@@ -141,6 +143,45 @@ gantt
 ### T4.3 — Configuração de CI e SonarQube Quality Gate *(Issue #36)*
 - **Tipo:** Infraestrutura / CI-CD · **Responsável:** Taciano Silva · **Status:** 🟡 Em andamento (Branch `feature/configurar-sonarqube-ci`)
 - **Escopo:** Criação do `sonar-project.properties` com exclusões e relatório de cobertura LCOV; pipeline no GitHub Actions (`.github/workflows/ci.yml`) com scan unificado (Community Edition) e bloqueio por Quality Gate (`sonar.qualitygate.wait=true`); documentação em `docs/ci-sonarqube.md`.
+
+---
+
+## Sprint 5 — Refinamento Alfa, Acessibilidade & Gestão de Treino (31/10 → 15/11)
+
+**Objetivo:** Integrar os ajustes prioritários do teste alfa de usabilidade com idosos, simplificar a autenticação e disponibilizar a gestão de exercícios para personal trainers.
+
+### T5.1 — Rolagem contínua e controles do cronômetro na WorkoutScreen *(Issue #73 / PR #74)*
+- **US:** US11 e US08 · **Prioridade:** Alta · **Revisor:** @Tome-arcanjo
+- **Escopo:** Rolagem de tela cheia unificada (`SingleChildScrollView`), remoção de play vago em `00:00`, exibição do nome do exercício no relógio com link de retorno, legenda concisa nos cards e descrição completa no topo da tela de detalhes.
+
+### T5.2 — Chip de intensidade na tela de detalhes *(Issue #53 / PR #68)*
+- **US:** US08 e US21 · **Prioridade:** Alta · **Revisor:** @Icaro-Nonato
+- **Escopo:** Exibir chip informativo de intensidade (Leve / Moderado / Intenso) em `ExerciseDetailScreen` com cores semânticas e narração acessível via TTS.
+
+### T5.3 — Autenticação simplificada (Google Sign-In e E-mail) *(Issues #21, #67 / PRs #71, #72)*
+- **US:** US01 e US02 · **Prioridade:** Alta · **Revisores:** @Tome-arcanjo, @Isaac-Ribeiro
+- **Escopo:** Padronização do campo de login exclusivamente para E-mail e adição do botão de login em 1 clique com Conta Google para facilitar acesso por idosos.
+
+### T5.4 — Cadastro e edição de exercícios por Personal Trainer *(Issues #65, #66 / PR #70)*
+- **US:** Backlog Personal · **Prioridade:** Alta · **Revisor:** @LuizFelixDev
+- **Escopo:** Telas de formulário e edição de novos exercícios no catálogo do Firestore com permissão RBAC restrita a personal/admin.
+
+---
+
+## Sprint 6 — Treinos ao Ar Livre, Histórico & Release Beta (16/11 → 30/11)
+
+**Objetivo:** Expandir as modalidades de treino ao ar livre, implementar o acompanhamento da evolução do idoso e consolidar a release Beta do aplicativo.
+
+### T6.1 — Treinos na Rua (Ao Ar Livre) *(Issue #57 / PR #69)*
+- **US:** US16 · **Prioridade:** Média · **Revisor:** @LuizFelixDev
+- **Escopo:** Rota dedicada e catálogo de exercícios orientados para praças e caminhada ao ar livre com geolocalização/recomendações.
+
+### T6.2 — Tela de Progresso e Evolução do Idoso *(Issue #56)*
+- **US:** US18 · **Prioridade:** Alta
+- **Escopo:** Exibição do histórico de treinos concluídos consumindo `RegistroAtivDia` com métricas visuais acessíveis (dias ativos, tempo total acumulado e gráficos simplificados).
+
+### T6.3 — Homologação da Release Beta e Auditoria Final de Acessibilidade
+- **Escopo:** Verificação completa com leitores de tela (TalkBack / leitor web), bateria de testes de regressão em dispositivos reais e publicação da release tag `v0.2.0-beta`.
 
 ---
 
