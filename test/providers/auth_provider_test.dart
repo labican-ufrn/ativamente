@@ -39,14 +39,7 @@ class FakeFirebaseAuth extends Fake implements FirebaseAuth {
 
   @override
   Stream<User?> authStateChanges() {
-    late StreamController<User?> controller;
-    controller = StreamController<User?>(
-      sync: true,
-      onListen: () {
-        controller.add(currentUserMock);
-      },
-    );
-    return controller.stream;
+    return Stream<User?>.value(currentUserMock);
   }
 
   @override
