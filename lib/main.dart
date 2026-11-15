@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -58,10 +59,12 @@ class _AppAcademiaState extends ConsumerState<AppAcademia> {
     // Executa seed automático e idempotente assim que a árvore de widgets estiver montada e o rootBundle de assets pronto
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(authControllerProvider).initializeSession();
-      try {
-        await ref.read(seedDatabaseProvider)();
-      } catch (e) {
-        debugPrint('Erro no seed automático de inicialização: $e');
+      if (kDebugMode && AppEnvironment.useEmulators) {
+        try {
+          await ref.read(seedDatabaseProvider)();
+        } catch (e) {
+          debugPrint('Erro no seed automático de inicialização: $e');
+        }
       }
     });
   }
