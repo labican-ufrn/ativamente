@@ -241,15 +241,15 @@ void main() {
       'userDataProvider emite null quando authStateProvider for null',
       () async {
         final fakeFirestore = FakeFirebaseFirestore();
-        final fakeAuth = FakeFirebaseAuth()..currentUserMock = null;
         final container = ProviderContainer(
           overrides: [
             firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-            firebaseAuthProvider.overrideWithValue(fakeAuth),
+            authStateProvider.overrideWith((ref) => Stream.value(null)),
           ],
         );
         addTearDown(container.dispose);
 
+        await container.read(authStateProvider.future);
         final result = await container.read(userDataProvider.future);
         expect(result, isNull);
       },
@@ -259,11 +259,7 @@ void main() {
       'userDataProvider realiza leitura pura e mapeia Pessoa quando documento existe no Firestore',
       () async {
         final fakeFirestore = FakeFirebaseFirestore();
-        final fakeAuth = FakeFirebaseAuth()
-          ..currentUserMock = FakeUser(
-            uid: 'user-123',
-            email: 'florinda@test.com',
-          );
+        final fakeUser = FakeUser(uid: 'user-123', email: 'florinda@test.com');
         final col =
             fakeFirestore.collection('Pessoas') as FakeCollectionReference;
         final docRef = col.doc('user-123') as FakeDocumentReference;
@@ -277,11 +273,12 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-            firebaseAuthProvider.overrideWithValue(fakeAuth),
+            authStateProvider.overrideWith((ref) => Stream.value(fakeUser)),
           ],
         );
         addTearDown(container.dispose);
 
+        await container.read(authStateProvider.future);
         final pessoa = await container.read(userDataProvider.future);
         expect(pessoa, isNotNull);
         expect(pessoa!.id, equals('user-123'));
@@ -296,11 +293,10 @@ void main() {
       'userDataProvider realiza leitura pura sem efeitos colaterais de escrita quando documento nao existe',
       () async {
         final fakeFirestore = FakeFirebaseFirestore();
-        final fakeAuth = FakeFirebaseAuth()
-          ..currentUserMock = FakeUser(
-            uid: 'user-inexistente',
-            email: 'inexistente@test.com',
-          );
+        final fakeUser = FakeUser(
+          uid: 'user-inexistente',
+          email: 'inexistente@test.com',
+        );
         final col =
             fakeFirestore.collection('Pessoas') as FakeCollectionReference;
         final docRef = col.doc('user-inexistente') as FakeDocumentReference;
@@ -309,11 +305,12 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             firebaseFirestoreProvider.overrideWithValue(fakeFirestore),
-            firebaseAuthProvider.overrideWithValue(fakeAuth),
+            authStateProvider.overrideWith((ref) => Stream.value(fakeUser)),
           ],
         );
         addTearDown(container.dispose);
 
+        await container.read(authStateProvider.future);
         final pessoa = await container.read(userDataProvider.future);
         expect(pessoa, isNull);
         // Confirma que não houve chamada de escrita on-demand dentro da stream

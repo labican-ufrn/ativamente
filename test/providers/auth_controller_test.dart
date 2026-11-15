@@ -154,6 +154,7 @@ void main() {
       final sub = container.listen(userDataProvider, (_, _) {});
       addTearDown(sub.close);
 
+      await container.read(authStateProvider.future);
       expect(await container.read(userDataProvider.future), isNull);
     });
 
@@ -176,7 +177,9 @@ void main() {
       expect(container.read(userDisplayNameProvider), 'João');
     });
 
-    test('emite null sem criar Pessoas quando o documento não existe', () async {
+    test(
+      'emite null sem criar Pessoas quando o documento não existe',
+      () async {
         final container = criarContainer(
           usuarioLogado: FakeUser(uid: 'uid-2', email: 'ana.souza@b.com'),
         );
@@ -186,6 +189,7 @@ void main() {
         expect(pessoa, isNull);
         final doc = await firestore.collection('Pessoas').doc('uid-2').get();
         expect(doc.exists, isFalse);
-      });
+      },
+    );
   });
 }

@@ -45,23 +45,29 @@ final userDisplayNameProvider = Provider<String>((ref) {
   return getEffectiveDisplayName(pessoa, user);
 });
 
-final userDataProvider = StreamProvider<Pessoa?>((ref) async* {
-  final user = await ref.watch(authStateProvider.future);
-  if (user == null) {
-    yield null;
-    return;
-  }
-  yield* ref
-      .watch(firebaseFirestoreProvider)
-      .collection('Pessoas')
-      .doc(user.uid)
-      .snapshots()
-      .map((snapshot) {
-    if (snapshot.exists && snapshot.data() != null) {
-      return Pessoa.fromJson(snapshot.data()!, snapshot.id);
-    }
-    return null;
-  });
+final userDataProvider = StreamProvider<Pessoa?>((ref) {
+  return ref
+      .watch(authStateProvider)
+      .when(
+        data: (user) {
+          if (user == null) {
+            return Stream.value(null);
+          }
+          return ref
+              .watch(firebaseFirestoreProvider)
+              .collection('Pessoas')
+              .doc(user.uid)
+              .snapshots()
+              .map((snapshot) {
+                if (snapshot.exists && snapshot.data() != null) {
+                  return Pessoa.fromJson(snapshot.data()!, snapshot.id);
+                }
+                return null;
+              });
+        },
+        loading: () => const Stream<Pessoa?>.empty(),
+        error: (error, stackTrace) => Stream<Pessoa?>.error(error, stackTrace),
+      );
 });
 
 final authControllerProvider = Provider<AuthController>((ref) {
@@ -151,7 +157,7 @@ class AuthController {
   }
 
   Future<void> initializeSession() async {
-    final user = await ref.read(authStateProvider.future);
+    final user = ref.read(firebaseAuthProvider).currentUser;
     if (user != null) {
       await ensureUserProfile(user);
     }
