@@ -36,6 +36,18 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
 - **Sintoma:** O cronômetro podia apresentar descompasso/drift com o tempo real decorrido em execuções prolongadas ou segundo plano devido à acumulação de atrasos de agendamento do `Timer.periodic`.
 - **Solução Aplicada:** Cálculo do tempo decorrido utilizando timestamps de `DateTime` no provider de treino (`elapsed = DateTime.now().difference(inicio)`).
 
+### Bug Teste Alfa — Rolagem e Controles da Tela de Treino (US11, US07)
+- **Sintomas (Feedback Profa. Karliane em 04/11/2026):**
+  1. **Rolagem travada no celular:** O cronômetro e as categorias ocupam espaço fixo exagerado no topo da tela, reduzindo a área de visualização e rolagem da lista de exercícios a menos da metade da tela em smartphones. Idosos encontram dificuldade para navegar e visualizar os exercícios disponíveis.
+  2. **Botão de Play abaixo do relógio incoerente:** O botão de Play abaixo do cronômetro quando nenhum exercício foi iniciado (`00:00`) induz o usuário a acreditar que o treino inicia ali, mas o toque não tem efeito, já que o disparo da execução ocorre no card do exercício.
+- **Evidência:** [`docs/testes/teste-alfa-tela-treino-rolagem-e-cronometro.jpeg`](testes/teste-alfa-tela-treino-rolagem-e-cronometro.jpeg) e registro em [`docs/testes/registro-testes-alfa.md`](testes/registro-testes-alfa.md).
+- **Causas Raízes Diagnosticadas:**
+  1. Uso de `Column` com cabeçalho estático e `Expanded(child: ListView.builder(...))` em `WorkoutScreen`, limitando o viewport de rolagem.
+  2. Presença de alternância para `Icons.play_arrow` no bloco do relógio em vez de restringir os controles aos botões de sessão (`Icons.pause` e `Icons.stop`).
+- **Solução Proposta:**
+  1. Tornar a tela de treino inteiramente rolável (`SingleChildScrollView` ou `CustomScrollView`).
+  2. Substituir o botão de play abaixo do relógio por controles dedicados de sessão: Pausar e Parar, deixando o início/play exclusivamente nos cards de exercícios.
+
 ---
 
 ## 2. Matriz de Casos de Teste (QA)
@@ -54,6 +66,9 @@ Documento de rastreabilidade de testes e matriz de garantia de qualidade do apli
 | **CT-US10-01** | US10 | Voltar da tela de treino | Tela de treino `/workout` aberta | 1. Tocar no botão voltar na AppBar. | Retorna à Home via `context.go('/home')` preservando estado de autenticação. | ✅ Aprovado |
 | **CT-US11-01** | US11 | Marcação de exercício ativo | Tela de treino ou detalhe aberta | 1. Clicar no botão de iniciar exercício. | Exercício fica visualmente marcado como ativo e o cronômetro inicia automaticamente. | ✅ Aprovado |
 | **CT-US11-02** | US11 | Troca e interrupção de exercício | Exercício A em andamento | 1. Iniciar exercício B. | Exercício A é desmarcado, exercício B torna-se o ativo e cronômetro é reiniciado. | ✅ Aprovado |
+| **CT-US11-03** | US11 | Rolagem completa da tela de treino no celular | Tela de treino `/workout` aberta em smartphone | 1. Tocar em qualquer ponto da tela (inclusive cronômetro ou categorias) e deslizar para cima.<br>2. Observar a visualização da lista de exercícios. | A tela rola completamente de forma unificada; os exercícios ocupam a tela inteira com excelente legibilidade e sem cortes de layout. | ✅ Aprovado |
+| **CT-US11-04** | US11 | Controles abaixo do cronômetro sem botão de play vago | Tela de treino aberta sem exercício ativo | 1. Observar botões abaixo do tempo `00:00`.<br>2. Iniciar exercício no card.<br>3. Observar botões do cronômetro. | Inicialmente exibe botões Pause e Stop desabilitados (sem botão Play vago). Durante a execução, o botão Pause permite pausar e Stop encerra a sessão. | ✅ Aprovado |
+| **CT-US11-05** | US11 | Nome do exercício, link, pausa e retomada no relógio | Exercício em execução na tela de treino | 1. Observar o nome do exercício no relógio e tocar nele.<br>2. Clicar em pausar no relógio.<br>3. Observar indicativo visual e alternância do botão para Play.<br>4. Clicar em Play para retomar. | Nome do exercício ativo abre a tela de detalhes; ao pausar, exibe badge "PAUSADO" e o botão vira Play, retomando a execução ao clicar. | ✅ Aprovado |
 | **CT-US15-01** | US15 | Separação visual de Cards | Modo Alto Contraste ativado | 1. Ativar Modo Alto Contraste no Perfil.<br>2. Navegar por Home e listas de treinos. | Cards exibem fundo escuro destacado (`0xFF1C1C1C`) e borda contrastante (`0xFFFFE600`, 2px). | ✅ Aprovado |
 | **CT-US15-02** | US15 | Formulários em Alto Contraste | Modo Alto Contraste ativado | 1. Abrir telas de Login, Registro, Editar Perfil e Adicionar Usuário. | Textos, rótulos e bordas com taxa de contraste WCAG AA >= 4.5:1, sem textos ilegíveis. | ✅ Aprovado |
 | **CT-US09-01** | US09 | Povoamento oficial do catálogo (Manual do Idoso) | Acesso administrativo no projeto `ativamente-labican-ufrn` | 1. Executar seed idempotente do catálogo inicial.<br>2. Consultar coleção `Exercicios` no Cloud Firestore. | 12 exercícios oficiais do Manual semeados com intensidade e idempotência garantida (`docs/catalogo-exercicios-manual.md`). | ✅ Aprovado |

@@ -108,16 +108,17 @@
   - [x] Lista vazia mostra mensagem amigável.
 - **Observações:** usa `Categoria`/`Tipo` simplificadas do design original (nome+ícone), não as tabelas N:N do backend.
 
-### US08 — Ver detalhe do exercício *(nova)*
+### US08 — Ver detalhe do exercício *(atualizada pelo teste alfa)*
 **Como** usuário, **quero** tocar em um exercício da lista e ver sua descrição detalhada, **para** saber como executá-lo corretamente.
 
-- **Status:** ✅ Implementada (PR #30 e PR #60)
+- **Status:** 🐞 Implementada com ajuste de conteúdo/UX reportado em teste alfa (04/11/2026)
 - **Prioridade:** Alta
-- **Origem:** feedback 21/08/2026 (*"ao listar os exercícios... não encaminha para nenhum local — deveria ir para a descrição detalhada, que no futuro terá vídeo/gif animado"*)
+- **Origem:** feedback 21/08/2026 (*"ao listar os exercícios... não encaminha para nenhum local — deveria ir para a descrição detalhada, que no futuro terá vídeo/gif animado"*) e teste alfa 04/11/2026 ([`docs/testes/registro-testes-alfa.md`](testes/registro-testes-alfa.md))
 - **Critérios de aceite:**
-  - [x] Tap no card abre tela de detalhe (rota dedicada `/exercise/:id`) com nome, descrição, categoria, tipo e intensidade.
+  - [x] Tap no card abre tela de detalhe (rota dedicada `/exercise/:id`) com nome, descrição, categoria, tipo e controles de execução.
   - [x] Espaço reservado (widget) para mídia futura (vídeo/GIF), sem quebrar layout hoje.
   - [x] Botão voltar da tela de detalhe funciona (retorna à lista mantendo categoria selecionada).
+  - [ ] **Clareza semântica nos chips de metadados:** Evitar chips redundantes lado a lado (ex.: "Coracao" e "Cardio" sem contexto). Garantir acentuação correta e exibir o chip de **Intensidade** (Leve / Moderado / Intenso) com cores e rótulo claro (Refs: #53).
 
 ### US09 — Seed oficial do catálogo *(atualizada)*
 **Como** administrador, **quero** popular o Firestore com os exercícios oficiais (Manual do Idoso) e as contas de teste (admin/trainer), **para** validar o app com dados reais.
@@ -143,17 +144,20 @@
   - [x] Voltar (seta do AppBar) retorna à Home via `context.go('/home')` preservando estado de autenticação.
   - [x] Padrão adotado documentado: `go` para troca de seção, `push` para empilhar detalhes.
 
-### US11 — Marcar exercício em execução *(nova)*
+### US11 — Marcar exercício em execução *(atualizada pelo teste alfa)*
 **Como** usuário, **quero** indicar qual exercício estou realizando agora, **para** o app controlar o tempo daquele exercício específico.
 
-- **Status:** ✅ Implementada (PR #60)
+- **Status:** 🐞 Implementada com bug/ajuste de UX reportado em teste alfa (04/11/2026)
 - **Prioridade:** Alta
-- **Origem:** feedback 21/08/2026 (*"tem que ter uma forma para marcar qual exercício está sendo realizado naquele momento"*)
+- **Origem:** feedback 21/08/2026 (*"tem que ter uma forma para marcar qual exercício está sendo realizado naquele momento"*) e feedback de testes alfa em 04/11/2026 ([`docs/testes/registro-testes-alfa.md`](testes/registro-testes-alfa.md))
 - **Critérios de aceite:**
   - [x] Ao selecionar um exercício (detalhe ou lista), ele fica marcado visualmente como "Em execução".
   - [x] O cronômetro inicia automaticamente ao marcar o exercício.
   - [x] Somente um exercício em execução por vez; iniciar outro finaliza/marca o anterior.
   - [x] Usuário consegue interromper/cancelar a execução.
+  - [ ] **Rolagem unificada na tela de treino:** A tela inteira (`WorkoutScreen`) deve rolar de forma contínua no celular, sem manter cronômetro e categorias travados como cabeçalho fixo, dando visibilidade e área de rolagem confortável aos exercícios para o idoso.
+  - [ ] **Controles de sessão sem botão de play abaixo do relógio:** O acionamento de "Play" pertence exclusivamente ao exercício (card ou detalhe). Abaixo do relógio devem existir apenas os botões de controle de sessão (**Pausar** e **Parar**), desabilitados quando nenhum exercício estiver ativo, evitando falsas expectativas e toques ineficazes.
+- **Evidências e QA:** [`docs/testes/teste-alfa-tela-treino-rolagem-e-cronometro.jpeg`](testes/teste-alfa-tela-treino-rolagem-e-cronometro.jpeg) e [`docs/testes/registro-testes-alfa.md`](testes/registro-testes-alfa.md).
 
 ### US12 — Tempo previsto com alertas *(nova)*
 **Como** usuário idoso, **quero** ser avisado quando o tempo previsto do exercício terminar e lembrado (com som e aviso visual) caso continue além do previsto, **para** não exceder a duração segura recomendada.
@@ -183,22 +187,27 @@
 
 ## Épico 5 — Acessibilidade
 
-### US14 — Ler tela em voz alta
-**Como** usuário com baixa visão, **quero** ouvir o conteúdo da tela, **para** usar o app com autonomia.
+### US14 — Ler tela em voz alta *(atualizada pelo teste alfa)*
+**Como** usuário com baixa visão ou idoso, **quero** ouvir o conteúdo da tela com voz clara e ritmo natural, **para** usar o app com autonomia sem dificuldades de compreensão.
 
-- **Status:** ✅ Implementada (`flutter_tts` pt-BR, botão de volume em todas as telas)
+- **Status:** 🐞 Implementada com ajuste de calibração fonética (teste alfa 04/11/2026)
+- **Origem:** feedback de acessibilidade e teste alfa 04/11/2026 (*"a voz será difícil p um idoso entender, apesar de falar muuuito devagar, a fala é enrolada"*)
+- **Critérios de aceite:**
+  - [x] Botão de volume (TTS) disponível em todas as telas com suporte a pt-BR.
+  - [ ] **Cadência e inteligibilidade fonética:** Calibrar a velocidade de reprodução (`speechRate`) para evitar distorção fonética (fala arrastada/enrolada) provocada por valores excessivamente lentos no sintetizador Web/Android.
 
 ### US15 — Preferências de acessibilidade funcionais
 **Como** usuário, **quero** configurar alto contraste, tamanho de fonte e velocidade da voz, **para** adaptar o app às minhas necessidades.
 
-- **Status:** ✅ Modo Alto Contraste implementado (Issue #37) / 💤 Outras opções em backlog
+- **Status:** ✅ Modo Alto Contraste implementado (Issue #37) / 🔜 Velocidade da voz priorizada para ajuste de fala
 - **Critérios de aceite:**
   - [x] Switch "Modo Alto Contraste" ativa tema de alto contraste em toda a aplicação instantaneamente.
   - [x] Desativar o switch retorna ao tema padrão.
   - [x] Preferência de alto contraste persistida em `shared_preferences` entre sessões.
   - [x] Cores do próprio tema atendem WCAG AAA (fundo preto + destaque amarelo: 16,6:1 e 21:1).
   - [x] Contraste AA com o modo ligado em **todas** as telas — separação visual de Cards e substituição de cores fixas por tokens do tema concluídas (Issue #37).
-  - [ ] Ajuste de tamanho de fonte e velocidade da voz (backlog).
+  - [ ] Ajuste funcional de velocidade da voz (Normal, Lenta, Rápida) integrado ao `profile_screen.dart` e persistido nas preferências.
+  - [ ] Ajuste de tamanho de fonte (backlog).
 
 ---
 
@@ -226,13 +235,13 @@
 | US05 | Ver meus dados em todas as telas | ✅ | S1 |
 | US06 | Editar dados biométricos | ✅ | S4 |
 | US07 | Listar exercícios por categoria | ✅ | — |
-| US08 | Detalhe do exercício | ✅ | S2 |
+| US08 | Detalhe do exercício | 🐞 | S2 |
 | US09 | Seed oficial do catálogo | ✅ | S1 |
 | US10 | Navegação correta na tela de treino | ✅ | S1 |
-| US11 | Marcar exercício em execução | ✅ | S2 |
+| US11 | Marcar exercício em execução | 🐞 | S2 |
 | US12 | Tempo previsto com alertas | 🔜 | S3 |
 | US13 | Registrar conclusão do exercício | 🔜 | S3 |
-| US14 | Ler tela em voz alta | ✅ | — |
+| US14 | Ler tela em voz alta | 🐞 | — |
 | US15 | Preferências de acessibilidade (Alto Contraste) | ✅ | S4 |
 | US16–US20 | Backlog futuro | 💤 | — |
 | US21 | Intensidade do exercício (1-10) | ✅ | S2 |
