@@ -249,6 +249,8 @@ void main() {
         );
         addTearDown(container.dispose);
 
+        final subscription = container.listen(userDataProvider, (_, _) {});
+        addTearDown(subscription.close);
         await container.read(authStateProvider.future);
         final result = await container.read(userDataProvider.future);
         expect(result, isNull);
@@ -278,6 +280,8 @@ void main() {
         );
         addTearDown(container.dispose);
 
+        final subscription = container.listen(userDataProvider, (_, _) {});
+        addTearDown(subscription.close);
         await container.read(authStateProvider.future);
         final pessoa = await container.read(userDataProvider.future);
         expect(pessoa, isNotNull);
@@ -310,6 +314,8 @@ void main() {
         );
         addTearDown(container.dispose);
 
+        final subscription = container.listen(userDataProvider, (_, _) {});
+        addTearDown(subscription.close);
         await container.read(authStateProvider.future);
         final pessoa = await container.read(userDataProvider.future);
         expect(pessoa, isNull);
