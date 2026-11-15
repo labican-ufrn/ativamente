@@ -1,6 +1,18 @@
 # Changelog
 
-Todas as mudanças relevantes do AtivaMente são registradas neste arquivo, seguindo o padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
+e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+
+---
+
+## [Unreleased]
+
+### Adicionado
+- Preparação inicial para novas funcionalidades da Sprint atual.
+
+---
 
 ## [0.1.0] - 2026-11-04
 
