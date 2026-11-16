@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/utils/intensity.dart';
+import '../../core/utils/time_formatters.dart';
 import '../../models/exercicio.dart';
 import '../../providers/active_exercise_provider.dart';
 import '../../providers/tts_provider.dart';
@@ -35,7 +36,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
       ),
       error: (err, stack) {
         debugPrint('Erro ao buscar exercício $exerciseId: $err');
-        return _StateScreen(
+        return const _StateScreen(
           title: 'Exercício',
           message: 'Não foi possível carregar o exercício. Tente novamente.',
           screenText: 'Detalhe do exercício. Erro ao carregar. Tente novamente.',
@@ -102,12 +103,6 @@ class _StateScreen extends ConsumerWidget {
   }
 }
 
-String _formatTime(int seconds) {
-  final minutes = seconds ~/ 60;
-  final remainingSeconds = seconds % 60;
-  return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
-}
-
 class _ExerciseDetailBody extends ConsumerWidget {
   const _ExerciseDetailBody({required this.exercicio});
 
@@ -125,7 +120,7 @@ class _ExerciseDetailBody extends ConsumerWidget {
         : isPaused
         ? 'Pausado'
         : 'Parado';
-    final formattedTime = _formatTime(elapsedSeconds);
+    final formattedTime = formatarSegundos(elapsedSeconds);
 
     final screenText =
         'Detalhe do exercício. ${exercicio.nome}. Status: $statusLabel. '
@@ -258,7 +253,7 @@ class _ExecutionControlCard extends ConsumerWidget {
         : 'Parado';
     final startLabel = isPaused ? 'Retomar' : 'Iniciar';
     final startTooltip = isPaused ? 'Retomar exercício' : 'Iniciar exercício';
-    final formattedTime = _formatTime(elapsedSeconds);
+    final formattedTime = formatarSegundos(elapsedSeconds);
     final colorScheme = Theme.of(context).colorScheme;
     final notifier = ref.read(activeExerciseProvider.notifier);
 
