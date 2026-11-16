@@ -1,27 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/constants/exercise_constants.dart';
 import '../../core/utils/intensity.dart';
 import '../../models/exercicio.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/firestore_provider.dart';
 import '../../providers/tts_provider.dart';
 
-// Valores usados pelo app (mesmos do seed `assets/data/exercises.json`).
-const _categorias = <(String, String)>[
-  ('Coracao', 'favorite'),
-  ('Equilibrio', 'balance'),
-  ('Flexibilidade', 'accessibility_new'),
-  ('Musculo', 'fitness_center'),
-  ('NaRua', 'park'),
-];
-
-const _tipos = <(String, String)>[
-  ('Cardio', 'directions_run'),
-  ('Estabilidade', 'accessibility'),
-  ('Alongamento', 'self_improvement'),
-  ('Forca', 'fitness_center'),
-];
+const _categorias = defaultExerciseCategories;
+const _tipos = defaultExerciseTypes;
 
 /// Opções do seletor; preserva o valor atual caso não esteja na lista padrão.
 List<String> _opcoes(List<(String, String)> padrao, String atual) => [

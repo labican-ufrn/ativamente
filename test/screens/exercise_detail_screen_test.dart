@@ -362,6 +362,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           nowProvider.overrideWithValue(relogio),
+          userDataProvider.overrideWith((ref) => Stream.value(null)),
           exerciciosProvider.overrideWith(
             (ref) => Stream.value([comIntensidade(intensidade)]),
           ),

@@ -38,6 +38,7 @@ final exerciciosFiltradosProvider = Provider.family<AsyncValue<List<Exercicio>>,
 /// Atualiza campos de um exercício existente (`update()`, nunca `set`).
 final atualizarExercicioProvider =
     Provider<Future<void> Function(String id, Map<String, dynamic> dados)>((ref) {
+  final firestore = ref.watch(firebaseFirestoreProvider);
   return (id, dados) =>
-      FirebaseFirestore.instance.collection('Exercicios').doc(id).update(dados);
+      firestore.collection('Exercicios').doc(id).update(dados);
 });
