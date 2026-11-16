@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/utils/intensity.dart';
+import '../../core/utils/time_formatters.dart';
 import '../../models/exercicio.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
@@ -166,47 +167,69 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        final activeId = execucao.exerciseId;
-                        if (activeId != null) {
-                          ref
-                              .read(activeExerciseProvider.notifier)
-                              .toggleExercise(activeId);
-                        }
-                      },
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: execucao.exerciseId != null
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onPrimary.withValues(alpha: 0.4),
-                        child: Icon(
-                          execucao.isRunning ? Icons.pause : Icons.play_arrow,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.primary,
+                    Tooltip(
+                      message: execucao.isRunning
+                          ? 'Pausar cronômetro'
+                          : 'Iniciar cronômetro',
+                      child: Semantics(
+                        button: true,
+                        label: execucao.isRunning
+                            ? 'Pausar cronômetro'
+                            : 'Iniciar cronômetro',
+                        enabled: execucao.exerciseId != null,
+                        child: InkWell(
+                          onTap: () {
+                            final activeId = execucao.exerciseId;
+                            if (activeId != null) {
+                              ref
+                                  .read(activeExerciseProvider.notifier)
+                                  .toggleExercise(activeId);
+                            }
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: execucao.exerciseId != null
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withValues(alpha: 0.4),
+                            child: Icon(
+                              execucao.isRunning ? Icons.pause : Icons.play_arrow,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 24),
-                    InkWell(
-                      onTap: () {
-                        ref
-                            .read(activeExerciseProvider.notifier)
-                            .stopExercise();
-                      },
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: execucao.exerciseId != null
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onPrimary.withValues(alpha: 0.4),
-                        child: Icon(
-                          Icons.stop,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.primary,
+                    Tooltip(
+                      message: 'Parar cronômetro',
+                      child: Semantics(
+                        button: true,
+                        label: 'Parar cronômetro',
+                        enabled: execucao.exerciseId != null,
+                        child: InkWell(
+                          onTap: () {
+                            if (execucao.exerciseId != null) {
+                              ref
+                                  .read(activeExerciseProvider.notifier)
+                                  .stopExercise();
+                            }
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: execucao.exerciseId != null
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withValues(alpha: 0.4),
+                            child: Icon(
+                              Icons.stop,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -371,11 +394,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
 class _CronometroTexto extends ConsumerWidget {
   const _CronometroTexto();
 
-  static String formatarTempo(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
-  }
+  static String formatarTempo(int seconds) => formatarSegundos(seconds);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
