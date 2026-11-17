@@ -27,6 +27,8 @@ rules_version = '2';
 //   - role: string (opcional, 'idoso' | 'user' | 'trainer' | 'admin', padrão 'user')
 //   - tipoUsuario: string (opcional, 'idoso' | 'user' | 'trainer' | 'admin', alias de role)
 //   - nome: string (obrigatório, 1 a 150 caracteres) - Nome completo do usuário
+//   - foto: string (opcional, máx 500 caracteres) - URL da foto de perfil
+//   - fotoUrl: string (opcional, máx 500 caracteres) - Alias de URL da foto de perfil
 //   - cpf: string (opcional, máx 20 caracteres)
 //   - nomeLogin: string (opcional, máx 150 caracteres) - Login ou e-mail de acesso
 //   - email: string (opcional, máx 150 caracteres) - E-mail de contato
@@ -173,7 +175,7 @@ service cloud.firestore {
     /// Validação estrita de esquema para a entidade Pessoa
     function isValidPessoa(data) {
       return data.keys().hasOnly([
-        'role', 'tipoUsuario', 'nome', 'cpf', 'nomeLogin', 'email',
+        'role', 'tipoUsuario', 'nome', 'foto', 'fotoUrl', 'cpf', 'nomeLogin', 'email',
         'numTelefone', 'telefone', 'dataNascimento', 'altura', 'peso',
         'genero', 'cidade', 'comorbidade', 'freqAtivFisica', 'histEsportivo',
         'notificacoes', 'criadoEm', 'createdAt', 'atualizadoEm', 'updatedAt'
@@ -181,6 +183,8 @@ service cloud.firestore {
       ('nome' in data) && data.nome is string && data.nome.size() >= 1 && data.nome.size() <= 150 &&
       (!('role' in data) || data.role in ['user', 'idoso', 'trainer', 'admin']) &&
       (!('tipoUsuario' in data) || data.tipoUsuario in ['user', 'idoso', 'trainer', 'admin']) &&
+      isValidOptionalString(data, 'foto', 500) &&
+      isValidOptionalString(data, 'fotoUrl', 500) &&
       isValidOptionalString(data, 'cpf', 20) &&
       isValidOptionalString(data, 'nomeLogin', 150) &&
       isValidOptionalString(data, 'email', 150) &&
