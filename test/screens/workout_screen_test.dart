@@ -1,12 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:app_academia/models/exercicio.dart';
 import 'package:app_academia/providers/firestore_provider.dart';
+import 'package:app_academia/providers/tts_provider.dart';
 import 'package:app_academia/screens/workout/workout_screen.dart';
 import 'package:app_academia/theme.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets(
+    'Exibe somente exercícios ao ar livre na rota de treinos na rua e sincroniza categoria',
+    (WidgetTester tester) async {
+      final lidos = <String>[];
+      final exercicioAoArLivre = Exercicio(
+        id: 'ao-ar-livre',
+        nome: 'Caminhada na Praça',
+        descricao: 'Caminhada em terreno plano.',
+        midia: '',
+        categoria: Categoria(nome: 'NaRua', icone: 'park'),
+        tipo: Tipo(nome: 'Cardio', icone: 'directions_run'),
+        intensidade: 3,
+      );
+      final exercicioEmCasa = Exercicio(
+        id: 'em-casa',
+        nome: 'Caminhada em Esteira',
+        descricao: 'Caminhada em ambiente interno.',
+        midia: '',
+        categoria: Categoria(nome: 'Coracao', icone: 'favorite'),
+        tipo: Tipo(nome: 'Cardio', icone: 'directions_run'),
+        intensidade: 3,
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            exerciciosProvider.overrideWith(
+              (ref) => Stream.value([exercicioAoArLivre, exercicioEmCasa]),
+            ),
+            readScreenProvider.overrideWith(
+              (ref, text) =>
+                  () => lidos.add(text),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.theme,
+            home: const WorkoutScreen(category: 'NaRua'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ao Ar Livre'), findsOneWidget);
+      expect(find.text('Caminhada na Praça'), findsOneWidget);
+      expect(find.text('Caminhada em Esteira'), findsNothing);
+      expect(find.byIcon(Icons.favorite), findsNothing);
+      expect(find.byIcon(Icons.fitness_center), findsNothing);
+
+      await tester.tap(find.byTooltip('Ler tela'));
+      await tester.pump();
+      expect(lidos.single, contains('Exercícios ao ar livre.'));
+
+      // Verifica didUpdateWidget ao alternar category para null (Treinos em Casa)
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            exerciciosProvider.overrideWith(
+              (ref) => Stream.value([exercicioAoArLivre, exercicioEmCasa]),
+            ),
+            readScreenProvider.overrideWith(
+              (ref, text) =>
+                  () => lidos.add(text),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.theme,
+            home: const WorkoutScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Coração'), findsOneWidget);
+      expect(find.text('Caminhada em Esteira'), findsOneWidget);
+      expect(find.text('Caminhada na Praça'), findsNothing);
+      expect(find.byIcon(Icons.favorite), findsOneWidget);
+      expect(find.byIcon(Icons.fitness_center), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'Abas de categoria usam tokens semanticos do colorScheme no Modo Alto Contraste',
@@ -142,4 +226,3 @@ void main() {
     },
   );
 }
-

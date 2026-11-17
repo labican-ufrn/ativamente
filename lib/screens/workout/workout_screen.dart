@@ -20,7 +20,9 @@ typedef _ExecucaoAtiva = ({String? exerciseId, bool isRunning});
 /// tempo total decorrido e o exercício continua marcado como "Em execução".
 /// Para encerrar, o usuário usa Pausar ou Parar. Ver `docs/cronometro-exercicio.md`.
 class WorkoutScreen extends ConsumerStatefulWidget {
-  const WorkoutScreen({super.key});
+  final String? category;
+
+  const WorkoutScreen({super.key, this.category});
 
   @override
   ConsumerState<WorkoutScreen> createState() => _WorkoutScreenState();
@@ -29,6 +31,32 @@ class WorkoutScreen extends ConsumerStatefulWidget {
 class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
   String _selectedCategory = 'Coracao'; // Coracao or Musculo
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = widget.category ?? 'Coracao';
+  }
+
+  @override
+  void didUpdateWidget(covariant WorkoutScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.category != widget.category) {
+      _selectedCategory = widget.category ?? 'Coracao';
+    }
+  }
+
+  bool get _hasFixedCategory => widget.category != null;
+
+  String get _categoryLabel {
+    switch (_selectedCategory) {
+      case 'NaRua':
+        return 'Ao Ar Livre';
+      case 'Musculo':
+        return 'Músculo';
+      default:
+        return 'Coração';
+    }
+  }
   void _filterByIntensity(int? intensidade) {
     ref.read(intensidadeFilterProvider.notifier).setIntensidade(intensidade);
   }
@@ -125,9 +153,12 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
     final selectedIntensity = ref.watch(intensidadeFilterProvider);
     final hasIntensityFilter = selectedIntensity != null;
 
+    final categoryText = _hasFixedCategory
+        ? 'Exercícios ao ar livre.'
+        : 'Categorias Coração e Músculo.';
     final screenText = hasIntensityFilter
-        ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
-        : 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
+        ? 'Tela de Treino. Tempo decorrido. $categoryText Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
+        : 'Tela de Treino. Tempo decorrido. $categoryText Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -238,16 +269,17 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildCategoryTab(Icons.favorite, 'Coracao'),
-                _buildCategoryTab(Icons.fitness_center, 'Musculo'),
-              ],
+          if (!_hasFixedCategory)
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCategoryTab(Icons.favorite, 'Coracao'),
+                  _buildCategoryTab(Icons.fitness_center, 'Musculo'),
+                ],
+              ),
             ),
-          ),
           if (hasIntensityFilter)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -280,7 +312,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _selectedCategory == 'Coracao' ? 'Coração' : 'Músculo',
+                    _categoryLabel,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,

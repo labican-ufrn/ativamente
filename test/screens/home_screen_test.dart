@@ -59,11 +59,20 @@ void main() {
     expect(find.text(rotuloRota('/workout')), findsOneWidget);
   });
 
-  testWidgets('cartões ainda não implementados não navegam', (tester) async {
+  testWidgets('cartão Treinos na Rua navega para /workout/outdoor', (
+    tester,
+  ) async {
     await pumpHome(tester);
 
     await tester.tap(find.text('Treinos na\nRua'));
     await tester.pumpAndSettle();
+
+    expect(find.text(rotuloRota('/workout/outdoor')), findsOneWidget);
+  });
+
+  testWidgets('cartões ainda não implementados não navegam', (tester) async {
+    await pumpHome(tester);
+
     await tester.tap(find.text('Treinos\nSugeridos'));
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.notifications));
