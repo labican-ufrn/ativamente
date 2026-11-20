@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_academia/providers/accessibility_provider.dart';
 import 'package:app_academia/providers/auth_provider.dart';
+import 'package:app_academia/screens/profile/edit_profile_screen.dart';
 import 'package:app_academia/screens/profile/profile_screen.dart';
 import 'package:app_academia/theme.dart';
 
@@ -35,6 +36,8 @@ void main() {
 
     await tester.pumpAndSettle();
 
+    expect(find.text('Usuário'), findsOneWidget);
+    expect(find.text('Nascimento: Não informada'), findsOneWidget);
     final switchFinder = find.byType(Switch);
     expect(switchFinder, findsOneWidget);
 
@@ -51,4 +54,29 @@ void main() {
     expect(container.read(highContrastProvider), true);
     expect(prefs.getBool(HighContrastNotifier.keyHighContrast), true);
   });
+
+  testWidgets(
+    'edição exibe estado recuperável enquanto o perfil é nulo',
+    (WidgetTester tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          authStateProvider.overrideWith((ref) => Stream.value(null)),
+          userDataProvider.overrideWith((ref) => Stream.value(null)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(home: const EditProfileScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Seu perfil ainda não está disponível.'), findsOneWidget);
+      expect(find.text('Tentar novamente'), findsOneWidget);
+      expect(find.byType(TextFormField), findsNothing);
+    },
+  );
 }

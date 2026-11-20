@@ -101,9 +101,15 @@ class FakeAuthController extends AuthController {
   }
 
   @override
-  Future<void> login(String email, String password) async {
-    chamadas.add(['login', email, password]);
+  Future<UserCredential> signIn(String email, String password) async {
+    chamadas.add(['signIn', email, password]);
     if (erro != null) throw erro!;
+    return FakeUserCredential(null);
+  }
+
+  @override
+  Future<void> initializeSession() async {
+    chamadas.add(['initializeSession']);
   }
 
   @override

@@ -15,11 +15,29 @@ import 'screens/profile/edit_profile_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
+  final authStateFuture = ref.read(authStateProvider.future);
+  final authController = ref.read(authControllerProvider);
+  String? initializedUserId;
+  Future<void>? sessionInitialization;
 
   return GoRouter(
     initialLocation: '/',
-    redirect: (context, state) {
-      final isAuth = authState.value != null;
+    redirect: (context, state) async {
+      final user = authState.isLoading
+          ? await authStateFuture
+          : authState.value;
+
+      if (user == null) {
+        initializedUserId = null;
+        sessionInitialization = null;
+      } else if (initializedUserId != user.uid) {
+        initializedUserId = user.uid;
+        sessionInitialization = authController.initializeSession();
+      }
+      final initialization = sessionInitialization;
+      if (initialization != null) await initialization;
+
+      final isAuth = user != null;
       final isLoggingIn = state.matchedLocation == '/' || 
                           state.matchedLocation == '/login' || 
                           state.matchedLocation == '/register';

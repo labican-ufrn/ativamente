@@ -29,11 +29,11 @@ void main() {
     auth = FakeFirebaseAuth();
   });
 
-  group('AuthController.login', () {
+  group('AuthController.signIn', () {
     test('autentica com e-mail e senha', () async {
       final container = criarContainer();
 
-      await container.read(authControllerProvider).login('a@b.com', '123456');
+      await container.read(authControllerProvider).signIn('a@b.com', '123456');
 
       expect(auth.chamadas, ['signIn:a@b.com']);
     });
@@ -45,7 +45,7 @@ void main() {
         final container = criarContainer();
 
         await expectLater(
-          container.read(authControllerProvider).login('a@b.com', 'x'),
+          container.read(authControllerProvider).signIn('a@b.com', 'x'),
           throwsA(
             isA<FirebaseAuthException>()
                 .having((e) => e.code, 'code', 'wrong-password')
@@ -64,7 +64,7 @@ void main() {
       final container = criarContainer();
 
       await expectLater(
-        container.read(authControllerProvider).login('a@b.com', 'x'),
+        container.read(authControllerProvider).signIn('a@b.com', 'x'),
         throwsA(
           isA<Exception>().having(
             (e) => e.toString(),
@@ -154,6 +154,7 @@ void main() {
       final sub = container.listen(userDataProvider, (_, _) {});
       addTearDown(sub.close);
 
+      await container.read(authStateProvider.future);
       expect(await container.read(userDataProvider.future), isNull);
     });
 
@@ -177,7 +178,7 @@ void main() {
     });
 
     test(
-      'auto-cria Pessoas sem gravar role quando o documento não existe',
+      'emite null sem criar Pessoas quando o documento não existe',
       () async {
         final container = criarContainer(
           usuarioLogado: FakeUser(uid: 'uid-2', email: 'ana.souza@b.com'),
@@ -185,13 +186,9 @@ void main() {
 
         final pessoa = await lerPessoa(container);
 
-        expect(pessoa.nome, 'ana.souza');
-        expect(pessoa.nomeLogin, 'ana.souza@b.com');
-
+        expect(pessoa, isNull);
         final doc = await firestore.collection('Pessoas').doc('uid-2').get();
-        expect(doc.exists, isTrue);
-        expect(doc.data()!['nome'], 'ana.souza');
-        expect(doc.data()!.containsKey('role'), isFalse);
+        expect(doc.exists, isFalse);
       },
     );
   });
