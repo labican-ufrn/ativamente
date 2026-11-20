@@ -16,6 +16,7 @@ const rotasDoApp = [
   '/register',
   '/home',
   '/workout',
+  '/workout/outdoor',
   '/profile',
   '/edit-profile',
   '/add-user',

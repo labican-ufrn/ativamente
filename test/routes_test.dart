@@ -106,5 +106,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(WorkoutScreen), findsOneWidget);
+    expect(find.text('Coração'), findsOneWidget);
+
+    container.read(goRouterProvider).go('/workout/outdoor');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(WorkoutScreen), findsOneWidget);
+    expect(find.text('Ao Ar Livre'), findsOneWidget);
   });
 }

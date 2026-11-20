@@ -2,13 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/utils/intensity.dart';
+import '../../core/utils/time_formatters.dart';
 import '../../models/exercicio.dart';
 import '../../providers/tts_provider.dart';
 import '../../providers/firestore_provider.dart';
 import '../../providers/active_exercise_provider.dart';
 
+/// Fatia do estado de execução que a tela observa: muda só ao iniciar,
+/// pausar, parar ou trocar de exercício — nunca a cada tick do cronômetro.
+typedef _ExecucaoAtiva = ({String? exerciseId, bool isRunning});
+
+/// Comportamento ao sair da tela (Issue #45): o cronômetro **continua
+/// contando**. O `activeExerciseProvider` é global (sem `autoDispose`) de
+/// propósito — é a mesma sessão de execução exibida na lista e no detalhe do
+/// exercício, e o tempo é calculado pelo relógio, então segue correto mesmo
+/// com o app em segundo plano. Ao voltar para esta tela, o cronômetro mostra o
+/// tempo total decorrido e o exercício continua marcado como "Em execução".
+/// Para encerrar, o usuário usa Pausar ou Parar. Ver `docs/cronometro-exercicio.md`.
 class WorkoutScreen extends ConsumerStatefulWidget {
-  const WorkoutScreen({super.key});
+  final String? category;
+
+  const WorkoutScreen({super.key, this.category});
 
   @override
   ConsumerState<WorkoutScreen> createState() => _WorkoutScreenState();
@@ -17,22 +31,40 @@ class WorkoutScreen extends ConsumerStatefulWidget {
 class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
   String _selectedCategory = 'Coracao'; // Coracao or Musculo
 
-  String _formatTime(int seconds) {
-    int minutes = seconds ~/ 60;
-    int remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = widget.category ?? 'Coracao';
   }
 
+  @override
+  void didUpdateWidget(covariant WorkoutScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.category != widget.category) {
+      _selectedCategory = widget.category ?? 'Coracao';
+    }
+  }
+
+  bool get _hasFixedCategory => widget.category != null;
+
+  String get _categoryLabel {
+    switch (_selectedCategory) {
+      case 'NaRua':
+        return 'Ao Ar Livre';
+      case 'Musculo':
+        return 'Músculo';
+      default:
+        return 'Coração';
+    }
+  }
   void _filterByIntensity(int? intensidade) {
     ref.read(intensidadeFilterProvider.notifier).setIntensidade(intensidade);
   }
 
-  Widget _buildExerciseTile(
-    Exercicio exercicio,
-    ActiveExerciseState activeState,
-  ) {
+  Widget _buildExerciseTile(Exercicio exercicio, _ExecucaoAtiva execucao) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isActive = activeState.exerciseId == exercicio.id;
+    final isActive = execucao.exerciseId == exercicio.id;
+    final isRunning = isActive && execucao.isRunning;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -89,20 +121,13 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(
-                isActive && activeState.isRunning
-                    ? Icons.pause_circle_filled
-                    : Icons.play_circle_fill,
+                isRunning ? Icons.pause_circle_filled : Icons.play_circle_fill,
               ),
               color: colorScheme.primary,
               iconSize: 36,
               padding: const EdgeInsets.all(8),
-              constraints: const BoxConstraints(
-                minWidth: 48,
-                minHeight: 48,
-              ),
-              tooltip: isActive && activeState.isRunning
-                  ? 'Pausar exercício'
-                  : 'Iniciar exercício',
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              tooltip: isRunning ? 'Pausar exercício' : 'Iniciar exercício',
               onPressed: () => ref
                   .read(activeExerciseProvider.notifier)
                   .toggleExercise(exercicio.id),
@@ -116,13 +141,24 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activeState = ref.watch(activeExerciseProvider);
+    // Observa só "qual exercício" e "se está rodando" (mudam ao iniciar,
+    // pausar ou parar). O tick de cada segundo altera apenas elapsedSeconds,
+    // que é observado isoladamente por _CronometroTexto — assim a lista de
+    // exercícios não é reconstruída por segundo (Issue #45).
+    final execucao = ref.watch(
+      activeExerciseProvider.select(
+        (s) => (exerciseId: s.exerciseId, isRunning: s.isRunning),
+      ),
+    );
     final selectedIntensity = ref.watch(intensidadeFilterProvider);
     final hasIntensityFilter = selectedIntensity != null;
 
+    final categoryText = _hasFixedCategory
+        ? 'Exercícios ao ar livre.'
+        : 'Categorias Coração e Músculo.';
     final screenText = hasIntensityFilter
-        ? 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
-        : 'Tela de Treino. Tempo decorrido. Categorias Coração e Músculo. Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
+        ? 'Tela de Treino. Tempo decorrido. $categoryText Filtrado por intensidade ${rotuloIntensidade(selectedIntensity)}. Lista de exercícios.'
+        : 'Tela de Treino. Tempo decorrido. $categoryText Exercícios com níveis Leve, Moderado e Intenso. Lista de exercícios.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -157,61 +193,74 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
             padding: const EdgeInsets.symmetric(vertical: 24.0),
             child: Column(
               children: [
-                Text(
-                  _formatTime(activeState.elapsedSeconds),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    fontSize: 72,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const _CronometroTexto(),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        final activeId = activeState.exerciseId;
-                        if (activeId != null) {
-                          ref
-                              .read(activeExerciseProvider.notifier)
-                              .toggleExercise(activeId);
-                        }
-                      },
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: activeState.exerciseId != null
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onPrimary.withValues(alpha: 0.4),
-                        child: Icon(
-                          activeState.isRunning
-                              ? Icons.pause
-                              : Icons.play_arrow,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.primary,
+                    Tooltip(
+                      message: execucao.isRunning
+                          ? 'Pausar cronômetro'
+                          : 'Iniciar cronômetro',
+                      child: Semantics(
+                        button: true,
+                        label: execucao.isRunning
+                            ? 'Pausar cronômetro'
+                            : 'Iniciar cronômetro',
+                        enabled: execucao.exerciseId != null,
+                        child: InkWell(
+                          onTap: () {
+                            final activeId = execucao.exerciseId;
+                            if (activeId != null) {
+                              ref
+                                  .read(activeExerciseProvider.notifier)
+                                  .toggleExercise(activeId);
+                            }
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: execucao.exerciseId != null
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withValues(alpha: 0.4),
+                            child: Icon(
+                              execucao.isRunning ? Icons.pause : Icons.play_arrow,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 24),
-                    InkWell(
-                      onTap: () {
-                        ref
-                            .read(activeExerciseProvider.notifier)
-                            .stopExercise();
-                      },
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: activeState.exerciseId != null
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onPrimary.withValues(alpha: 0.4),
-                        child: Icon(
-                          Icons.stop,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.primary,
+                    Tooltip(
+                      message: 'Parar cronômetro',
+                      child: Semantics(
+                        button: true,
+                        label: 'Parar cronômetro',
+                        enabled: execucao.exerciseId != null,
+                        child: InkWell(
+                          onTap: () {
+                            if (execucao.exerciseId != null) {
+                              ref
+                                  .read(activeExerciseProvider.notifier)
+                                  .stopExercise();
+                            }
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: execucao.exerciseId != null
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withValues(alpha: 0.4),
+                            child: Icon(
+                              Icons.stop,
+                              size: 40,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -220,16 +269,17 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildCategoryTab(Icons.favorite, 'Coracao'),
-                _buildCategoryTab(Icons.fitness_center, 'Musculo'),
-              ],
+          if (!_hasFixedCategory)
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCategoryTab(Icons.favorite, 'Coracao'),
+                  _buildCategoryTab(Icons.fitness_center, 'Musculo'),
+                ],
+              ),
             ),
-          ),
           if (hasIntensityFilter)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -262,7 +312,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _selectedCategory == 'Coracao' ? 'Coração' : 'Músculo',
+                    _categoryLabel,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -296,7 +346,7 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                               itemBuilder: (context, index) {
                                 return _buildExerciseTile(
                                   filteredExercicios[index],
-                                  activeState,
+                                  execucao,
                                 );
                               },
                             );
@@ -364,12 +414,31 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
         child: CircleAvatar(
           radius: 30,
           backgroundColor: colorScheme.primary,
-          child: Icon(
-            icon,
-            color: colorScheme.onPrimary,
-            size: 30,
-          ),
+          child: Icon(icon, color: colorScheme.onPrimary, size: 30),
         ),
+      ),
+    );
+  }
+}
+
+/// Mostra o tempo decorrido. É o único widget da tela que observa
+/// `elapsedSeconds`, então o tick de 1 s reconstrói só este texto.
+class _CronometroTexto extends ConsumerWidget {
+  const _CronometroTexto();
+
+  static String formatarTempo(int seconds) => formatarSegundos(seconds);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final elapsed = ref.watch(
+      activeExerciseProvider.select((s) => s.elapsedSeconds),
+    );
+    return Text(
+      formatarTempo(elapsed),
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onPrimary,
+        fontSize: 72,
+        fontWeight: FontWeight.bold,
       ),
     );
   }

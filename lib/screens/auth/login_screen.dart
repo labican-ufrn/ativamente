@@ -27,8 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const screenText =
-        'AtivaMente. Tela de Login. Que bom ter você aqui! Campo usuário. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.';
+    const screenText = 'AtivaMente. Tela de Login. Que bom ter você aqui! Campo e-mail. Campo senha. Botão Entrar. Não possui uma conta? Cadastre-se.';
     final readScreen = ref.watch(readScreenProvider(screenText));
 
     return Scaffold(
@@ -107,16 +106,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
             ],
-            Text('Usuário', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'E-mail',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                hintText: 'Email ou Nome',
-                prefixIcon: Icon(
-                  Icons.person,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                hintText: 'Digite seu e-mail...',
+                prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.primary),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
                 hintStyle: TextStyle(
