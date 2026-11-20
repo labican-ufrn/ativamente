@@ -108,6 +108,11 @@ class FakeAuthController extends AuthController {
   }
 
   @override
+  Future<void> initializeSession() async {
+    chamadas.add(['initializeSession']);
+  }
+
+  @override
   Future<void> logout() async {
     chamadas.add(['logout']);
   }

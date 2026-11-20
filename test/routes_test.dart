@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:app_academia/providers/auth_provider.dart';
 import 'package:app_academia/providers/firestore_provider.dart';
@@ -12,13 +11,11 @@ import 'package:app_academia/screens/auth/login_screen.dart';
 import 'package:app_academia/screens/auth/welcome_screen.dart';
 import 'package:app_academia/screens/home/home_screen.dart';
 import 'package:app_academia/screens/workout/workout_screen.dart';
-import 'package:app_academia/theme.dart';
 
 import 'helpers/fakes.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  GoogleFonts.config.allowRuntimeFetching = false;
 
   Future<ProviderContainer> pumpApp(
     WidgetTester tester, {
@@ -27,6 +24,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         authStateProvider.overrideWith((ref) => Stream.value(usuario)),
+        authControllerProvider.overrideWith((ref) => FakeAuthController(ref)),
         userDataProvider.overrideWith((ref) => Stream.value(null)),
         exerciciosProvider.overrideWith((ref) => Stream.value(const [])),
         readScreenProvider.overrideWith((ref, text) => () {}),
@@ -42,7 +40,7 @@ void main() {
         container: container,
         child: Consumer(
           builder: (context, ref, _) => MaterialApp.router(
-            theme: AppTheme.theme,
+            theme: ThemeData(),
             routerConfig: ref.watch(goRouterProvider),
           ),
         ),
@@ -64,10 +62,13 @@ void main() {
     tester,
   ) async {
     final container = await pumpApp(tester);
+    final authController =
+        container.read(authControllerProvider) as FakeAuthController;
 
     container.read(goRouterProvider).go('/workout');
     await tester.pumpAndSettle();
 
+    expect(authController.chamadas, isEmpty);
     expect(find.byType(WorkoutScreen), findsNothing);
     expect(find.byType(WelcomeScreen), findsOneWidget);
   });
@@ -88,8 +89,16 @@ void main() {
       tester,
       usuario: FakeUser(uid: 'u1', email: 'maria@b.com'),
     );
+    final authController =
+        container.read(authControllerProvider) as FakeAuthController;
 
     expect(find.byType(HomeScreen), findsOneWidget);
+    expect(
+      authController.chamadas.where(
+        (call) => call.first == 'initializeSession',
+      ),
+      hasLength(1),
+    );
 
     container.read(goRouterProvider).go('/login');
     await tester.pumpAndSettle();
@@ -101,10 +110,18 @@ void main() {
       tester,
       usuario: FakeUser(uid: 'u1', email: 'maria@b.com'),
     );
+    final authController =
+        container.read(authControllerProvider) as FakeAuthController;
 
     container.read(goRouterProvider).go('/workout');
     await tester.pumpAndSettle();
 
+    expect(
+      authController.chamadas.where(
+        (call) => call.first == 'initializeSession',
+      ),
+      hasLength(1),
+    );
     expect(find.byType(WorkoutScreen), findsOneWidget);
     expect(find.text('Coração'), findsOneWidget);
 
