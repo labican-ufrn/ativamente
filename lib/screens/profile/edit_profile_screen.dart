@@ -116,6 +116,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
   }
 
+  Future<void> _retryProfileInitialization() async {
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(authControllerProvider).initializeSession();
+    } catch (error, stackTrace) {
+      debugPrint('Falha ao inicializar o perfil: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar perfil: $error')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   String? _validateDataNascimento(String? value) {
     if (value == null || value.isEmpty) return 'Informe a data de nascimento';
     
@@ -203,10 +222,33 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       ),
       body: userDataAsync.when(
         data: (pessoa) {
-          if (pessoa != null) {
-            _initControllers(pessoa);
+          if (pessoa == null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Seu perfil ainda não está disponível.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed:
+                          _isLoading ? null : _retryProfileInitialization,
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Tentar novamente'),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
+          _initControllers(pessoa);
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Form(
